@@ -1,0 +1,26 @@
+# Learn more about configuring your app at https://shopify.dev/docs/apps/tools/cli/configuration
+
+client_id = "6f1b15dd970f4535404ddd0d71402124"
+name = "Atribe"
+application_url = "https://crumpled-vanish-debtor.ngrok-free.dev"
+embedded = false
+
+[build]
+automatically_update_urls_on_dev = false
+
+[webhooks]
+api_version = "2026-04"
+
+[[webhooks.subscriptions]]
+uri = "/webhooks/app_uninstalled"
+compliance_topics = [ "customers/data_request", "customers/redact", "shop/redact" ]
+topics = [ "app/uninstalled" ]
+
+[access_scopes]
+# Learn more at https://shopify.dev/docs/apps/tools/cli/configuration#access_scopes
+scopes = "read_products,read_orders,read_script_tags,write_script_tags"
+optional_scopes = [ ]
+use_legacy_install_flow = false
+
+[auth]
+redirect_urls = [ "https://crumpled-vanish-debtor.ngrok-free.dev/auth/callback" ]

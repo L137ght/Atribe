@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,wght@0,300;0,400;0,500;0,700;1,300;1,400&amp;family=Manrope:wght@400;500;700&amp;family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          "colors": {
+            "outline-muted": "#55414a",
+            "on-secondary-container": "#cfacb9",
+            "secondary": "#e2bdcb",
+            "on-secondary-fixed-variant": "#5a3f4b",
+            "on-primary": "#620043",
+            "surface-tint": "#ffafd6",
+            "tertiary-fixed": "#b4f490",
+            "surface-variant": "#3e3137",
+            "inverse-surface": "#f2dde4",
+            "primary-fixed": "#ffd8e8",
+            "on-secondary": "#422934",
+            "on-primary-container": "#ff99ce",
+            "on-tertiary-container": "#8cca6b",
+            "surface-dim": "#1b1015",
+            "error": "#ffb4ab",
+            "surface-container": "#281c22",
+            "primary-container": "#8f0164",
+            "surface": "#1b1015",
+            "midnight-violet-elevated": "#1d1116",
+            "on-primary-fixed": "#3c0028",
+            "surface-container-low": "#24181e",
+            "secondary-fixed": "#ffd8e7",
+            "on-surface-variant": "#dbbfca",
+            "primary-fixed-dim": "#ffafd6",
+            "midnight-violet-base": "#120a0e",
+            "surface-bright": "#43363b",
+            "inverse-on-surface": "#3a2d32",
+            "alabaster-grey": "#d7dedc",
+            "secondary-container": "#5a3f4b",
+            "error-container": "#93000a",
+            "on-primary-fixed-variant": "#8a0060",
+            "surface-container-high": "#33272c",
+            "surface-container-lowest": "#150b10",
+            "on-error-container": "#ffdad6",
+            "on-surface": "#f2dde4",
+            "on-secondary-fixed": "#2a151f",
+            "tertiary-fixed-dim": "#99d776",
+            "tertiary": "#99d776",
+            "on-background": "#f2dde4",
+            "inverse-primary": "#aa247a",
+            "surface-container-highest": "#3e3137",
+            "tertiary-container": "#1f5500",
+            "on-tertiary-fixed-variant": "#1d5200",
+            "on-tertiary": "#123800",
+            "dark-raspberry": "#8f0164",
+            "secondary-fixed-dim": "#e2bdcb",
+            "primary": "#ffafd6",
+            "background": "#1b1015",
+            "on-error": "#690005",
+            "outline": "#a38a94",
+            "on-tertiary-fixed": "#082100",
+            "outline-variant": "#55414a"
+          },
+          "borderRadius": {
+            "DEFAULT": "0.125rem",
+            "lg": "0.25rem",
+            "xl": "0.5rem",
+            "full": "0.75rem"
+          },
+          "spacing": {
+            "unit": "4px",
+            "gutter": "24px",
+            "lg": "2.5rem",
+            "md": "1.5rem",
+            "margin": "max(5vw, 24px)",
+            "xs": "0.5rem",
+            "xl": "4rem",
+            "sm": "1rem"
+          },
+          "fontFamily": {
+            "h3": ["Newsreader"],
+            "h1": ["Newsreader"],
+            "body-lg": ["Manrope"],
+            "h2": ["Newsreader"],
+            "body-md": ["Manrope"],
+            "display": ["Newsreader"],
+            "label-caps": ["Manrope"]
+          },
+          "fontSize": {
+            "h3": ["1.5rem", {"lineHeight": "1.4", "fontWeight": "500"}],
+            "h1": ["3rem", {"lineHeight": "1.2", "fontWeight": "400"}],
+            "body-lg": ["1.125rem", {"lineHeight": "1.7", "fontWeight": "400"}],
+            "h2": ["2.25rem", {"lineHeight": "1.3", "fontWeight": "400"}],
+            "body-md": ["1rem", {"lineHeight": "1.6", "fontWeight": "400"}],
+            "display": ["4.5rem", {"lineHeight": "1.1", "letterSpacing": "-0.02em", "fontWeight": "300"}],
+            "label-caps": ["0.75rem", {"lineHeight": "1.2", "letterSpacing": "0.1em", "fontWeight": "700"}]
+          }
+        },
+      },
+    }
+  </script>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-midnight-violet-base text-on-background font-body-md selection:bg-dark-raspberry selection:text-white">
+<!-- Shared Component: TopAppBar -->
+<header class="fixed top-0 z-50 w-full flex justify-between items-center px-6 py-4 bg-zinc-950/70 backdrop-blur-xl border-b border-white/10">
+<div class="flex items-center gap-4">
+<button class="material-symbols-outlined text-zinc-100 hover:bg-white/5 transition-colors p-2 rounded">menu</button>
+<span class="text-2xl font-serif italic text-pink-700 dark:text-pink-600">Atribe</span>
+</div>
+<div class="flex items-center gap-6">
+<nav class="hidden md:flex gap-8 items-center">
+<a class="font-sans text-[10px] font-medium tracking-widest uppercase text-zinc-400 hover:bg-white/5 transition-colors px-2 py-1" href="#">Route</a>
+<a class="font-sans text-[10px] font-medium tracking-widest uppercase text-zinc-400 hover:bg-white/5 transition-colors px-2 py-1" href="#">Links</a>
+<a class="font-sans text-[10px] font-medium tracking-widest uppercase text-zinc-400 hover:bg-white/5 transition-colors px-2 py-1" href="#">Creators</a>
+<a class="font-sans text-[10px] font-medium tracking-widest uppercase text-pink-600 font-bold px-2 py-1" href="#">Discover</a>
+</nav>
+<div class="w-10 h-10 rounded-full overflow-hidden border border-white/10">
+<img class="w-full h-full object-cover" data-alt="close-up portrait of a professional woman with a calm expression against a dark textured background" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAZHQQq5os9dmHQCNtyQxoyhF9iGQGSmMa8E9sMVpgfIp0gPLg5EXArDTdMoQ-_wWqlnPvyRiKCxjStBq_-ihhsBiLVraBpv1GSa53u7YZiZEmEu05zH2c35JGQUn7ALUnVer87ypRlwBnbYQyUnGqVHIQ8j_psq_s4qYFR0RNt5q2KeykZYfVhjyl_3qAXMzTEhTJ-kvBM1YKjNNARMBxklYPuVjxlXq_CQsNwb21GTnsj3XxN3Y4RyhXwdvhSPJr4vTRNPbAE_lFU"/>
+</div>
+</div>
+</header>
+<!-- Content Canvas -->
+<main class="min-h-screen pt-32 pb-40 px-margin flex flex-col items-center">
+<!-- Hero Section / Fallback State -->
+<section class="max-w-4xl w-full text-center">
+<div class="mb-lg">
+<span class="font-label-caps text-label-caps text-dark-raspberry uppercase tracking-[0.2em] block mb-sm">Unmapped Territory</span>
+<h1 class="font-h1 text-h1 text-on-surface mb-md">This domain is currently <span class="italic">unclaimed</span>.</h1>
+<p class="font-body-lg text-body-lg text-on-surface-variant max-w-2xl mx-auto">
+          We couldn't find any creators currently supporting this URL. Our network is expanding daily as thinkers and artists reclaim their digital footprints.
+        </p>
+</div>
+<!-- Asymmetric Bento-style Layout for Actions -->
+<div class="grid grid-cols-1 md:grid-cols-12 gap-gutter text-left">
+<!-- Main Action Card -->
+<div class="md:col-span-7 bg-surface-container border border-white/5 p-lg rounded-xl flex flex-col justify-between">
+<div>
+<h2 class="font-h3 text-h3 text-on-surface mb-sm italic">Request this Domain</h2>
+<p class="font-body-md text-body-md text-on-surface-variant mb-lg">
+              Want to see a specific creator here? Let us know, and we'll reach out to bridge the gap.
+            </p>
+</div>
+<div class="relative">
+<input class="w-full bg-surface-container-lowest border-0 border-b border-outline-muted py-4 px-0 focus:ring-0 focus:border-dark-raspberry text-on-surface transition-all" placeholder="Paste the domain URL here..." type="text"/>
+<button class="absolute right-0 bottom-3 text-dark-raspberry font-label-caps uppercase tracking-widest text-[10px] hover:opacity-80 transition-opacity">Submit</button>
+</div>
+</div>
+<!-- Suggestion Card -->
+<div class="md:col-span-5 bg-dark-raspberry p-lg rounded-xl text-primary-fixed flex flex-col justify-between overflow-hidden relative">
+<div class="relative z-10">
+<h2 class="font-h3 text-h3 mb-sm">Explore Atribe</h2>
+<p class="font-body-md text-body-md opacity-90 mb-lg">
+              Discover verified creators who are already shaping the new web.
+            </p>
+</div>
+<button class="relative z-10 w-full bg-primary-fixed text-on-primary-fixed font-label-caps py-4 rounded transition-transform hover:scale-[1.02] active:scale-95">
+            Browse Creators
+          </button>
+<!-- Decorative Background Image/Texture -->
+<div class="absolute inset-0 opacity-10">
+<img class="w-full h-full object-cover" data-alt="abstract dark texture with organic flowing lines resembling charcoal strokes on paper" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDJEeJNBtQ0bNDU0HAzNYberujE6a9z9aJtqH51WAl-XMw1ZhFiI2l1kgLjG8iXpKnH2FKBD_L3UaTyP_61UcnhYcHeIfx8hrTdekLzRGHml8q6X07fIjYbCdfRqPoh-fuya8i_IJ5aqRWKFdykFnBoMc167QCq7U6kJ44OXz4wcUSjiC5t8sMH9dJS6B-r8lZZErl68YlP-F__EpSWRMKAphvFwGZhZDNq0OjMv5fq8PMDXq-tm87r--tXAkuRryvRBAnTcq8qI5lZ"/>
+</div>
+</div>
+<!-- Editorial Content Column -->
+<div class="md:col-span-12 mt-md">
+<div class="grid grid-cols-1 md:grid-cols-3 gap-gutter">
+<div class="border-l border-dark-raspberry pl-md py-2">
+<span class="font-label-caps text-[10px] text-dark-raspberry block mb-2">01</span>
+<h3 class="font-h3 text-[1.125rem] text-on-surface mb-2">Universal Identity</h3>
+<p class="font-body-md text-sm text-on-surface-variant">Atribe allows creators to map their identity across any domain, creating a decentralized web of trust.</p>
+</div>
+<div class="border-l border-white/10 pl-md py-2">
+<span class="font-label-caps text-[10px] text-on-surface-variant block mb-2">02</span>
+<h3 class="font-h3 text-[1.125rem] text-on-surface mb-2">Community Driven</h3>
+<p class="font-body-md text-sm text-on-surface-variant">The map grows through user discovery and creator verification. Help us bridge the gaps.</p>
+</div>
+<div class="border-l border-white/10 pl-md py-2">
+<span class="font-label-caps text-[10px] text-on-surface-variant block mb-2">03</span>
+<h3 class="font-h3 text-[1.125rem] text-on-surface mb-2">Nocturne Protocol</h3>
+<p class="font-body-md text-sm text-on-surface-variant">Designed for deep work and focused reading, away from the noise of traditional social streams.</p>
+</div>
+</div>
+</div>
+</div>
+<!-- Editorial Quote -->
+<blockquote class="mt-xl text-left max-w-2xl border-l-4 border-dark-raspberry pl-lg py-4 mx-auto">
+<p class="font-h2 text-h3 italic text-on-surface mb-4">"The web is not just a place to host content; it is a landscape where every domain should tell a story."</p>
+<cite class="font-label-caps text-[10px] text-on-surface-variant not-italic tracking-[0.15em]">— The Atribe Manifesto</cite>
+</blockquote>
+</section>
+</main>
+<!-- Shared Component: BottomNavBar -->
+<nav class="fixed bottom-0 left-0 w-full flex justify-around items-center px-4 pb-6 pt-3 bg-zinc-950/80 backdrop-blur-lg border-t border-white/5 z-50 md:hidden">
+<a class="flex flex-col items-center justify-center text-zinc-500 hover:text-zinc-300 transition-all" href="#">
+<span class="material-symbols-outlined mb-1">directions_run</span>
+<span class="font-sans text-[10px] font-medium tracking-widest uppercase">Route</span>
+</a>
+<a class="flex flex-col items-center justify-center text-zinc-500 hover:text-zinc-300 transition-all" href="#">
+<span class="material-symbols-outlined mb-1">link</span>
+<span class="font-sans text-[10px] font-medium tracking-widest uppercase">Links</span>
+</a>
+<a class="flex flex-col items-center justify-center text-zinc-500 hover:text-zinc-300 transition-all" href="#">
+<span class="material-symbols-outlined mb-1">group</span>
+<span class="font-sans text-[10px] font-medium tracking-widest uppercase">Creators</span>
+</a>
+<a class="flex flex-col items-center justify-center bg-pink-900/20 text-pink-500 rounded-xl px-3 py-1 scale-95 duration-150" href="#">
+<span class="material-symbols-outlined mb-1">explore</span>
+<span class="font-sans text-[10px] font-medium tracking-widest uppercase">Discover</span>
+</a>
+</nav>
+</body></html>

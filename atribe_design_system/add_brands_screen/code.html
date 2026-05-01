@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Nocturne Creator Dashboard - Connect Brands</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,wght@0,300;0,400;0,500;1,300;1,400&amp;family=Manrope:wght@400;500;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              "colors": {
+                      "on-primary-fixed-variant": "#8a0060",
+                      "on-secondary-container": "#cfacb9",
+                      "alabaster-grey": "#d7dedc",
+                      "on-error": "#690005",
+                      "on-background": "#f2dde4",
+                      "tertiary-container": "#1f5500",
+                      "inverse-on-surface": "#3a2d32",
+                      "surface-tint": "#ffafd6",
+                      "surface-dim": "#1b1015",
+                      "on-secondary-fixed-variant": "#5a3f4b",
+                      "on-secondary-fixed": "#2a151f",
+                      "tertiary-fixed": "#b4f490",
+                      "primary": "#ffafd6",
+                      "outline": "#a38a94",
+                      "secondary": "#e2bdcb",
+                      "surface-container": "#281c22",
+                      "surface-variant": "#3e3137",
+                      "on-error-container": "#ffdad6",
+                      "error": "#ffb4ab",
+                      "midnight-violet-base": "#120a0e",
+                      "error-container": "#93000a",
+                      "dark-raspberry": "#8f0164",
+                      "on-primary-container": "#ff99ce",
+                      "outline-muted": "#55414a",
+                      "on-surface": "#f2dde4",
+                      "midnight-violet-elevated": "#1d1116",
+                      "on-tertiary-fixed-variant": "#1d5200",
+                      "surface-container-low": "#24181e",
+                      "surface-bright": "#43363b",
+                      "primary-fixed-dim": "#ffafd6",
+                      "on-surface-variant": "#dbbfca",
+                      "inverse-surface": "#f2dde4",
+                      "inverse-primary": "#aa247a",
+                      "primary-fixed": "#ffd8e8",
+                      "primary-container": "#8f0164",
+                      "on-tertiary": "#123800",
+                      "surface": "#1b1015",
+                      "outline-variant": "#55414a",
+                      "on-primary": "#620043",
+                      "surface-container-highest": "#3e3137",
+                      "on-tertiary-fixed": "#082100",
+                      "on-primary-fixed": "#3c0028",
+                      "surface-container-high": "#33272c",
+                      "secondary-fixed": "#ffd8e7",
+                      "on-tertiary-container": "#8cca6b",
+                      "secondary-fixed-dim": "#e2bdcb",
+                      "tertiary": "#99d776",
+                      "surface-container-lowest": "#150b10",
+                      "background": "#1b1015",
+                      "on-secondary": "#422934",
+                      "tertiary-fixed-dim": "#99d776",
+                      "secondary-container": "#5a3f4b"
+              },
+              "borderRadius": {
+                      "DEFAULT": "0.125rem",
+                      "lg": "0.25rem",
+                      "xl": "0.5rem",
+                      "full": "0.75rem"
+              },
+              "spacing": {
+                      "xs": "0.5rem",
+                      "md": "1.5rem",
+                      "lg": "2.5rem",
+                      "xl": "4rem",
+                      "sm": "1rem",
+                      "margin": "max(5vw, 24px)",
+                      "gutter": "24px",
+                      "unit": "4px"
+              },
+              "fontFamily": {
+                      "body-md": ["Manrope"],
+                      "label-caps": ["Manrope"],
+                      "h3": ["Newsreader"],
+                      "display": ["Newsreader"],
+                      "h1": ["Newsreader"],
+                      "body-lg": ["Manrope"],
+                      "h2": ["Newsreader"]
+              },
+              "fontSize": {
+                      "body-md": ["1rem", {"lineHeight": "1.6", "fontWeight": "400"}],
+                      "label-caps": ["0.75rem", {"lineHeight": "1.2", "letterSpacing": "0.1em", "fontWeight": "700"}],
+                      "h3": ["1.5rem", {"lineHeight": "1.4", "fontWeight": "500"}],
+                      "display": ["4.5rem", {"lineHeight": "1.1", "letterSpacing": "-0.02em", "fontWeight": "300"}],
+                      "h1": ["3rem", {"lineHeight": "1.2", "fontWeight": "400"}],
+                      "body-lg": ["1.125rem", {"lineHeight": "1.7", "fontWeight": "400"}],
+                      "h2": ["2.25rem", {"lineHeight": "1.3", "fontWeight": "400"}]
+              }
+            },
+          },
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        body {
+            background-color: #1b1015;
+            color: #f2dde4;
+        }
+        .hide-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .hide-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+    </style>
+<style>
+        body {
+          min-height: max(884px, 100dvh);
+        }
+    </style>
+</head>
+<body class="font-body-md bg-background min-h-screen pb-32">
+<!-- TopAppBar -->
+<header class="bg-stone-950/70 backdrop-blur-xl docked full-width top-0 z-50 border-b border-stone-800/50 flex justify-between items-center px-6 h-16 w-full sticky">
+<div class="flex items-center gap-4">
+<span class="material-symbols-outlined text-stone-50">menu</span>
+<h1 class="font-serif italic text-2xl text-stone-50 dark:text-stone-100">Atribe</h1>
+</div>
+<div class="h-8 w-8 rounded-full overflow-hidden bg-surface-variant border border-outline-muted">
+<img alt="Creator profile picture" class="h-full w-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDiXARwQzIN652qOr2tWpBdQoa07SlwmRxAoyrIawC1zIbi3dQf0gTI2eA13PLlQkFqyE3MZ5bZIaeGif0SOURE6AlTV41F_uog8DFiJLG4c-0bIrPCqhq3o1g_piwRxS_Ld7y_71zXgLFbVlnQB_N03ViC5YX6sIGdPOgobcu05h9ZY1NT8GRLGXed5MW0jbtAGirrGJ4OfFCjk6XQwc3FUDaL50N6-aN_l9h_sAKfEFbJsQkSGYF5df74ZAejhqLwmYVKQBmmJlJb"/>
+</div>
+</header>
+<main class="max-w-4xl mx-auto px-margin pt-lg">
+<!-- Page Header -->
+<div class="mb-xl">
+<h2 class="font-h1 text-h1 text-on-surface mb-xs">Connect Brands</h2>
+<p class="font-body-lg text-body-lg text-on-surface-variant max-w-2xl">Integrate your premium affiliate partnerships. Link your existing codes or discover new exclusive programs.</p>
+</div>
+<!-- Search & Filter -->
+<div class="mb-lg relative">
+<div class="absolute inset-y-0 left-4 flex items-center pointer-events-none">
+<span class="material-symbols-outlined text-outline">search</span>
+</div>
+<input class="w-full bg-midnight-violet-elevated border-b border-outline-muted py-4 pl-12 pr-4 focus:outline-none focus:border-dark-raspberry text-body-md transition-colors placeholder:text-outline-muted" placeholder="Search brands (Aesop, Ssense, Toteme...)" type="text"/>
+</div>
+<!-- Brand Grid - Uniform 2 Column -->
+<div class="grid grid-cols-2 gap-gutter">
+<!-- Brand Card 1: Aesop (Expanded Example) -->
+<div class="col-span-2 bg-midnight-violet-elevated border border-outline-muted/30 p-md flex flex-col group transition-all duration-300">
+<div class="flex items-start justify-between mb-4">
+<div class="flex items-center gap-md">
+<div class="w-16 h-16 bg-stone-900 border border-outline-muted/20 flex items-center justify-center p-2">
+<img alt="Aesop Logo" class="h-full w-full object-contain filter grayscale invert" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCrpK5I4k3134S4VMBsZ-0rez7WcvDquz-duyT3vGHawtC14H0QX-CZoSZE1zk0qRlrh8B2v21R9ma1Zq5Q94c7HOtKBX4u86Ute96Kd9RpIvybI5R9rSxnnDY-WQsSEG9WwvP3AtNNDMs5ZW7qB6v1QxkvPIUC16HEu6MhLStd_xt7V_h-_L5m9x0H9yV9z9EYfG4cqll_XgkWadcAqqDMxivVE7sPKXrrZR6hpu9u5rsEj41qxz6aiP9a1Qol9C-lc5YcTSPkervv"/>
+</div>
+<div>
+<h3 class="font-h3 text-h3 text-on-surface leading-none mb-1">Aesop</h3>
+<span class="font-label-caps text-[10px] text-on-secondary-container tracking-wider">SKINCARE • APOTHECARY</span>
+</div>
+</div>
+<span class="material-symbols-outlined text-primary">keyboard_arrow_up</span>
+</div>
+<div class="pt-md border-t border-outline-muted/20 animate-in fade-in duration-500">
+<div class="grid grid-cols-1 md:grid-cols-2 gap-md mb-lg">
+<div class="flex flex-col">
+<label class="block font-label-caps text-label-caps text-outline-muted mb-xs">AFFILIATE URL</label>
+<input class="w-full bg-midnight-violet-base border-b border-outline-muted py-2 focus:outline-none focus:border-dark-raspberry text-body-md" placeholder="https://aesop.com/r/creator..." type="text"/>
+</div>
+<div class="flex flex-col">
+<label class="block font-label-caps text-label-caps text-outline-muted mb-xs">COUPON CODE</label>
+<input class="w-full bg-midnight-violet-base border-b border-outline-muted py-2 focus:outline-none focus:border-dark-raspberry text-body-md" placeholder="EXTRA15" type="text"/>
+</div>
+</div>
+<div class="flex flex-col gap-sm">
+<button class="w-full bg-dark-raspberry text-alabaster-grey py-3 font-label-caps tracking-widest hover:brightness-110 transition-all">SAVE CONNECTION</button>
+<a class="text-center py-2 text-primary font-body-md font-bold border border-primary/20 hover:bg-primary/5 transition-all" href="#">Join Program</a>
+</div>
+</div>
+</div>
+<!-- Brand Card 2: Ssense -->
+<div class="bg-midnight-violet-elevated border border-outline-muted/30 p-md flex flex-col group h-full">
+<div class="flex items-start justify-between mb-4">
+<div class="w-14 h-14 bg-stone-900 border border-outline-muted/20 flex items-center justify-center p-2 shrink-0">
+<span class="font-serif font-bold text-xs text-stone-300">SSENSE</span>
+</div>
+<span class="material-symbols-outlined text-outline-muted group-hover:text-primary transition-colors">keyboard_arrow_down</span>
+</div>
+<div class="mt-auto">
+<h3 class="font-h3 text-xl text-on-surface leading-tight mb-1">Ssense</h3>
+<div class="flex items-center gap-2">
+<span class="bg-surface-container text-outline-muted px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-tighter">Connected</span>
+</div>
+</div>
+</div>
+<!-- Brand Card 3: Mejuri -->
+<div class="bg-midnight-violet-elevated border border-outline-muted/30 p-md flex flex-col group h-full">
+<div class="flex items-start justify-between mb-4">
+<div class="w-14 h-14 bg-stone-900 border border-outline-muted/20 flex items-center justify-center overflow-hidden shrink-0">
+<img alt="Mejuri Aesthetics" class="h-full w-full object-cover opacity-80" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDHrg84TvrE5CNPUVgIepD1msEQr1FJ1NsAAG7WMj-RA-4phJiPB8nIvP5p_DHafVUTFSu7oybmQW8SnTUVpytqDhfcnSgRR2Q21AF8yqrrcIFMIOkmehSLiJC-3iiGW88QXmm4k7iGZZxYOcT8xb1F-6j7vTq6MP5tw3l0ujiz6e05bvK3i5fINocH-chUTykJypcysXawE0BtmfQX-oUWntJFYQkXw4amRPv_NvxZWjctmLF5SoZoW9zMkYOlxSU8XMyHmLnqA6YI"/>
+</div>
+<span class="material-symbols-outlined text-outline-muted group-hover:text-primary transition-colors">add</span>
+</div>
+<div class="mt-auto">
+<h3 class="font-h3 text-xl text-on-surface leading-tight mb-1">Mejuri</h3>
+<span class="font-label-caps text-[9px] text-on-secondary-container uppercase tracking-wider">Fine Jewelry</span>
+</div>
+</div>
+<!-- Brand Card 4: Toteme -->
+<div class="bg-midnight-violet-elevated border border-outline-muted/30 p-md flex flex-col group h-full">
+<div class="flex items-start justify-between mb-4">
+<div class="w-14 h-14 bg-stone-900 border border-outline-muted/20 flex items-center justify-center p-2 shrink-0">
+<span class="font-serif italic text-sm text-stone-400">Toteme</span>
+</div>
+<span class="material-symbols-outlined text-outline-muted group-hover:text-primary transition-colors">add</span>
+</div>
+<div class="mt-auto">
+<h3 class="font-h3 text-xl text-on-surface leading-tight mb-1">Toteme</h3>
+<span class="font-label-caps text-[9px] text-on-secondary-container uppercase tracking-wider">Minimalism</span>
+</div>
+</div>
+<!-- Brand Card 5: Net-A-Porter (Featured uniform) -->
+<div class="bg-gradient-to-br from-midnight-violet-elevated to-surface-container-low border border-outline-muted/30 p-md flex flex-col group h-full">
+<div class="flex items-start justify-between mb-4">
+<div class="w-14 h-14 bg-stone-950 border border-outline-muted/20 flex items-center justify-center text-center shrink-0">
+<span class="font-serif text-[7px] leading-tight tracking-[0.2em] text-stone-100 px-1">NET-A-PORTER</span>
+</div><span class="material-symbols-outlined text-outline-muted group-hover:text-primary transition-colors">add</span>
+</div>
+<div class="mt-auto">
+<h3 class="font-h3 text-xl text-on-surface leading-tight mb-1">Net-A-Porter</h3>
+<span class="font-label-caps text-[9px] text-on-secondary-container uppercase tracking-wider">Luxury Fashion</span></div>
+</div>
+<!-- Brand Card 6: Byredo (New item for grid completeness) -->
+<div class="bg-midnight-violet-elevated border border-outline-muted/30 p-md flex flex-col group h-full">
+<div class="flex items-start justify-between mb-4">
+<div class="w-14 h-14 bg-stone-900 border border-outline-muted/20 flex items-center justify-center p-2 shrink-0">
+<span class="font-serif font-medium text-sm text-stone-300">BYREDO</span>
+</div>
+<span class="material-symbols-outlined text-outline-muted group-hover:text-primary transition-colors">add</span>
+</div>
+<div class="mt-auto">
+<h3 class="font-h3 text-xl text-on-surface leading-tight mb-1">Byredo</h3>
+<span class="font-label-caps text-[9px] text-on-secondary-container uppercase tracking-wider">Fragrance</span>
+</div>
+</div>
+</div>
+</main>
+<!-- BottomNavBar -->
+<nav class="fixed bottom-0 left-0 w-full flex justify-around items-center pt-3 pb-6 px-4 bg-stone-950/80 backdrop-blur-2xl z-50 border-t border-stone-800/30">
+<a class="flex flex-col items-center justify-center text-stone-500 space-y-1 hover:text-stone-200 transition-all" href="#">
+<span class="material-symbols-outlined">auto_awesome</span>
+<span class="font-sans text-[10px] tracking-widest uppercase font-medium">Curation</span>
+</a>
+<a class="flex flex-col items-center justify-center text-fuchsia-500 font-bold space-y-1 hover:text-stone-200 transition-all" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">handshake</span>
+<span class="font-sans text-[10px] tracking-widest uppercase font-medium">Brands</span>
+</a>
+<a class="flex flex-col items-center justify-center text-stone-500 space-y-1 hover:text-stone-200 transition-all" href="#">
+<span class="material-symbols-outlined">analytics</span>
+<span class="font-sans text-[10px] tracking-widest uppercase font-medium">Insights</span>
+</a>
+<a class="flex flex-col items-center justify-center text-stone-500 space-y-1 hover:text-stone-200 transition-all" href="#">
+<span class="material-symbols-outlined">menu_book</span>
+<span class="font-sans text-[10px] tracking-widest uppercase font-medium">Library</span>
+</a>
+</nav>
+</body></html>

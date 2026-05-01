@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,wght@0,300;0,400;0,500;1,300;1,400&amp;family=Manrope:wght@400;500;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "outline-muted": "#55414a",
+                    "on-secondary-container": "#cfacb9",
+                    "secondary": "#e2bdcb",
+                    "on-secondary-fixed-variant": "#5a3f4b",
+                    "on-primary": "#620043",
+                    "surface-tint": "#ffafd6",
+                    "tertiary-fixed": "#b4f490",
+                    "surface-variant": "#3e3137",
+                    "inverse-surface": "#f2dde4",
+                    "primary-fixed": "#ffd8e8",
+                    "on-secondary": "#422934",
+                    "on-primary-container": "#ff99ce",
+                    "on-tertiary-container": "#8cca6b",
+                    "surface-dim": "#1b1015",
+                    "error": "#ffb4ab",
+                    "surface-container": "#281c22",
+                    "primary-container": "#8f0164",
+                    "surface": "#1b1015",
+                    "midnight-violet-elevated": "#1d1116",
+                    "on-primary-fixed": "#3c0028",
+                    "surface-container-low": "#24181e",
+                    "secondary-fixed": "#ffd8e7",
+                    "on-surface-variant": "#dbbfca",
+                    "primary-fixed-dim": "#ffafd6",
+                    "midnight-violet-base": "#120a0e",
+                    "surface-bright": "#43363b",
+                    "inverse-on-surface": "#3a2d32",
+                    "alabaster-grey": "#d7dedc",
+                    "secondary-container": "#5a3f4b",
+                    "error-container": "#93000a",
+                    "on-primary-fixed-variant": "#8a0060",
+                    "surface-container-high": "#33272c",
+                    "surface-container-lowest": "#150b10",
+                    "on-error-container": "#ffdad6",
+                    "on-surface": "#f2dde4",
+                    "on-secondary-fixed": "#2a151f",
+                    "tertiary-fixed-dim": "#99d776",
+                    "tertiary": "#99d776",
+                    "on-background": "#f2dde4",
+                    "inverse-primary": "#aa247a",
+                    "surface-container-highest": "#3e3137",
+                    "tertiary-container": "#1f5500",
+                    "on-tertiary-fixed-variant": "#1d5200",
+                    "on-tertiary": "#123800",
+                    "dark-raspberry": "#8f0164",
+                    "secondary-fixed-dim": "#e2bdcb",
+                    "primary": "#ffafd6",
+                    "background": "#1b1015",
+                    "on-error": "#690005",
+                    "outline": "#a38a94",
+                    "on-tertiary-fixed": "#082100",
+                    "outline-variant": "#55414a"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.125rem",
+                    "lg": "0.25rem",
+                    "xl": "0.5rem",
+                    "full": "0.75rem"
+            },
+            "spacing": {
+                    "unit": "4px",
+                    "gutter": "24px",
+                    "lg": "2.5rem",
+                    "md": "1.5rem",
+                    "margin": "max(5vw, 24px)",
+                    "xs": "0.5rem",
+                    "xl": "4rem",
+                    "sm": "1rem"
+            },
+            "fontFamily": {
+                    "h3": ["Newsreader"],
+                    "h1": ["Newsreader"],
+                    "body-lg": ["Manrope"],
+                    "h2": ["Newsreader"],
+                    "body-md": ["Manrope"],
+                    "display": ["Newsreader"],
+                    "label-caps": ["Manrope"]
+            },
+            "fontSize": {
+                    "h3": ["1.5rem", {"lineHeight": "1.4", "fontWeight": "500"}],
+                    "h1": ["3rem", {"lineHeight": "1.2", "fontWeight": "400"}],
+                    "body-lg": ["1.125rem", {"lineHeight": "1.7", "fontWeight": "400"}],
+                    "h2": ["2.25rem", {"lineHeight": "1.3", "fontWeight": "400"}],
+                    "body-md": ["1rem", {"lineHeight": "1.6", "fontWeight": "400"}],
+                    "display": ["4.5rem", {"lineHeight": "1.1", "letterSpacing": "-0.02em", "fontWeight": "300"}],
+                    "label-caps": ["0.75rem", {"lineHeight": "1.2", "letterSpacing": "0.1em", "fontWeight": "700"}]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        body {
+            background-color: #120a0e;
+            color: #f2dde4;
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 24;
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="min-h-screen flex flex-col font-body-md selection:bg-dark-raspberry selection:text-white">
+<!-- TopAppBar from Shared Components JSON -->
+<header class="fixed top-0 z-50 w-full bg-zinc-950/70 backdrop-blur-xl border-b border-white/10 flex justify-between items-center px-6 py-4">
+<div class="flex items-center gap-4">
+<button class="hover:bg-white/5 transition-colors p-2 rounded-full">
+<span class="material-symbols-outlined text-pink-700 dark:text-pink-600">menu</span>
+</button>
+</div>
+<div class="absolute left-1/2 -translate-x-1/2">
+<h1 class="text-2xl font-serif italic text-pink-700 dark:text-pink-600 tracking-tight">Atribe</h1>
+</div>
+<div class="flex items-center">
+<div class="w-8 h-8 rounded-full overflow-hidden border border-white/10">
+<img alt="User Profile" class="w-full h-full object-cover" data-alt="Close up portrait of a professional man with clean lighting on a neutral studio background" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDcVcoHr3a6dLKf3rQ3vsXI5JWjFogvefWe1LHtiDjxmAwWqQoz11e5WdX-u_rNLI4NaqbIrvU13fPq9q4cXFf4qZzrCfPxa6JbCzeDiDcnzRRcLwNy2Cu82jbKbTevmZ52KqaI1MgyoplgDwKdn_k7FrBWdYb3tAW2ldvyBB6jouXZXfLiW7KoZH-Q5VSRJcA0CxGiTCp_y045qROee6ZRoEDcD2HeaDt_MynGyN89wp05WO8dSO466hFA4pAyhTMwa3uCTPhATE2O"/>
+</div>
+</div>
+</header>
+<!-- Main Content -->
+<main class="flex-grow flex items-center justify-center px-margin pt-24 pb-12">
+<div class="w-full max-w-4xl grid md:grid-cols-2 gap-12 items-center">
+<!-- Branding & Editorial Section -->
+<div class="hidden md:flex flex-col space-y-md">
+<div class="space-y-sm">
+<span class="font-label-caps text-label-caps text-on-secondary-container uppercase">Join the community</span>
+<h2 class="font-h1 text-h1 text-on-surface">Where depth meets digital.</h2>
+</div>
+<div class="relative pl-sm border-l border-dark-raspberry py-1">
+<p class="font-h3 text-h3 italic text-on-surface-variant">
+                        "The quietest space for the loudest ideas."
+                    </p>
+</div>
+<p class="font-body-lg text-body-lg text-on-surface-variant opacity-80 max-w-md">
+                    Atribe is an editorial-first ecosystem designed for intellectual depth and immersive reading experiences.
+                </p>
+</div>
+<!-- Login Container -->
+<div class="w-full max-w-md mx-auto">
+<div class="bg-surface-container-low border border-white/5 p-lg rounded-xl flex flex-col space-y-md shadow-2xl">
+<div class="text-center md:text-left space-y-xs">
+<h3 class="font-h2 text-h2 text-on-surface">Welcome back</h3>
+<p class="font-body-md text-body-md text-on-surface-variant">Sign in to continue your journey.</p>
+</div>
+<!-- Action: Continue with Google -->
+<button class="group w-full flex items-center justify-center gap-3 bg-dark-raspberry text-on-surface py-md px-lg rounded-lg hover:opacity-90 transition-all duration-150 active:scale-[0.98]">
+<svg class="w-5 h-5 fill-current" viewbox="0 0 24 24">
+<path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"></path>
+<path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"></path>
+<path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"></path>
+<path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"></path>
+</svg>
+<span class="font-label-caps text-label-caps tracking-widest text-white">CONTINUE WITH GOOGLE</span>
+</button>
+<div class="flex items-center gap-4 py-xs">
+<div class="flex-grow h-px bg-white/5"></div>
+<span class="font-label-caps text-[10px] text-outline opacity-60">OR LOGIN WITH EMAIL</span>
+<div class="flex-grow h-px bg-white/5"></div>
+</div>
+<!-- Minimalist Input Fields -->
+<div class="space-y-sm">
+<div class="group">
+<label class="block font-label-caps text-[10px] text-on-secondary-container mb-1 opacity-80">EMAIL ADDRESS</label>
+<input class="w-full bg-[#1a0f14] border-0 border-b border-white/20 px-0 py-2 text-on-surface focus:ring-0 focus:border-dark-raspberry transition-colors placeholder:text-outline/40" placeholder="name@atribe.co" type="email"/>
+</div>
+<div class="group">
+<label class="block font-label-caps text-[10px] text-on-secondary-container mb-1 opacity-80">PASSWORD</label>
+<input class="w-full bg-[#1a0f14] border-0 border-b border-white/20 px-0 py-2 text-on-surface focus:ring-0 focus:border-dark-raspberry transition-colors placeholder:text-outline/40" placeholder="••••••••" type="password"/>
+</div>
+</div>
+<div class="flex items-center justify-between text-[11px] font-medium tracking-tight">
+<label class="flex items-center gap-2 text-on-surface-variant cursor-pointer">
+<input class="w-3 h-3 rounded-sm bg-midnight-violet-base border-white/20 text-dark-raspberry focus:ring-0" type="checkbox"/>
+                            Remember for 30 days
+                        </label>
+<a class="text-primary hover:text-dark-raspberry transition-colors" href="#">Forgot password?</a>
+</div>
+<button class="w-full py-md font-label-caps text-label-caps border border-white/10 hover:bg-white/5 transition-all rounded-lg text-on-surface">
+                        SIGN IN
+                    </button>
+<p class="text-center font-body-md text-[13px] text-on-surface-variant mt-4">
+                        Don't have an account? <a class="text-pink-600 font-bold hover:underline" href="#">Register</a>
+</p>
+</div>
+<!-- Legal footer in small caps -->
+<div class="mt-md text-center">
+<p class="font-label-caps text-[10px] text-outline opacity-40 leading-relaxed uppercase">
+                        By signing in, you agree to the Atribe <br/>
+<a class="underline" href="#">Terms of Service</a> &amp; <a class="underline" href="#">Privacy Protocol</a>.
+                    </p>
+</div>
+</div>
+</div>
+</main>
+<!-- Visual Layering Element -->
+<div class="fixed inset-0 pointer-events-none -z-10 overflow-hidden">
+<div class="absolute -top-[20%] -right-[10%] w-[60%] h-[60%] rounded-full bg-dark-raspberry/5 blur-[120px]"></div>
+<div class="absolute -bottom-[20%] -left-[10%] w-[50%] h-[50%] rounded-full bg-primary/5 blur-[120px]"></div>
+</div>
+</body></html>

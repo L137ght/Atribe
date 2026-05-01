@@ -1,0 +1,33 @@
+# Node
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Env
+.env
+.env.local
+.env.*.local
+
+# Mac
+.DS_Store
+
+# Logs
+logs/
+*.log
+
+# SQLite (optional - keep if you want backup)
+*.db
+*.sqlite
+
+# Build
+dist/
+build/
+
+# ngrok
+*.ngrok.log
+
+# IDE
+.vscode/
+.idea/
+apps/mobile/

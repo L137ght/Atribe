@@ -1,0 +1,18 @@
+{
+  "name": "atribe",
+  "private": true,
+  "version": "1.0.0",
+  "workspaces": [
+    "apps/*",
+    "services/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "mobile:start": "npm --workspace @atribe/mobile run start",
+    "mobile:ios": "npm --workspace @atribe/mobile run ios",
+    "mobile:android": "npm --workspace @atribe/mobile run android",
+    "mobile:web": "npm --workspace @atribe/mobile run web",
+    "shopify-app:dev": "npm --workspace @atribe/shopify-app run dev",
+    "shopify-app:start": "npm --workspace @atribe/shopify-app run start"
+  }
+}

@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,200..800;1,6..72,200..800&amp;family=Manrope:wght@200..800&amp;family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              "colors": {
+                      "outline-muted": "#55414a",
+                      "on-secondary-container": "#cfacb9",
+                      "secondary": "#e2bdcb",
+                      "on-secondary-fixed-variant": "#5a3f4b",
+                      "on-primary": "#620043",
+                      "surface-tint": "#ffafd6",
+                      "tertiary-fixed": "#b4f490",
+                      "surface-variant": "#3e3137",
+                      "inverse-surface": "#f2dde4",
+                      "primary-fixed": "#ffd8e8",
+                      "on-secondary": "#422934",
+                      "on-primary-container": "#ff99ce",
+                      "on-tertiary-container": "#8cca6b",
+                      "surface-dim": "#1b1015",
+                      "error": "#ffb4ab",
+                      "surface-container": "#281c22",
+                      "primary-container": "#8f0164",
+                      "surface": "#1b1015",
+                      "midnight-violet-elevated": "#1d1116",
+                      "on-primary-fixed": "#3c0028",
+                      "surface-container-low": "#24181e",
+                      "secondary-fixed": "#ffd8e7",
+                      "on-surface-variant": "#dbbfca",
+                      "primary-fixed-dim": "#ffafd6",
+                      "midnight-violet-base": "#120a0e",
+                      "surface-bright": "#43363b",
+                      "inverse-on-surface": "#3a2d32",
+                      "alabaster-grey": "#d7dedc",
+                      "secondary-container": "#5a3f4b",
+                      "error-container": "#93000a",
+                      "on-primary-fixed-variant": "#8a0060",
+                      "surface-container-high": "#33272c",
+                      "surface-container-lowest": "#150b10",
+                      "on-error-container": "#ffdad6",
+                      "on-surface": "#f2dde4",
+                      "on-secondary-fixed": "#2a151f",
+                      "tertiary-fixed-dim": "#99d776",
+                      "tertiary": "#99d776",
+                      "on-background": "#f2dde4",
+                      "inverse-primary": "#aa247a",
+                      "surface-container-highest": "#3e3137",
+                      "tertiary-container": "#1f5500",
+                      "on-tertiary-fixed-variant": "#1d5200",
+                      "on-tertiary": "#123800",
+                      "dark-raspberry": "#8f0164",
+                      "secondary-fixed-dim": "#e2bdcb",
+                      "primary": "#ffafd6",
+                      "background": "#1b1015",
+                      "on-error": "#690005",
+                      "outline": "#a38a94",
+                      "on-tertiary-fixed": "#082100",
+                      "outline-variant": "#55414a"
+              },
+              "borderRadius": {
+                      "DEFAULT": "0.125rem",
+                      "lg": "0.25rem",
+                      "xl": "0.5rem",
+                      "full": "0.75rem"
+              },
+              "spacing": {
+                      "unit": "4px",
+                      "gutter": "24px",
+                      "lg": "2.5rem",
+                      "md": "1.5rem",
+                      "margin": "max(5vw, 24px)",
+                      "xs": "0.5rem",
+                      "xl": "4rem",
+                      "sm": "1rem"
+              },
+              "fontFamily": {
+                      "h3": ["Newsreader"],
+                      "h1": ["Newsreader"],
+                      "body-lg": ["Manrope"],
+                      "h2": ["Newsreader"],
+                      "body-md": ["Manrope"],
+                      "display": ["Newsreader"],
+                      "label-caps": ["Manrope"]
+              },
+              "fontSize": {
+                      "h3": ["1.5rem", {"lineHeight": "1.4", "fontWeight": "500"}],
+                      "h1": ["3rem", {"lineHeight": "1.2", "fontWeight": "400"}],
+                      "body-lg": ["1.125rem", {"lineHeight": "1.7", "fontWeight": "400"}],
+                      "h2": ["2.25rem", {"lineHeight": "1.3", "fontWeight": "400"}],
+                      "body-md": ["1rem", {"lineHeight": "1.6", "fontWeight": "400"}],
+                      "display": ["4.5rem", {"lineHeight": "1.1", "letterSpacing": "-0.02em", "fontWeight": "300"}],
+                      "label-caps": ["0.75rem", {"lineHeight": "1.2", "letterSpacing": "0.1em", "fontWeight": "700"}]
+              }
+            },
+          },
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+            display: inline-block;
+            line-height: 1;
+            text-transform: none;
+            letter-spacing: normal;
+            word-wrap: normal;
+            white-space: nowrap;
+            direction: ltr;
+        }
+        .hide-scrollbar::-webkit-scrollbar { display: none; }
+        .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+        
+        /* Custom range slider styling */
+        input[type=range] {
+            -webkit-appearance: none;
+            background: transparent;
+        }
+        input[type=range]::-webkit-slider-runnable-track {
+            width: 100%;
+            height: 2px;
+            background: #55414a;
+            border: none;
+            border-radius: 0;
+        }
+        input[type=range]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            height: 12px;
+            width: 12px;
+            border-radius: 50%;
+            background: #8f0164;
+            margin-top: -5px;
+            cursor: pointer;
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background text-on-background font-body-md min-h-screen">
+<!-- TopAppBar -->
+<header class="bg-zinc-950/70 backdrop-blur-xl docked full-width top-0 z-50 border-b border-white/10 flex justify-between items-center px-6 py-4 w-full fixed">
+<div class="flex items-center gap-4">
+<button class="hover:bg-white/5 transition-colors p-2 rounded-full flex items-center justify-center">
+<span class="material-symbols-outlined text-pink-700 dark:text-pink-600" data-icon="menu">menu</span>
+</button>
+<h1 class="text-2xl font-serif italic text-pink-700 dark:text-pink-600">Atribe</h1>
+</div>
+<div class="flex items-center gap-4">
+<div class="w-8 h-8 rounded-full bg-surface-container overflow-hidden border border-outline-variant">
+<img class="w-full h-full object-cover" data-alt="Portrait of a creative professional with soft studio lighting and dark background" src="https://lh3.googleusercontent.com/aida-public/AB6AXuB753EUSeDGfil23X9FP0hXNsIbB3IivRuU06-AT6_HRO7feRUeQjsuigm2qJysZLfORsQpkMUB0xFLhGSoKQzyXUvTx-kHxD_0ID7S68hUf-x50vw9N0NdCDmJ5AMLyid80tIp4Y4Cb5qbU40PJNrwuqRDqjW0NdieRXCOWzHKE6tr5z2WRBnqXaZM5EAPnqLOKrn2DHCrdTMza-dcTQGMvAPQC2pAkTvyGipo6RuaG927YZjD208UdCwq4Ewt55heU4JhG_aVQ6Bv"/>
+</div>
+</div>
+</header>
+<main class="pt-24 pb-32 px-margin max-w-5xl mx-auto">
+<!-- Header Section -->
+<section class="mb-xl">
+<div class="flex flex-col gap-sm">
+<span class="font-label-caps text-label-caps text-primary uppercase tracking-widest">Impact Distribution</span>
+<h2 class="font-h2 text-h2 text-on-surface">Select Creators</h2>
+<p class="font-body-lg text-body-lg text-on-surface-variant max-w-2xl">
+                    Define the collective contribution of your circle. Select the voices that shaped this journey and assign their relative influence.
+                </p>
+</div>
+</section>
+<!-- Selection Grid (Bento Style) -->
+<div class="grid grid-cols-1 md:grid-cols-12 gap-lg">
+<!-- Creator Selection List (Left Column) -->
+<div class="md:col-span-7 flex flex-col gap-sm">
+<div class="flex justify-between items-end mb-xs">
+<h3 class="font-label-caps text-label-caps text-on-surface-variant">AVAILABLE TALENT</h3>
+<div class="flex items-center gap-xs text-primary border-b border-primary/20 pb-1 cursor-pointer hover:border-primary transition-colors">
+<span class="material-symbols-outlined text-sm" data-icon="filter_list">filter_list</span>
+<span class="text-[10px] font-bold uppercase tracking-tighter">Filter Collective</span>
+</div>
+</div>
+<!-- Creator Card 1 (Active) -->
+<div class="group relative bg-surface-container-low border border-outline-variant p-md flex items-center gap-md hover:bg-surface-container transition-all cursor-pointer">
+<div class="relative w-12 h-12 flex-shrink-0">
+<img class="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all" data-alt="Close-up of a focused designer with dramatic shadows and warm highlights" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDnWLzr6UoDGRXlraaYCp1X6qPeYT27GL6P__61jmEYCxVHURYqesPrS8nQo0imXbcYZOxzqt0FN4KO5CuWfIAiAJhzT_FwD3FRq7IIEVy8IIZfNdh-q8ByyPzj-3ex9Ao8iGLh1LGPeWOu__8-EvS6inGlAvbU3bYM3i94SDRBGHdi_ExVHRVXe-k-afog4TF-ADjdEjlf_2e-4uSYdzL-sCYnt_2XgK-qlIt-SIAIKlGZWrudZr_gzmT6FW94yPiCwqYFrNg3phpu"/>
+<div class="absolute inset-0 border border-white/5 pointer-events-none"></div>
+</div>
+<div class="flex flex-col flex-grow">
+<span class="font-h3 text-body-md font-bold text-on-surface">Julian Aris</span>
+<span class="font-label-caps text-[10px] text-on-secondary-container">VISUAL ETHNOGRAPHY</span>
+</div>
+<div class="flex items-center justify-center w-6 h-6 border border-primary bg-primary/10">
+<span class="material-symbols-outlined text-primary text-lg" data-icon="check" data-weight="fill" style="font-variation-settings: 'FILL' 1;">check</span>
+</div>
+</div>
+<!-- Creator Card 2 -->
+<div class="group relative bg-surface-container-low border border-outline-variant/30 p-md flex items-center gap-md hover:bg-surface-container transition-all cursor-pointer">
+<div class="relative w-12 h-12 flex-shrink-0">
+<img class="w-full h-full object-cover grayscale opacity-60 group-hover:grayscale-0 group-hover:opacity-100 transition-all" data-alt="A portrait of a minimalist architect with soft natural light and clean lines" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBrFZHnX-9CIRHLzRRYUC89FXalJUSz8FyzVnMtJDFNn17q_voD8jesPyrgGqIa0KgB-Pcx58oxzqMQF1bBlKEX5xHhq2v1AFmfL4EhdG9asvAnnDvShjoZwfl2ikUeLwrhsBssEhobs87hN_Vk02bVjPV2qwm6Zka_JaorLZKid8ghOfQWibVmJrdjQZ6jfi6f5K_POFM1VKGilVyTqWObebVN--AZtPME_fnrEDTzl7vYZxvQtpkXd6Xo-I1BqtdEYzU_XUsN54w2"/>
+</div>
+<div class="flex flex-col flex-grow">
+<span class="font-h3 text-body-md font-bold text-on-surface">Elena Vance</span>
+<span class="font-label-caps text-[10px] text-on-surface-variant">SPATIAL THEORY</span>
+</div>
+<div class="flex items-center justify-center w-6 h-6 border border-outline-muted"></div>
+</div>
+<!-- Creator Card 3 (Active) -->
+<div class="group relative bg-surface-container-low border border-outline-variant p-md flex items-center gap-md hover:bg-surface-container transition-all cursor-pointer">
+<div class="relative w-12 h-12 flex-shrink-0">
+<img class="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all" data-alt="Sophisticated writer with classic glasses in a moody library setting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuB0XmdtAYE0K0_OJ1sjKI5M_StMBbSZvZtY0NS7woX1L9K7dGRWZwxV1DqT7x1rDQjjSRq3ddJki08WZTpFhxzMc-LUjAuybQTSqOxbHJZQyWPCh9fF4kxDrVWrKKK-U9HKgI7lOPw61wrR_qnyUzUynr6iIejNoc2cW445wueUxgTF31mwfwiL4CsRakpRMPQP712dKy-ZtXrFfxBtmYM4GqcnfVdNHEr2JYVG7q39BqcFF_0pguvguz3NE46qvVDRNV2xYU_4pkIe"/>
+</div>
+<div class="flex flex-col flex-grow">
+<span class="font-h3 text-body-md font-bold text-on-surface">Marcus Thorne</span>
+<span class="font-label-caps text-[10px] text-on-secondary-container">NARRATIVE DESIGN</span>
+</div>
+<div class="flex items-center justify-center w-6 h-6 border border-primary bg-primary/10">
+<span class="material-symbols-outlined text-primary text-lg" data-icon="check" data-weight="fill" style="font-variation-settings: 'FILL' 1;">check</span>
+</div>
+</div>
+<!-- Creator Card 4 -->
+<div class="group relative bg-surface-container-low border border-outline-variant/30 p-md flex items-center gap-md hover:bg-surface-container transition-all cursor-pointer">
+<div class="relative w-12 h-12 flex-shrink-0">
+<img class="w-full h-full object-cover grayscale opacity-60 group-hover:grayscale-0 group-hover:opacity-100 transition-all" data-alt="Modern intellectual woman in a high-end minimalist office space" src="https://lh3.googleusercontent.com/aida-public/AB6AXuA3oONCm0D8Gk73DY8akeKBWDSFD2u6dSVlsvP6QGbgSUSx4zBgGJaIZjYUvjehMp6J4DjDX3ZONNe2ULm17dzXUqksjFj-dVYFz-HpVE9pfGRi9zvk4OjeoA5SdAyZxJ9xyKJOHxbIWDkxYD_PprpgljPBbCpqwGuX-vOyhqqQpMgzzhUEml1GZQqWD51CtZT2BBtyH8mJ5jpxU1MeKW1R56Texjm5yd14TPj2PJkMOiXHLM1SLx521OfU35o7feFKdsxp0x7Irqeh"/>
+</div>
+<div class="flex flex-col flex-grow">
+<span class="font-h3 text-body-md font-bold text-on-surface">Sana Kapoor</span>
+<span class="font-label-caps text-[10px] text-on-surface-variant">SOUND SCULPTING</span>
+</div>
+<div class="flex items-center justify-center w-6 h-6 border border-outline-muted"></div>
+</div>
+</div>
+<!-- Weight Control (Right Column) -->
+<div class="md:col-span-5">
+<div class="sticky top-28 bg-surface-container p-lg border border-outline-variant/50">
+<div class="flex flex-col gap-lg">
+<div class="flex flex-col gap-xs">
+<h3 class="font-label-caps text-label-caps text-on-secondary-container">DISTRIBUTION WEIGHT</h3>
+<p class="text-[13px] text-on-surface-variant italic">Balancing the collective output.</p>
+</div>
+<!-- Weight Item 1 -->
+<div class="flex flex-col gap-md">
+<div class="flex justify-between items-center">
+<span class="font-h3 text-body-md text-on-surface">Julian Aris</span>
+<span class="font-label-caps text-primary">60%</span>
+</div>
+<div class="relative pt-1">
+<input class="w-full h-1" type="range" value="60"/>
+</div>
+</div>
+<!-- Weight Item 2 -->
+<div class="flex flex-col gap-md">
+<div class="flex justify-between items-center">
+<span class="font-h3 text-body-md text-on-surface">Marcus Thorne</span>
+<span class="font-label-caps text-primary">40%</span>
+</div>
+<div class="relative pt-1">
+<input class="w-full h-1" type="range" value="40"/>
+</div>
+</div>
+<div class="pt-lg border-t border-outline-variant">
+<div class="flex justify-between items-center mb-md">
+<span class="font-label-caps text-[10px] text-on-surface-variant">TOTAL IMPACT</span>
+<span class="font-label-caps text-primary text-lg">100%</span>
+</div>
+<button class="w-full bg-dark-raspberry text-on-background py-md font-label-caps text-label-caps hover:bg-primary-container transition-colors tracking-[0.2em]">
+                                CONFIRM ATTRIBUTION
+                            </button>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Editorial Pull Quote Component -->
+<section class="mt-xl py-xl border-t border-outline-variant/20">
+<div class="flex items-start gap-md">
+<div class="w-1 bg-dark-raspberry h-24"></div>
+<blockquote class="font-h3 text-h3 italic text-on-surface max-w-3xl">
+                    "True attribution is not about ownership, but about acknowledging the invisible threads that connect one mind to another in the act of creation."
+                </blockquote>
+</div>
+</section>
+</main>
+<!-- BottomNavBar -->
+<nav class="fixed bottom-0 left-0 w-full flex justify-around items-center px-4 pb-6 pt-3 bg-zinc-950/80 backdrop-blur-lg border-t border-white/5 z-50 rounded-t-lg md:hidden">
+<div class="flex flex-col items-center justify-center text-zinc-500 hover:text-zinc-300 hover:text-pink-400 transition-all">
+<span class="material-symbols-outlined" data-icon="directions_run">directions_run</span>
+<span class="font-sans text-[10px] font-medium tracking-widest uppercase mt-1">Route</span>
+</div>
+<div class="flex flex-col items-center justify-center text-zinc-500 hover:text-zinc-300 hover:text-pink-400 transition-all">
+<span class="material-symbols-outlined" data-icon="link">link</span>
+<span class="font-sans text-[10px] font-medium tracking-widest uppercase mt-1">Links</span>
+</div>
+<div class="flex flex-col items-center justify-center bg-pink-900/20 text-pink-500 rounded-xl px-3 py-1 scale-95 transition-all">
+<span class="material-symbols-outlined" data-icon="group" data-weight="fill" style="font-variation-settings: 'FILL' 1;">group</span>
+<span class="font-sans text-[10px] font-medium tracking-widest uppercase mt-1">Creators</span>
+</div>
+<div class="flex flex-col items-center justify-center text-zinc-500 hover:text-zinc-300 hover:text-pink-400 transition-all">
+<span class="material-symbols-outlined" data-icon="explore">explore</span>
+<span class="font-sans text-[10px] font-medium tracking-widest uppercase mt-1">Discover</span>
+</div>
+</nav>
+<!-- Desktop Navigation Side Anchors (Simulated for Web) -->
+<div class="hidden md:flex fixed left-6 top-1/2 -translate-y-1/2 flex-col gap-lg z-40">
+<a class="text-zinc-500 hover:text-primary transition-colors transform -rotate-90 origin-center whitespace-nowrap font-label-caps text-[10px]" href="#">PREVIOUS PROJECT</a>
+<div class="h-12 w-px bg-outline-muted mx-auto"></div>
+<a class="text-zinc-500 hover:text-primary transition-colors transform -rotate-90 origin-center whitespace-nowrap font-label-caps text-[10px]" href="#">NEXT ENTRY</a>
+</div>
+</body></html>

@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,wght@0,300;0,400;0,500;1,400&amp;family=Manrope:wght@400;500;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "outline-muted": "#55414a",
+                    "on-secondary-container": "#cfacb9",
+                    "secondary": "#e2bdcb",
+                    "on-secondary-fixed-variant": "#5a3f4b",
+                    "on-primary": "#620043",
+                    "surface-tint": "#ffafd6",
+                    "tertiary-fixed": "#b4f490",
+                    "surface-variant": "#3e3137",
+                    "inverse-surface": "#f2dde4",
+                    "primary-fixed": "#ffd8e8",
+                    "on-secondary": "#422934",
+                    "on-primary-container": "#ff99ce",
+                    "on-tertiary-container": "#8cca6b",
+                    "surface-dim": "#1b1015",
+                    "error": "#ffb4ab",
+                    "surface-container": "#281c22",
+                    "primary-container": "#8f0164",
+                    "surface": "#1b1015",
+                    "midnight-violet-elevated": "#1d1116",
+                    "on-primary-fixed": "#3c0028",
+                    "surface-container-low": "#24181e",
+                    "secondary-fixed": "#ffd8e7",
+                    "on-surface-variant": "#dbbfca",
+                    "primary-fixed-dim": "#ffafd6",
+                    "midnight-violet-base": "#120a0e",
+                    "surface-bright": "#43363b",
+                    "inverse-on-surface": "#3a2d32",
+                    "alabaster-grey": "#d7dedc",
+                    "secondary-container": "#5a3f4b",
+                    "error-container": "#93000a",
+                    "on-primary-fixed-variant": "#8a0060",
+                    "surface-container-high": "#33272c",
+                    "surface-container-lowest": "#150b10",
+                    "on-error-container": "#ffdad6",
+                    "on-surface": "#f2dde4",
+                    "on-secondary-fixed": "#2a151f",
+                    "tertiary-fixed-dim": "#99d776",
+                    "tertiary": "#99d776",
+                    "on-background": "#f2dde4",
+                    "inverse-primary": "#aa247a",
+                    "surface-container-highest": "#3e3137",
+                    "tertiary-container": "#1f5500",
+                    "on-tertiary-fixed-variant": "#1d5200",
+                    "on-tertiary": "#123800",
+                    "dark-raspberry": "#8f0164",
+                    "secondary-fixed-dim": "#e2bdcb",
+                    "primary": "#ffafd6",
+                    "background": "#1b1015",
+                    "on-error": "#690005",
+                    "outline": "#a38a94",
+                    "on-tertiary-fixed": "#082100",
+                    "outline-variant": "#55414a"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.125rem",
+                    "lg": "0.25rem",
+                    "xl": "0.5rem",
+                    "full": "0.75rem"
+            },
+            "spacing": {
+                    "unit": "4px",
+                    "gutter": "24px",
+                    "lg": "2.5rem",
+                    "md": "1.5rem",
+                    "margin": "max(5vw, 24px)",
+                    "xs": "0.5rem",
+                    "xl": "4rem",
+                    "sm": "1rem"
+            },
+            "fontFamily": {
+                    "h3": ["Newsreader"],
+                    "h1": ["Newsreader"],
+                    "body-lg": ["Manrope"],
+                    "h2": ["Newsreader"],
+                    "body-md": ["Manrope"],
+                    "display": ["Newsreader"],
+                    "label-caps": ["Manrope"]
+            },
+            "fontSize": {
+                    "h3": ["1.5rem", {"lineHeight": "1.4", "fontWeight": "500"}],
+                    "h1": ["3rem", {"lineHeight": "1.2", "fontWeight": "400"}],
+                    "body-lg": ["1.125rem", {"lineHeight": "1.7", "fontWeight": "400"}],
+                    "h2": ["2.25rem", {"lineHeight": "1.3", "fontWeight": "400"}],
+                    "body-md": ["1rem", {"lineHeight": "1.6", "fontWeight": "400"}],
+                    "display": ["4.5rem", {"lineHeight": "1.1", "letterSpacing": "-0.02em", "fontWeight": "300"}],
+                    "label-caps": ["0.75rem", {"lineHeight": "1.2", "letterSpacing": "0.1em", "fontWeight": "700"}]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        body {
+            background-color: #1b1015;
+            color: #f2dde4;
+            -webkit-font-smoothing: antialiased;
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 24;
+        }
+        .editorial-shadow {
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="font-body-md selection:bg-dark-raspberry selection:text-white">
+<!-- TopAppBar from JSON -->
+<header class="fixed top-0 z-50 w-full bg-zinc-950/70 backdrop-blur-xl border-b border-white/10 flex justify-between items-center px-6 py-4">
+<div class="flex items-center gap-4">
+<span class="material-symbols-outlined text-pink-700 dark:text-pink-600" data-icon="menu">menu</span>
+<span class="text-2xl font-serif italic text-pink-700 dark:text-pink-600">Atribe</span>
+</div>
+<div class="flex items-center gap-4">
+<div class="w-8 h-8 rounded-full overflow-hidden border border-white/20">
+<img alt="Profile" class="w-full h-full object-cover" data-alt="Close-up portrait of a stylish woman with soft lighting against a dark editorial background" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCwU3CMdtxDQjziTJ_-8uL6qPQREGqbODwqlx2-FKDf_lq0nte8poClXnN0du5Zmx5W_CBx9-HWeIbR0ER0nPKhSmoMShI8aPbLArR7Sl22t-9h203ArwkN9Bbs0h7f2_DsTNPBbsQRdKoh6uw_nTNsld74ZqpMGIhrFHxgRRnNFlKnUc6uH9rvEsd-0XuQy8WzrQohsdzN-ILmJ5goK2sa75ymZkeoGs0VID-Dq5ynFmZqib-BUAxbxQcBQ6QFMSMv6nLw6Zsw5ch5"/>
+</div>
+</div>
+</header>
+<main class="min-h-screen flex flex-col items-center justify-center px-margin pt-xl pb-xl">
+<!-- Confirmation Canvas -->
+<div class="max-w-3xl w-full flex flex-col items-center text-center">
+<!-- Celebration Graphic / Checkmark -->
+<div class="relative mb-lg">
+<div class="absolute inset-0 bg-dark-raspberry blur-[120px] opacity-20 rounded-full scale-150"></div>
+<div class="relative w-24 h-24 flex items-center justify-center rounded-full border border-dark-raspberry/30 bg-surface-container-low editorial-shadow">
+<span class="material-symbols-outlined text-5xl text-primary" data-icon="check_circle" data-weight="fill" style="font-variation-settings: 'FILL' 1;">check_circle</span>
+</div>
+</div>
+<!-- Reward Message -->
+<div class="space-y-sm mb-xl">
+<h1 class="font-h1 text-h1 text-on-surface tracking-tight">
+                    You supported <span class="text-primary italic">Elena Vance</span>
+</h1>
+<p class="font-body-lg text-body-lg text-on-surface-variant max-w-lg mx-auto">
+                    Your contribution directly fuels the deep-dive research and independent journalism that makes Atribe unique.
+                </p>
+</div>
+<!-- Bento Detail Card -->
+<div class="grid grid-cols-1 md:grid-cols-2 gap-gutter w-full text-left">
+<!-- Creator Spotlight -->
+<div class="bg-surface-container border border-white/5 rounded-xl p-md flex flex-col justify-between aspect-video md:aspect-auto">
+<div>
+<span class="font-label-caps text-label-caps text-secondary mb-xs block">IMPACT</span>
+<h2 class="font-h3 text-h3 text-on-surface leading-tight">Elena's latest project: "The Architecture of Silence" is now 85% funded.</h2>
+</div>
+<div class="flex items-center gap-3 pt-md">
+<div class="h-1 flex-grow bg-white/10 rounded-full overflow-hidden">
+<div class="h-full bg-dark-raspberry w-[85%]"></div>
+</div>
+<span class="font-label-caps text-label-caps text-on-surface-variant">85%</span>
+</div>
+</div>
+<!-- Receipt/Share Section -->
+<div class="bg-surface-container-low border border-white/5 rounded-xl p-md flex flex-col gap-sm">
+<span class="font-label-caps text-label-caps text-outline mb-xs block">MEMBERSHIP DETAILS</span>
+<div class="flex justify-between items-center py-2 border-b border-white/5">
+<span class="text-on-surface-variant">Contribution</span>
+<span class="font-bold text-on-surface">$25.00</span>
+</div>
+<div class="flex justify-between items-center py-2 border-b border-white/5">
+<span class="text-on-surface-variant">Frequency</span>
+<span class="text-on-surface">Monthly</span>
+</div>
+<div class="mt-auto flex gap-3">
+<button class="flex-1 bg-dark-raspberry text-alabaster-grey font-label-caps py-3 px-6 rounded-lg transition-transform active:scale-95">
+                            VIEW RECEIPT
+                        </button>
+<button class="w-12 h-12 flex items-center justify-center border border-white/20 rounded-lg hover:bg-white/5 transition-colors">
+<span class="material-symbols-outlined text-secondary" data-icon="share">share</span>
+</button>
+</div>
+</div>
+</div>
+<!-- Editorial Quote Section -->
+<div class="mt-xl border-l-4 border-dark-raspberry pl-md text-left max-w-xl self-start">
+<p class="font-h3 text-h3 italic text-on-surface-variant leading-relaxed">
+                    "True creative freedom is only possible when the audience becomes the patron. Thank you for being part of this journey."
+                </p>
+<cite class="font-label-caps text-label-caps text-primary mt-sm block not-italic">— Elena Vance</cite>
+</div>
+</div>
+</main>
+<!-- BottomNavBar Suppressed as per "Success/Confirmation" rule -->
+<!-- Secondary Interaction: Floating action back to home -->
+<div class="fixed bottom-12 left-1/2 -translate-x-1/2 flex items-center gap-4 bg-midnight-violet-elevated/80 backdrop-blur-md px-6 py-3 rounded-full border border-white/10 shadow-2xl">
+<a class="font-label-caps text-label-caps text-on-surface flex items-center gap-2 hover:text-primary transition-colors" href="#">
+<span class="material-symbols-outlined text-sm" data-icon="arrow_back">arrow_back</span>
+            RETURN TO FEED
+        </a>
+<div class="w-px h-4 bg-white/20"></div>
+<a class="font-label-caps text-label-caps text-on-surface flex items-center gap-2 hover:text-primary transition-colors" href="#">
+            EXPLORE OTHERS
+            <span class="material-symbols-outlined text-sm" data-icon="explore">explore</span>
+</a>
+</div>
+<!-- Decorative background texture -->
+<div class="fixed inset-0 pointer-events-none opacity-[0.03]" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuDWBQLijl7UiKgpfE6NALx4uJ_Y4jJ6hZdbUNf0RhW95SMP1GhBUIMj53r_Efj3VbgfT_d2qza9wJnXtBaXtmXa3NLVLW3-3_5QiXlSJEKDAAHO3hiNsrmiodEFmaBXNF37ahxfIhitTn_aCDttRg-CaryhTUtlOsFg51vI4aoqzuIBkMOlzyg2x1ScBisJPBJZaNGN0e_82hTfOGlKUoXb3EkKLxhg3MoetIzS1UrjyEGp3DDt60KXVdObWapyyGRr6PByLeyY4UFf');"></div>
+</body></html>

@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,wght@0,300..700;1,300..700&amp;family=Manrope:wght@200..800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "outline-muted": "#55414a",
+                        "on-secondary-container": "#cfacb9",
+                        "secondary": "#e2bdcb",
+                        "on-secondary-fixed-variant": "#5a3f4b",
+                        "on-primary": "#620043",
+                        "surface-tint": "#ffafd6",
+                        "tertiary-fixed": "#b4f490",
+                        "surface-variant": "#3e3137",
+                        "inverse-surface": "#f2dde4",
+                        "primary-fixed": "#ffd8e8",
+                        "on-secondary": "#422934",
+                        "on-primary-container": "#ff99ce",
+                        "on-tertiary-container": "#8cca6b",
+                        "surface-dim": "#1b1015",
+                        "error": "#ffb4ab",
+                        "surface-container": "#281c22",
+                        "primary-container": "#8f0164",
+                        "surface": "#1b1015",
+                        "midnight-violet-elevated": "#1d1116",
+                        "on-primary-fixed": "#3c0028",
+                        "surface-container-low": "#24181e",
+                        "secondary-fixed": "#ffd8e7",
+                        "on-surface-variant": "#dbbfca",
+                        "primary-fixed-dim": "#ffafd6",
+                        "midnight-violet-base": "#120a0e",
+                        "surface-bright": "#43363b",
+                        "inverse-on-surface": "#3a2d32",
+                        "alabaster-grey": "#d7dedc",
+                        "secondary-container": "#5a3f4b",
+                        "error-container": "#93000a",
+                        "on-primary-fixed-variant": "#8a0060",
+                        "surface-container-high": "#33272c",
+                        "surface-container-lowest": "#150b10",
+                        "on-error-container": "#ffdad6",
+                        "on-surface": "#f2dde4",
+                        "on-secondary-fixed": "#2a151f",
+                        "tertiary-fixed-dim": "#99d776",
+                        "tertiary": "#99d776",
+                        "on-background": "#f2dde4",
+                        "inverse-primary": "#aa247a",
+                        "surface-container-highest": "#3e3137",
+                        "tertiary-container": "#1f5500",
+                        "on-tertiary-fixed-variant": "#1d5200",
+                        "on-tertiary": "#123800",
+                        "dark-raspberry": "#8f0164",
+                        "secondary-fixed-dim": "#e2bdcb",
+                        "primary": "#ffafd6",
+                        "background": "#1b1015",
+                        "on-error": "#690005",
+                        "outline": "#a38a94",
+                        "on-tertiary-fixed": "#082100",
+                        "outline-variant": "#55414a"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.125rem",
+                        "lg": "0.25rem",
+                        "xl": "0.5rem",
+                        "full": "0.75rem"
+                    },
+                    "spacing": {
+                        "unit": "4px",
+                        "gutter": "24px",
+                        "lg": "2.5rem",
+                        "md": "1.5rem",
+                        "margin": "max(5vw, 24px)",
+                        "xs": "0.5rem",
+                        "xl": "4rem",
+                        "sm": "1rem"
+                    },
+                    "fontFamily": {
+                        "h3": ["Newsreader"],
+                        "h1": ["Newsreader"],
+                        "body-lg": ["Manrope"],
+                        "h2": ["Newsreader"],
+                        "body-md": ["Manrope"],
+                        "display": ["Newsreader"],
+                        "label-caps": ["Manrope"]
+                    },
+                    "fontSize": {
+                        "h3": ["1.5rem", {"lineHeight": "1.4", "fontWeight": "500"}],
+                        "h1": ["3rem", {"lineHeight": "1.2", "fontWeight": "400"}],
+                        "body-lg": ["1.125rem", {"lineHeight": "1.7", "fontWeight": "400"}],
+                        "h2": ["2.25rem", {"lineHeight": "1.3", "fontWeight": "400"}],
+                        "body-md": ["1rem", {"lineHeight": "1.6", "fontWeight": "400"}],
+                        "display": ["4.5rem", {"lineHeight": "1.1", "letterSpacing": "-0.02em", "fontWeight": "300"}],
+                        "label-caps": ["0.75rem", {"lineHeight": "1.2", "letterSpacing": "0.1em", "fontWeight": "700"}]
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 24;
+        }
+        body {
+            background-color: #120a0e;
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-midnight-violet-base text-on-background selection:bg-dark-raspberry selection:text-white">
+<!-- TopAppBar -->
+<header class="bg-zinc-950/70 backdrop-blur-xl border-b border-white/10 docked full-width top-0 z-50 fixed w-full">
+<div class="flex justify-between items-center px-6 py-4 w-full max-w-7xl mx-auto">
+<div class="flex items-center gap-4">
+<button class="hover:bg-white/5 transition-colors p-2 rounded-full">
+<span class="material-symbols-outlined text-zinc-100" data-icon="menu">menu</span>
+</button>
+<h1 class="text-2xl font-serif italic text-pink-700 dark:text-pink-600">Atribe</h1>
+</div>
+<div class="flex items-center gap-6">
+<nav class="hidden md:flex gap-8 items-center">
+<a class="font-sans text-[10px] font-medium tracking-widest uppercase text-zinc-400 hover:text-pink-400 transition-all" href="#">Route</a>
+<a class="font-sans text-[10px] font-medium tracking-widest uppercase text-zinc-400 hover:text-pink-400 transition-all" href="#">Links</a>
+<a class="font-sans text-[10px] font-medium tracking-widest uppercase text-pink-600 font-bold hover:text-pink-400 transition-all" href="#">Creators</a>
+<a class="font-sans text-[10px] font-medium tracking-widest uppercase text-zinc-400 hover:text-pink-400 transition-all" href="#">Discover</a>
+</nav>
+<img alt="User Profile" class="w-10 h-10 rounded-full border border-white/20 object-cover" data-alt="close-up portrait of a creative professional woman with soft lighting and minimalist aesthetic" src="https://lh3.googleusercontent.com/aida-public/AB6AXuB58-tec45uNUWVB8gGAC1mqZXKsfkyY0B6QGjk0n6T-BnulzKiEZ45DXn9MtoGcAxLmw_as3ZrANtuq2NiT4GpK2ajUG5wPWO0HQzXg0vC2WFpA6ayjWn9eIoShgD58IZObpDYmMtLf8tj7qqjhHzuONPfDlxY8z1dqiH9-VoNbsIp0aNaHBEUKeqe8Z58SZ2jMdFOMccAloXEICg4l7lI3GPMm3WJ0yWAE6SO4JeUO34Jr-FTVn9rLiw2DAlRw8nD47B2_VhX626l"/>
+</div>
+</div>
+</header>
+<main class="pt-24 pb-32 px-margin max-w-5xl mx-auto min-h-screen">
+<!-- Header Section -->
+<section class="mb-xl">
+<div class="flex flex-col md:flex-row md:items-end justify-between gap-6">
+<div class="space-y-4">
+<span class="font-label-caps text-label-caps text-primary uppercase tracking-widest">Workspace</span>
+<h2 class="font-h1 text-h1 text-on-surface">Creator Brands</h2>
+<p class="font-body-md text-body-md text-on-surface-variant max-w-lg">Manage your authenticated domains and digital identity across the Atribe ecosystem.</p>
+</div>
+<button class="flex items-center gap-2 bg-dark-raspberry text-white px-6 py-3 rounded-full font-label-caps text-label-caps uppercase transition-all hover:scale-105 active:opacity-80">
+<span class="material-symbols-outlined" data-icon="add" style="font-variation-settings: 'FILL' 0;">add</span>
+                    Connect Brand
+                </button>
+</div>
+</section>
+<!-- Brand List / Dashboard -->
+<section class="space-y-4">
+<!-- Brand Item 1 -->
+<div class="group relative bg-surface-container-low border border-white/5 rounded-xl p-6 transition-all hover:bg-surface-container hover:border-outline-variant/30">
+<div class="flex flex-col md:flex-row md:items-center justify-between gap-6">
+<div class="flex items-center gap-6">
+<div class="w-16 h-16 rounded-lg bg-surface-container-highest flex items-center justify-center overflow-hidden border border-white/5">
+<img alt="Vanguard Design" class="w-full h-full object-cover opacity-80 group-hover:opacity-100 transition-opacity" data-alt="abstract geometric shape in deep magenta and black minimalist professional logo style" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAjQqnJf7-VMJwYdQjn7OFVtLmJkQVjwaCAzrgLxztCzNXlNDhy50lx-IQKCj0MA0MTkFT1WfGS0TGc9cO9HvneYkE8_T6IrNAz_ZjFHyfRowHJFhpauy5UUT6BrFSsp2xp6qAefuHfp4AXDkYr5GYQWUtuB_zBQZj_YfrCtXLm4urrbrW8fnVWttJDrohNBSD1YLSYdDkPm_UE9PB_XlpzDzdCIrXSUcOEtmEGIC_lJxATrBti2SfrrcmYeyiHl8bdJB-RydFIhEr4"/>
+</div>
+<div>
+<h3 class="font-h3 text-h3 text-on-surface">Vanguard Design</h3>
+<p class="font-body-md text-body-md text-zinc-500">vanguard.studio</p>
+</div>
+</div>
+<div class="flex flex-wrap items-center gap-4">
+<div class="bg-midnight-violet-base px-3 py-1 rounded-full border border-outline-muted/30">
+<span class="font-label-caps text-[10px] text-tertiary uppercase tracking-tighter flex items-center gap-2">
+<span class="w-1.5 h-1.5 rounded-full bg-tertiary"></span>
+                                Active
+                            </span>
+</div>
+<div class="flex items-center gap-2">
+<button class="p-2 text-zinc-500 hover:text-pink-400 hover:bg-white/5 rounded-lg transition-all">
+<span class="material-symbols-outlined" data-icon="edit">edit</span>
+</button>
+<button class="p-2 text-zinc-500 hover:text-error rounded-lg hover:bg-error-container/20 transition-all">
+<span class="material-symbols-outlined" data-icon="delete">delete</span>
+</button>
+</div>
+</div>
+</div>
+<div class="mt-4 pt-4 border-t border-white/5 grid grid-cols-2 md:grid-cols-4 gap-4">
+<div>
+<p class="font-label-caps text-[9px] text-zinc-600 uppercase">Engagement</p>
+<p class="font-body-md text-on-surface">24.5k</p>
+</div>
+<div>
+<p class="font-label-caps text-[9px] text-zinc-600 uppercase">Growth</p>
+<p class="font-body-md text-tertiary">+12%</p>
+</div>
+</div>
+</div>
+<!-- Brand Item 2 -->
+<div class="group relative bg-surface-container-low border border-white/5 rounded-xl p-6 transition-all hover:bg-surface-container hover:border-outline-variant/30">
+<div class="flex flex-col md:flex-row md:items-center justify-between gap-6">
+<div class="flex items-center gap-6">
+<div class="w-16 h-16 rounded-lg bg-surface-container-highest flex items-center justify-center overflow-hidden border border-white/5">
+<img alt="Ethereal Journal" class="w-full h-full object-cover opacity-80 group-hover:opacity-100 transition-opacity" data-alt="monochrome minimalist typography emblem for an editorial publication high contrast" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCYF7NFyhkcZnoNj5t9-oOMpuLAX16kVilmjcP4rtCNJDEA1hqDx1_srXJG5uy-yVuTSaSQl86RZWCbnNmM4a7RgH8ThYxLXcWKelDMaLkBuGHtDtyaMna3MRtF53xByRGrgYGoHqea7L79GUamIMCMm94ZVrI8hojG2lnMZ9JiEcfOT616su1XKybeCgXDgnrg8KjhE0-MsIOo6vj6mOD0IoWdadHvvd5VvvQ2H9wyiHvcPY4Yml4bxTvuTxiSZHC3AxZHgvSDYzaV"/>
+</div>
+<div>
+<h3 class="font-h3 text-h3 text-on-surface">Ethereal Journal</h3>
+<p class="font-body-md text-body-md text-zinc-500">ethereal-mag.io</p>
+</div>
+</div>
+<div class="flex flex-wrap items-center gap-4">
+<div class="bg-midnight-violet-base px-3 py-1 rounded-full border border-outline-muted/30">
+<span class="font-label-caps text-[10px] text-on-secondary-container uppercase tracking-tighter flex items-center gap-2">
+<span class="w-1.5 h-1.5 rounded-full bg-secondary"></span>
+                                Pending
+                            </span>
+</div>
+<div class="flex items-center gap-2">
+<button class="p-2 text-zinc-500 hover:text-pink-400 hover:bg-white/5 rounded-lg transition-all">
+<span class="material-symbols-outlined" data-icon="edit">edit</span>
+</button>
+<button class="p-2 text-zinc-500 hover:text-error rounded-lg hover:bg-error-container/20 transition-all">
+<span class="material-symbols-outlined" data-icon="delete">delete</span>
+</button>
+</div>
+</div>
+</div>
+<div class="mt-4 pt-4 border-t border-white/5 grid grid-cols-2 md:grid-cols-4 gap-4">
+<div>
+<p class="font-label-caps text-[9px] text-zinc-600 uppercase">Engagement</p>
+<p class="font-body-md text-on-surface">3.1k</p>
+</div>
+<div>
+<p class="font-label-caps text-[9px] text-zinc-600 uppercase">Status</p>
+<p class="font-body-md text-secondary">Verifying DNS</p>
+</div>
+</div>
+</div>
+<!-- Brand Item 3 (Empty State Suggestion) -->
+<div class="border-2 border-dashed border-white/5 rounded-xl p-12 flex flex-col items-center justify-center text-center group hover:border-pink-900/30 transition-all cursor-pointer">
+<div class="w-12 h-12 rounded-full bg-surface-container flex items-center justify-center mb-4 group-hover:bg-dark-raspberry transition-colors">
+<span class="material-symbols-outlined text-zinc-500 group-hover:text-white" data-icon="language">language</span>
+</div>
+<h4 class="font-h3 text-[1.25rem] text-zinc-400 group-hover:text-on-surface">Add a new domain</h4>
+<p class="font-body-md text-body-md text-zinc-600 mt-2 max-w-xs">Register your custom TLD or blog domain to start tracking insights.</p>
+</div>
+</section>
+<!-- Insights Summary (Bento Style) -->
+<section class="mt-xl grid grid-cols-1 md:grid-cols-3 gap-6">
+<div class="col-span-1 md:col-span-2 bg-surface-container-low rounded-xl p-8 border border-white/5 overflow-hidden relative">
+<div class="relative z-10">
+<h4 class="font-label-caps text-label-caps text-zinc-500 uppercase mb-4">Network Growth</h4>
+<div class="flex items-baseline gap-2">
+<span class="font-h1 text-h1 text-on-surface">24%</span>
+<span class="text-tertiary font-body-md">↑ Monthly avg</span>
+</div>
+</div>
+<div class="absolute bottom-0 left-0 w-full h-32 opacity-20">
+<svg class="w-full h-full" preserveaspectratio="none" viewbox="0 0 400 100">
+<path d="M0,80 Q50,70 100,85 T200,60 T300,75 T400,40 L400,100 L0,100 Z" fill="url(#grad)"></path>
+<defs>
+<lineargradient id="grad" x1="0%" x2="0%" y1="0%" y2="100%">
+<stop offset="0%" style="stop-color:#8f0164;stop-opacity:1"></stop>
+<stop offset="100%" style="stop-color:#120a0e;stop-opacity:0"></stop>
+</lineargradient>
+</defs>
+</svg>
+</div>
+</div>
+<div class="bg-primary-container/20 rounded-xl p-8 border border-primary/10 flex flex-col justify-between">
+<div>
+<h4 class="font-label-caps text-label-caps text-pink-300 uppercase mb-4">Pro Perks</h4>
+<p class="font-h3 text-h3 text-on-surface leading-tight">Unlock deeper audience analytics</p>
+</div>
+<a class="font-label-caps text-label-caps text-primary hover:underline flex items-center gap-2 mt-6" href="#">
+                    UPGRADE PLAN
+                    <span class="material-symbols-outlined text-sm" data-icon="arrow_forward">arrow_forward</span>
+</a>
+</div>
+</section>
+</main>
+<!-- BottomNavBar -->
+<nav class="md:hidden fixed bottom-0 left-0 w-full bg-zinc-950/80 backdrop-blur-lg border-t border-white/5 z-50 rounded-t-lg">
+<div class="flex justify-around items-center px-4 pb-6 pt-3">
+<button class="flex flex-col items-center justify-center text-zinc-500 hover:text-zinc-300">
+<span class="material-symbols-outlined" data-icon="directions_run">directions_run</span>
+<span class="font-sans text-[10px] font-medium tracking-widest uppercase mt-1">Route</span>
+</button>
+<button class="flex flex-col items-center justify-center text-zinc-500 hover:text-zinc-300">
+<span class="material-symbols-outlined" data-icon="link">link</span>
+<span class="font-sans text-[10px] font-medium tracking-widest uppercase mt-1">Links</span>
+</button>
+<button class="flex flex-col items-center justify-center bg-pink-900/20 text-pink-500 rounded-xl px-3 py-1 scale-95 duration-150">
+<span class="material-symbols-outlined" data-icon="group" style="font-variation-settings: 'FILL' 1;">group</span>
+<span class="font-sans text-[10px] font-medium tracking-widest uppercase mt-1">Creators</span>
+</button>
+<button class="flex flex-col items-center justify-center text-zinc-500 hover:text-zinc-300">
+<span class="material-symbols-outlined" data-icon="explore">explore</span>
+<span class="font-sans text-[10px] font-medium tracking-widest uppercase mt-1">Discover</span>
+</button>
+</div>
+</nav>
+</body></html>

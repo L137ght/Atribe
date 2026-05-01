@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,200..800;1,6..72,200..800&amp;family=Manrope:wght@200..800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "outline-muted": "#55414a",
+                    "on-secondary-container": "#cfacb9",
+                    "secondary": "#e2bdcb",
+                    "on-secondary-fixed-variant": "#5a3f4b",
+                    "on-primary": "#620043",
+                    "surface-tint": "#ffafd6",
+                    "tertiary-fixed": "#b4f490",
+                    "surface-variant": "#3e3137",
+                    "inverse-surface": "#f2dde4",
+                    "primary-fixed": "#ffd8e8",
+                    "on-secondary": "#422934",
+                    "on-primary-container": "#ff99ce",
+                    "on-tertiary-container": "#8cca6b",
+                    "surface-dim": "#1b1015",
+                    "error": "#ffb4ab",
+                    "surface-container": "#281c22",
+                    "primary-container": "#8f0164",
+                    "surface": "#1b1015",
+                    "midnight-violet-elevated": "#1d1116",
+                    "on-primary-fixed": "#3c0028",
+                    "surface-container-low": "#24181e",
+                    "secondary-fixed": "#ffd8e7",
+                    "on-surface-variant": "#dbbfca",
+                    "primary-fixed-dim": "#ffafd6",
+                    "midnight-violet-base": "#120a0e",
+                    "surface-bright": "#43363b",
+                    "inverse-on-surface": "#3a2d32",
+                    "alabaster-grey": "#d7dedc",
+                    "secondary-container": "#5a3f4b",
+                    "error-container": "#93000a",
+                    "on-primary-fixed-variant": "#8a0060",
+                    "surface-container-high": "#33272c",
+                    "surface-container-lowest": "#150b10",
+                    "on-error-container": "#ffdad6",
+                    "on-surface": "#f2dde4",
+                    "on-secondary-fixed": "#2a151f",
+                    "tertiary-fixed-dim": "#99d776",
+                    "tertiary": "#99d776",
+                    "on-background": "#f2dde4",
+                    "inverse-primary": "#aa247a",
+                    "surface-container-highest": "#3e3137",
+                    "tertiary-container": "#1f5500",
+                    "on-tertiary-fixed-variant": "#1d5200",
+                    "on-tertiary": "#123800",
+                    "dark-raspberry": "#8f0164",
+                    "secondary-fixed-dim": "#e2bdcb",
+                    "primary": "#ffafd6",
+                    "background": "#1b1015",
+                    "on-error": "#690005",
+                    "outline": "#a38a94",
+                    "on-tertiary-fixed": "#082100",
+                    "outline-variant": "#55414a"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.125rem",
+                    "lg": "0.25rem",
+                    "xl": "0.5rem",
+                    "full": "0.75rem"
+            },
+            "spacing": {
+                    "unit": "4px",
+                    "gutter": "24px",
+                    "lg": "2.5rem",
+                    "md": "1.5rem",
+                    "margin": "max(5vw, 24px)",
+                    "xs": "0.5rem",
+                    "xl": "4rem",
+                    "sm": "1rem"
+            },
+            "fontFamily": {
+                    "h3": ["Newsreader"],
+                    "h1": ["Newsreader"],
+                    "body-lg": ["Manrope"],
+                    "h2": ["Newsreader"],
+                    "body-md": ["Manrope"],
+                    "display": ["Newsreader"],
+                    "label-caps": ["Manrope"]
+            },
+            "fontSize": {
+                    "h3": ["1.5rem", {"lineHeight": "1.4", "fontWeight": "500"}],
+                    "h1": ["3rem", {"lineHeight": "1.2", "fontWeight": "400"}],
+                    "body-lg": ["1.125rem", {"lineHeight": "1.7", "fontWeight": "400"}],
+                    "h2": ["2.25rem", {"lineHeight": "1.3", "fontWeight": "400"}],
+                    "body-md": ["1rem", {"lineHeight": "1.6", "fontWeight": "400"}],
+                    "display": ["4.5rem", {"lineHeight": "1.1", "letterSpacing": "-0.02em", "fontWeight": "300"}],
+                    "label-caps": ["0.75rem", {"lineHeight": "1.2", "letterSpacing": "0.1em", "fontWeight": "700"}]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        body {
+            background-color: #1b1015;
+            color: #f2dde4;
+            -webkit-font-smoothing: antialiased;
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 4px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: #1b1015;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #33272c;
+            border-radius: 10px;
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="font-body-md text-body-md overflow-x-hidden selection:bg-dark-raspberry selection:text-white">
+<!-- TopAppBar -->
+<header class="fixed top-0 z-50 w-full bg-zinc-950/70 backdrop-blur-xl border-b border-white/10 flex justify-between items-center px-6 py-4">
+<div class="flex items-center gap-4">
+<button class="hover:bg-white/5 transition-colors p-2 rounded-full">
+<span class="material-symbols-outlined text-zinc-100">menu</span>
+</button>
+<h1 class="text-2xl font-serif italic text-pink-700 dark:text-pink-600 tracking-tight">Atribe</h1>
+</div>
+<div class="flex items-center gap-4">
+<div class="w-10 h-10 rounded-full overflow-hidden border border-white/10">
+<img alt="Profile" class="w-full h-full object-cover" data-alt="Close-up portrait of a stylish woman with soft cinematic lighting against a dark minimalist studio background" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBNQdT2rBbSh_lv9uDkvJnLpPThiI8BBg0ms_WUhfX0oVMv4dRT8OzHRRUprG_jZyyYEj-yCXIG9T6ZaHwTyE8XRDgDtf28tG9DtpWl3vBqo0Tt4KgpH1PpqFlmKhXczvcrbdcCySw29bW975Jf63dK4pqRU24LD6hhoqmdptpf7oTZ9REcks79danDJ6bq7CeMFb-YeEEQEp_FBDJxItHnEgVEMTjkzHAZR9FpItfT3yRHgc3Ij4C8cmPcLxliGGG677gOHh1EvxKC"/>
+</div>
+</div>
+</header>
+<main class="pt-24 pb-32 px-margin max-w-7xl mx-auto min-h-screen">
+<!-- Search & Discovery Header -->
+<section class="mb-xl">
+<div class="flex flex-col md:flex-row md:items-end justify-between gap-md">
+<div>
+<span class="font-label-caps text-label-caps text-primary uppercase tracking-[0.2em] block mb-xs">Curation</span>
+<h2 class="font-h1 text-h1 mb-sm">Discover Creators</h2>
+<p class="font-body-lg text-body-lg text-on-surface-variant max-w-xl">
+                        Unveiling the architects of digital culture. High-fidelity connections for brands that value substance over noise.
+                    </p>
+</div>
+</div>
+<!-- Search Bar Component -->
+<div class="mt-lg relative group">
+<div class="absolute inset-y-0 left-6 flex items-center pointer-events-none">
+<span class="material-symbols-outlined text-outline">search</span>
+</div>
+<input class="w-full bg-surface-container-low border-b border-outline-muted py-6 pl-16 pr-6 font-body-lg text-on-surface focus:outline-none focus:border-dark-raspberry transition-colors placeholder:text-outline-muted rounded-t-xl" placeholder="Search by name, niche, or platform..." type="text"/>
+</div>
+<!-- Filter Chips -->
+<div class="mt-md flex flex-wrap gap-xs">
+<button class="bg-dark-raspberry text-white font-label-caps text-[10px] px-6 py-2 rounded-full uppercase tracking-widest">All Tiers</button>
+<button class="bg-surface-container-high text-on-surface-variant font-label-caps text-[10px] px-6 py-2 rounded-full uppercase tracking-widest border border-white/5 hover:border-primary/30 transition-all">Editorial</button>
+<button class="bg-surface-container-high text-on-surface-variant font-label-caps text-[10px] px-6 py-2 rounded-full uppercase tracking-widest border border-white/5 hover:border-primary/30 transition-all">Visual Arts</button>
+<button class="bg-surface-container-high text-on-surface-variant font-label-caps text-[10px] px-6 py-2 rounded-full uppercase tracking-widest border border-white/5 hover:border-primary/30 transition-all">Tech &amp; Futurism</button>
+<button class="bg-surface-container-high text-on-surface-variant font-label-caps text-[10px] px-6 py-2 rounded-full uppercase tracking-widest border border-white/5 hover:border-primary/30 transition-all">Fashion</button>
+<button class="bg-surface-container-high text-on-surface-variant font-label-caps text-[10px] px-6 py-2 rounded-full uppercase tracking-widest border border-white/5 hover:border-primary/30 transition-all">Sustainability</button>
+</div>
+</section>
+<!-- Featured Creator (Editorial Card) -->
+<section class="mb-xl">
+<div class="relative w-full aspect-[21/9] rounded-xl overflow-hidden group">
+<img alt="Featured Creator" class="w-full h-full object-cover" data-alt="Sophisticated woman working in a high-end minimalist tech laboratory with soft purple and pink ambient lighting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCguhk80zYbFRpRHyPO-4EZ6vOTYkm526fWUuUveVYcREP4b7y7uEUfHdV8bNg9Jn_8ctnzWotKBcSyouJMH41QWONl_c3L-jqY6wRsgc5NvS7SY7ArSw4rwz1KJqjLRTWD6mp8XyHkwUnVUV674KhLvMDu6UFpG43nDrYwTPI-N-Maxih5GswrzGu2sqhXA229dkgeslDLg8DVE60uuXOjEkIrq_hM6rnJm5ubyyVWeuUztpXkRPeIymHrDdKhD4MtTuv5RF9D4Qno"/>
+<div class="absolute inset-0 bg-gradient-to-t from-background via-background/40 to-transparent"></div>
+<div class="absolute bottom-0 left-0 p-lg max-w-2xl">
+<span class="inline-block bg-primary text-on-primary font-label-caps text-[10px] px-3 py-1 mb-md">SPOTLIGHT OF THE MONTH</span>
+<h3 class="font-h1 text-h1 text-white mb-xs">Elena Vossen</h3>
+<p class="font-body-lg text-body-lg text-alabaster-grey/80 mb-md">Bridging the gap between generative AI and classical haute couture. A vision of the future that respects the past.</p>
+<div class="flex gap-md">
+<button class="bg-dark-raspberry text-on-surface font-label-caps text-[10px] px-8 py-3 rounded-full hover:opacity-90 transition-opacity">VIEW PORTFOLIO</button>
+<button class="border border-white/20 text-white font-label-caps text-[10px] px-8 py-3 rounded-full hover:bg-white/5 transition-colors">REQUEST COLLAB</button>
+</div>
+</div>
+</div>
+</section>
+<!-- Creator Grid -->
+<section class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-gutter">
+<!-- Creator Card 1 -->
+<div class="bg-surface-container-low border border-white/5 rounded-lg overflow-hidden flex flex-col hover:border-primary/20 transition-all group">
+<div class="aspect-square relative overflow-hidden">
+<img alt="Creator" class="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-700" data-alt="Portrait of a male architect in a dark studio, dramatic lighting on face, holding a blueprint, moody atmosphere" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDb8AuoITJb7ovU6Kfn7XLNlrZNqur-_A8-_LvT98hZ147sqK_ZGtfRUcgifBUyNj_Zttwn_ljhzYSKiyDghtv18jRvmvJnFYu4D4C5kzEbZy6P4RTMEzzNslaR2VNvhehY7i7G1jacdUukpYMHkS-D2BIcbTRmbusX77SMpwYRxtoCugWIwNojuTXyhSZPZglp4XVF0wkxLFADzcEy5c9PtuUVueWPOZ8yXNpE0d8LqnQ2sslguoMllIVcQbdH1aR5YDzJcgYuTvDK"/>
+<div class="absolute top-4 right-4 bg-zinc-950/60 backdrop-blur-md p-2 rounded-full">
+<span class="material-symbols-outlined text-sm text-pink-500">verified</span>
+</div>
+</div>
+<div class="p-md">
+<div class="flex justify-between items-start mb-xs">
+<h4 class="font-h3 text-h3">Marcus Thorne</h4>
+<span class="font-label-caps text-[10px] text-primary">INSTAGRAM</span>
+</div>
+<p class="text-on-surface-variant font-body-md line-clamp-2 mb-md">Sustainable urbanism and the future of living spaces. 1.2M Community.</p>
+<div class="pt-md border-t border-white/5 flex justify-between items-center">
+<div class="flex -space-x-2">
+<div class="w-6 h-6 rounded-full bg-secondary-container border border-background flex items-center justify-center text-[8px]">AM</div>
+<div class="w-6 h-6 rounded-full bg-primary-container border border-background flex items-center justify-center text-[8px]">LC</div>
+<div class="w-6 h-6 rounded-full bg-surface-bright border border-background flex items-center justify-center text-[8px]">+4</div>
+</div>
+<span class="font-label-caps text-[10px] text-outline">TRUSTED BY TOP BRANDS</span>
+</div>
+</div>
+</div>
+<!-- Creator Card 2 -->
+<div class="bg-surface-container-low border border-white/5 rounded-lg overflow-hidden flex flex-col hover:border-primary/20 transition-all group">
+<div class="aspect-square relative overflow-hidden">
+<img alt="Creator" class="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-700" data-alt="High fashion editorial shot of a woman with neon pink lighting accents, futuristic aesthetic, sleek hair" src="https://lh3.googleusercontent.com/aida-public/AB6AXuD0ECCrFkIgVyboo-CaYB41OFwpWYI6nuINb-FE_djHh7qAamQEzU5R1mu5TPbYExk6Ch66wtYrV6-wsOjyQiljymhi62YKjg7oGz-Z3zYh1udXeGwivL3MjB9xPnY1dcLXQ2abYPhwuEGPVNJAvqR76Z472KIul5ONiDkpcPR4x4d0HiM2luaNbkf-ckEE1nNsLB4SHnVJC3PHi12B_XB44yFRCnM73cbmyj96U9FEfyaZV7tT3O40Wq1x4QytujdCWjV7FQ2bBUwG"/>
+</div>
+<div class="p-md">
+<div class="flex justify-between items-start mb-xs">
+<h4 class="font-h3 text-h3">Sora Leigh</h4>
+<span class="font-label-caps text-[10px] text-primary">TIKTOK</span>
+</div>
+<p class="text-on-surface-variant font-body-md line-clamp-2 mb-md">Digital fashion pioneer and 3D avatar stylist. Redefining virtual identity.</p>
+<div class="pt-md border-t border-white/5 flex justify-between items-center">
+<div class="flex -space-x-2">
+<div class="w-6 h-6 rounded-full bg-secondary-container border border-background"></div>
+<div class="w-6 h-6 rounded-full bg-primary-container border border-background"></div>
+</div>
+<span class="font-label-caps text-[10px] text-outline">NEW ON ATRIBE</span>
+</div>
+</div>
+</div>
+<!-- Creator Card 3 -->
+<div class="bg-surface-container-low border border-white/5 rounded-lg overflow-hidden flex flex-col hover:border-primary/20 transition-all group">
+<div class="aspect-square relative overflow-hidden">
+<img alt="Creator" class="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-700" data-alt="Cinematic shot of a man in a modern library setting, soft natural light, focused and intelligent look" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAD7JtFA4v_U9xSEs6P0MTqfwksxOCD-KbYMvafBu42pHWPqjgpKDFTnoksZolFzyTCkbNYggow6nodjCL0OZ0n7ZJtjY8yMUvCOGT8W4GZddHOTbLGC2AwrZqNvwxHj1judPPbf0CB_HR6jc9cl0KyDW9dr6E4wNxHCyQ_HK7OObqydQRJtH3fY-xNhsQwpJOlfe12VpxLzRQIKWQtA09Oyp32MWBvmEXHbs4PtuAtU62yvkYPVWWCfUgaZQqPnIor6bR9HsVOZ1K0"/>
+<div class="absolute top-4 right-4 bg-zinc-950/60 backdrop-blur-md p-2 rounded-full">
+<span class="material-symbols-outlined text-sm text-pink-500">star</span>
+</div>
+</div>
+<div class="p-md">
+<div class="flex justify-between items-start mb-xs">
+<h4 class="font-h3 text-h3">Julian K.</h4>
+<span class="font-label-caps text-[10px] text-primary">YOUTUBE</span>
+</div>
+<p class="text-on-surface-variant font-body-md line-clamp-2 mb-md">Video essays on philosophy and technology. Deep-dive intellectual content.</p>
+<div class="pt-md border-t border-white/5 flex justify-between items-center">
+<div class="flex gap-2">
+<span class="w-2 h-2 rounded-full bg-green-500"></span>
+<span class="font-label-caps text-[10px] text-outline">OPEN TO COLLABS</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Creator Card 4 -->
+<div class="bg-surface-container-low border border-white/5 rounded-lg overflow-hidden flex flex-col hover:border-primary/20 transition-all group">
+<div class="aspect-square relative overflow-hidden">
+<img alt="Creator" class="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-700" data-alt="Portrait of a young woman with creative makeup, vibrant colors, shot in a high-end photography studio" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAd9UatATKPJkl9hxDttR_-gq1c_8hi8b3DcGKhVtGUbh-elNpDORI8fEGbplNn-_PF97Wpimbo22C88WxYnFcODl-mRbKPu3S_C5LKDdr95IUXLf2j6-xMqx81l30UxEpcWADUzSnGrjn-2fRdIli_cKKnWPTNtpvRh0nqzApAZmneFOhL-zDBqxpxsw4hnqdzWXJ2NiLtd9ea3IDiRQ5FokBrAFDQZC7Qot9OfdryFO-kP7_4XjXgTRotG9fyuR8SOKYms2xLoREL"/>
+</div>
+<div class="p-md">
+<div class="flex justify-between items-start mb-xs">
+<h4 class="font-h3 text-h3">Tasha Moon</h4>
+<span class="font-label-caps text-[10px] text-primary">BEHANCE</span>
+</div>
+<p class="text-on-surface-variant font-body-md line-clamp-2 mb-md">Surrealist motion designer and conceptual artist. Visual storytelling redefined.</p>
+<div class="pt-md border-t border-white/5 flex justify-between items-center">
+<span class="font-label-caps text-[10px] text-outline">TOP RATED</span>
+</div>
+</div>
+</div>
+<!-- Creator Card 5 -->
+<div class="bg-surface-container-low border border-white/5 rounded-lg overflow-hidden flex flex-col hover:border-primary/20 transition-all group">
+<div class="aspect-square relative overflow-hidden">
+<img alt="Creator" class="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-700" data-alt="Close up of a man with an edgy look, urban background at dusk, cool blue and orange lighting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCyUoHvTUiLbAwX7DoTwT614dGmw79aXkhx33LlLDr2QZ7qJyK0gzoGdaIxT9zPEjw7yNqGHxDPJxtVl7DCDc6qPifPXWN-lfxlmiH1xsNgoPFxUFxPqt37KbxVnoxS-7z7PpffOYms2XqMD8nKQYu8UZEkWFSLx5x4cJwCxg-YXFy20yszvcxMGKaTGWrCiNUJee_adWpskgKuC-WAkp9le7sGrCjoZSABJCAvLZnG_vZQVo9yPnhPkDN2NV_u6sdefEeyEoD4shT3"/>
+</div>
+<div class="p-md">
+<div class="flex justify-between items-start mb-xs">
+<h4 class="font-h3 text-h3">Erik Vance</h4>
+<span class="font-label-caps text-[10px] text-primary">SUBSTACK</span>
+</div>
+<p class="text-on-surface-variant font-body-md line-clamp-2 mb-md">Cultural commentary and political analysis for the modern reader.</p>
+<div class="pt-md border-t border-white/5 flex justify-between items-center">
+<span class="font-label-caps text-[10px] text-outline">EDITORIAL TIER</span>
+</div>
+</div>
+</div>
+<!-- Creator Card 6 -->
+<div class="bg-surface-container-low border border-white/5 rounded-lg overflow-hidden flex flex-col hover:border-primary/20 transition-all group">
+<div class="aspect-square relative overflow-hidden">
+<img alt="Creator" class="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-700" data-alt="Candid portrait of a natural woman in a minimalist white room, soft daylight, serene and authentic mood" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCLOiKIemJoysvECLacDjUdVhBCmzIT3mXsWO-9ZwOwmeMc9mu5TLwj2bQbAWVVZj1eEOHp0OAzGQy_ZmFVGq7Rg5JvtiFILGVy3JaMncZp0ZRIXxoxMN2dOIfo8V3QCLcN_47GyWgkHaakXS1Jf93gSZTxTwQvK87py7gSVLql3XZCvh0HluR1cPXCMmyTRv4lqM-j6fFkJyJYEnlw_3zRAdxGFZ-Ac35SuNsTqxt2qxW0fTX3OSbr-pEw80tVxgF66QDGqj7S8MbP"/>
+</div>
+<div class="p-md">
+<div class="flex justify-between items-start mb-xs">
+<h4 class="font-h3 text-h3">Mia Lindon</h4>
+<span class="font-label-caps text-[10px] text-primary">PINTEREST</span>
+</div>
+<p class="text-on-surface-variant font-body-md line-clamp-2 mb-md">Minimalist interior design and lifestyle curation. Aesthetic excellence.</p>
+<div class="pt-md border-t border-white/5 flex justify-between items-center">
+<span class="font-label-caps text-[10px] text-outline">PLATINUM PARTNER</span>
+</div>
+</div>
+</div>
+</section>
+<!-- Loading Indicator / More Button -->
+<div class="mt-xl flex justify-center">
+<button class="flex items-center gap-2 text-on-surface-variant font-label-caps text-xs tracking-widest hover:text-primary transition-colors py-4">
+                EXPLORE MORE TALENT
+                <span class="material-symbols-outlined text-sm">expand_more</span>
+</button>
+</div>
+</main>
+<!-- BottomNavBar -->
+<nav class="fixed bottom-0 left-0 w-full flex justify-around items-center px-4 pb-6 pt-3 bg-zinc-950/80 backdrop-blur-lg border-t border-white/5 z-50 rounded-t-lg">
+<a class="flex flex-col items-center justify-center text-zinc-500 hover:text-zinc-300 group" href="#">
+<span class="material-symbols-outlined mb-1 group-hover:scale-110 transition-transform">directions_run</span>
+<span class="font-sans text-[10px] font-medium tracking-widest uppercase">Route</span>
+</a>
+<a class="flex flex-col items-center justify-center text-zinc-500 hover:text-zinc-300 group" href="#">
+<span class="material-symbols-outlined mb-1 group-hover:scale-110 transition-transform">link</span>
+<span class="font-sans text-[10px] font-medium tracking-widest uppercase">Links</span>
+</a>
+<a class="flex flex-col items-center justify-center bg-pink-900/20 text-pink-500 rounded-xl px-3 py-1 scale-95 duration-150" href="#">
+<span class="material-symbols-outlined mb-1" style="font-variation-settings: 'FILL' 1;">group</span>
+<span class="font-sans text-[10px] font-medium tracking-widest uppercase">Creators</span>
+</a>
+<a class="flex flex-col items-center justify-center text-zinc-500 hover:text-zinc-300 group" href="#">
+<span class="material-symbols-outlined mb-1 group-hover:scale-110 transition-transform">explore</span>
+<span class="font-sans text-[10px] font-medium tracking-widest uppercase">Discover</span>
+</a>
+</nav>
+</body></html>

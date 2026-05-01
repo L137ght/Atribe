@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,wght@0,300;0,400;0,500;1,400&amp;family=Manrope:wght@400;500;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "outline-muted": "#55414a",
+                    "on-secondary-container": "#cfacb9",
+                    "secondary": "#e2bdcb",
+                    "on-secondary-fixed-variant": "#5a3f4b",
+                    "on-primary": "#620043",
+                    "surface-tint": "#ffafd6",
+                    "tertiary-fixed": "#b4f490",
+                    "surface-variant": "#3e3137",
+                    "inverse-surface": "#f2dde4",
+                    "primary-fixed": "#ffd8e8",
+                    "on-secondary": "#422934",
+                    "on-primary-container": "#ff99ce",
+                    "on-tertiary-container": "#8cca6b",
+                    "surface-dim": "#1b1015",
+                    "error": "#ffb4ab",
+                    "surface-container": "#281c22",
+                    "primary-container": "#8f0164",
+                    "surface": "#1b1015",
+                    "midnight-violet-elevated": "#1d1116",
+                    "on-primary-fixed": "#3c0028",
+                    "surface-container-low": "#24181e",
+                    "secondary-fixed": "#ffd8e7",
+                    "on-surface-variant": "#dbbfca",
+                    "primary-fixed-dim": "#ffafd6",
+                    "midnight-violet-base": "#120a0e",
+                    "surface-bright": "#43363b",
+                    "inverse-on-surface": "#3a2d32",
+                    "alabaster-grey": "#d7dedc",
+                    "secondary-container": "#5a3f4b",
+                    "error-container": "#93000a",
+                    "on-primary-fixed-variant": "#8a0060",
+                    "surface-container-high": "#33272c",
+                    "surface-container-lowest": "#150b10",
+                    "on-error-container": "#ffdad6",
+                    "on-surface": "#f2dde4",
+                    "on-secondary-fixed": "#2a151f",
+                    "tertiary-fixed-dim": "#99d776",
+                    "tertiary": "#99d776",
+                    "on-background": "#f2dde4",
+                    "inverse-primary": "#aa247a",
+                    "surface-container-highest": "#3e3137",
+                    "tertiary-container": "#1f5500",
+                    "on-tertiary-fixed-variant": "#1d5200",
+                    "on-tertiary": "#123800",
+                    "dark-raspberry": "#8f0164",
+                    "secondary-fixed-dim": "#e2bdcb",
+                    "primary": "#ffafd6",
+                    "background": "#1b1015",
+                    "on-error": "#690005",
+                    "outline": "#a38a94",
+                    "on-tertiary-fixed": "#082100",
+                    "outline-variant": "#55414a"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.125rem",
+                    "lg": "0.25rem",
+                    "xl": "0.5rem",
+                    "full": "0.75rem"
+            },
+            "spacing": {
+                    "unit": "4px",
+                    "gutter": "24px",
+                    "lg": "2.5rem",
+                    "md": "1.5rem",
+                    "margin": "max(5vw, 24px)",
+                    "xs": "0.5rem",
+                    "xl": "4rem",
+                    "sm": "1rem"
+            },
+            "fontFamily": {
+                    "h3": ["Newsreader"],
+                    "h1": ["Newsreader"],
+                    "body-lg": ["Manrope"],
+                    "h2": ["Newsreader"],
+                    "body-md": ["Manrope"],
+                    "display": ["Newsreader"],
+                    "label-caps": ["Manrope"]
+            },
+            "fontSize": {
+                    "h3": ["1.5rem", {"lineHeight": "1.4", "fontWeight": "500"}],
+                    "h1": ["3rem", {"lineHeight": "1.2", "fontWeight": "400"}],
+                    "body-lg": ["1.125rem", {"lineHeight": "1.7", "fontWeight": "400"}],
+                    "h2": ["2.25rem", {"lineHeight": "1.3", "fontWeight": "400"}],
+                    "body-md": ["1rem", {"lineHeight": "1.6", "fontWeight": "400"}],
+                    "display": ["4.5rem", {"lineHeight": "1.1", "letterSpacing": "-0.02em", "fontWeight": "300"}],
+                    "label-caps": ["0.75rem", {"lineHeight": "1.2", "letterSpacing": "0.1em", "fontWeight": "700"}]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        body {
+            background-color: #120a0e;
+        }
+        .editorial-quote {
+            border-left: 3px solid #8f0164;
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 24;
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+</head>
+<body class="bg-background text-on-background selection:bg-primary-container selection:text-white min-h-screen flex flex-col font-body-md">
+<!-- TopAppBar -->
+<header class="fixed top-0 z-50 w-full bg-zinc-950/70 backdrop-blur-xl border-b border-white/10 flex justify-between items-center px-6 py-4">
+<div class="flex items-center gap-4">
+<button class="text-zinc-100 hover:bg-white/5 transition-colors p-2 rounded-full">
+<span class="material-symbols-outlined" data-icon="menu">menu</span>
+</button>
+<h1 class="text-2xl font-serif italic text-pink-700 dark:text-pink-600 tracking-tight">Atribe</h1>
+</div>
+<div class="flex items-center">
+<img alt="Profile" class="w-8 h-8 rounded-full border border-white/10 object-cover" data-alt="Close-up professional portrait of a woman with minimalist aesthetic, soft dramatic studio lighting, moody dark background" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDjo2QNjvooieioFn_ceFCmU5SwnpNDQoi09HRlPGS88QyZ0gQWRt6DhP5tQiMQHCrtfzbCGE2tb0JAPTLOXRB03zR6M8Z4vlalfFdZ9SR3Iaqx9HvLJveF3RWrhO-3oXalSRYZ4uiJ-t6wCmzGhLIg-t12r5bead4uVzlUrtyZJAwjqNzuArjZqxq0MZtRjG3w6mn1deeNjPrwyChLvkQz6u-rqmENWoSyFag5KXdMdATaM4QnTirv8PIKSN28qC3T5HWRMoTClNrB"/>
+</div>
+</header>
+<main class="flex-grow flex flex-col justify-center items-center px-margin pt-32 pb-16">
+<!-- Content Container -->
+<div class="max-w-4xl w-full">
+<!-- Hero Title -->
+<div class="mb-xl text-center">
+<p class="font-label-caps text-primary tracking-[0.2em] mb-sm uppercase">Join the Inner Circle</p>
+<h2 class="font-h1 text-h1 text-on-background mb-md">Choose your path</h2>
+</div>
+<!-- Bento Selection Grid -->
+<div class="grid grid-cols-1 md:grid-cols-2 gap-md items-stretch">
+<!-- Option 1: Support Creators -->
+<button class="group relative flex flex-col text-left h-full bg-surface-container-low border border-white/5 p-lg rounded-xl transition-all duration-300 hover:bg-surface-container hover:border-primary/30">
+<div class="absolute top-6 right-6 opacity-20 group-hover:opacity-100 transition-opacity text-primary">
+<span class="material-symbols-outlined text-4xl" data-icon="favorite">favorite</span>
+</div>
+<div class="mt-auto">
+<div class="mb-md">
+<span class="material-symbols-outlined text-primary text-4xl" data-icon="explore">explore</span>
+</div>
+<h3 class="font-h2 text-h2 mb-xs text-on-surface group-hover:text-primary transition-colors">Support creators</h3>
+<p class="font-body-md text-on-surface-variant leading-relaxed">Support your favorite creators, brands and causes</p>
+<div class="mt-md flex items-center gap-2 text-primary font-label-caps opacity-0 group-hover:opacity-100 transition-all translate-x-[-10px] group-hover:translate-x-0">
+<span>ENTER THE ARCHIVE</span>
+<span class="material-symbols-outlined text-sm" data-icon="arrow_forward">arrow_forward</span>
+</div>
+</div>
+<!-- Subtle tonal shift background for depth -->
+<div class="absolute inset-0 bg-gradient-to-br from-primary/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity rounded-xl -z-10"></div>
+</button>
+<!-- Option 2: I am a Creator -->
+<button class="group relative flex flex-col text-left h-full bg-surface-container-low border border-white/5 p-lg rounded-xl transition-all duration-300 hover:bg-surface-container hover:border-primary/30">
+<div class="absolute top-6 right-6 opacity-20 group-hover:opacity-100 transition-opacity text-primary">
+<span class="material-symbols-outlined text-4xl" data-icon="edit_note">edit_note</span>
+</div>
+<div class="mt-auto">
+<div class="mb-md">
+<span class="material-symbols-outlined text-primary text-4xl" data-icon="auto_stories">auto_stories</span>
+</div>
+<h3 class="font-h2 text-h2 mb-xs text-on-surface group-hover:text-primary transition-colors">I am a creator</h3>
+<p class="font-body-md text-on-surface-variant leading-relaxed">Harness the power of your network and build a tribe</p>
+<div class="mt-md flex items-center gap-2 text-primary font-label-caps opacity-0 group-hover:opacity-100 transition-all translate-x-[-10px] group-hover:translate-x-0">
+<span>START YOUR JOURNAL</span>
+<span class="material-symbols-outlined text-sm" data-icon="arrow_forward">arrow_forward</span>
+</div>
+</div>
+<div class="absolute inset-0 bg-gradient-to-br from-primary/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity rounded-xl -z-10"></div>
+</button>
+</div>
+<!-- Contextual Footer Message -->
+<div class="mt-xl text-center">
+<p class="text-on-surface-variant font-body-md opacity-60">
+                    You can change your primary focus at any time in your profile settings.
+                </p>
+</div>
+</div>
+</main>
+<!-- BottomNavBar (Only shown if top-level) -->
+<nav class="fixed bottom-0 left-0 w-full flex justify-around items-center px-4 pb-6 pt-3 bg-zinc-950/80 backdrop-blur-lg border-t border-white/5 z-50 rounded-t-lg md:hidden">
+<a class="flex flex-col items-center justify-center text-zinc-500 hover:text-zinc-300" href="#">
+<span class="material-symbols-outlined" data-icon="directions_run">directions_run</span>
+<span class="font-sans text-[10px] font-medium tracking-widest uppercase mt-1">Route</span>
+</a>
+<a class="flex flex-col items-center justify-center text-zinc-500 hover:text-zinc-300" href="#">
+<span class="material-symbols-outlined" data-icon="link">link</span>
+<span class="font-sans text-[10px] font-medium tracking-widest uppercase mt-1">Links</span>
+</a>
+<a class="flex flex-col items-center justify-center text-zinc-500 hover:text-zinc-300" href="#">
+<span class="material-symbols-outlined" data-icon="group">group</span>
+<span class="font-sans text-[10px] font-medium tracking-widest uppercase mt-1">Creators</span>
+</a>
+<a class="flex flex-col items-center justify-center text-zinc-500 hover:text-zinc-300" href="#">
+<span class="material-symbols-outlined" data-icon="explore">explore</span>
+<span class="font-sans text-[10px] font-medium tracking-widest uppercase mt-1">Discover</span>
+</a>
+</nav>
+</body></html>
