@@ -8,7 +8,7 @@ export const orderAttributionRepository = {
     if (env.dbProvider === "supabase") {
       const row = await fetchOne(
         "shopify_order_attributions",
-        "shop_domain, order_id, creator_id, user_id, brand_id, platform_type, attribution_source, order_value, currency, click_id, snapshot_id, fallback_reason, created_at",
+        "shop_domain, order_id, creator_id, user_id, brand_id, platform_type, attribution_source, order_value, currency, click_id, snapshot_id, fallback_reason, atribe_ref, coupon_code, processed_at, created_at",
         {
           order_id: orderId,
           shop_domain: shopDomain
@@ -29,9 +29,9 @@ export const orderAttributionRepository = {
             clickId: row.click_id,
             snapshotId: row.snapshot_id,
             fallbackReason: row.fallback_reason || null,
-            atribeRef: null,
-            couponCode: null,
-            processedAt: row.created_at
+            atribeRef: row.atribe_ref || null,
+            couponCode: row.coupon_code || null,
+            processedAt: row.processed_at || row.created_at
           }
         : null;
     }
@@ -76,6 +76,8 @@ export const orderAttributionRepository = {
     couponCode
   }) {
     if (env.dbProvider === "supabase") {
+      const timestamp = new Date().toISOString();
+
       await insertRow("shopify_order_attributions", {
         shop_domain: shopDomain,
         order_id: orderId,
@@ -89,7 +91,10 @@ export const orderAttributionRepository = {
         click_id: clickId || null,
         snapshot_id: snapshotId || null,
         fallback_reason: fallbackReason,
-        created_at: new Date().toISOString()
+        atribe_ref: atribeRef || null,
+        coupon_code: couponCode || null,
+        processed_at: timestamp,
+        created_at: timestamp
       });
       return;
     }
@@ -151,8 +156,8 @@ export const orderAttributionRepository = {
     if (env.dbProvider === "supabase") {
       const rows = await fetchMany({
         tableName: "shopify_order_attributions",
-        columns: "shop_domain, order_id, creator_id, user_id, brand_id, platform_type, attribution_source, order_value, currency, click_id, snapshot_id, fallback_reason, created_at",
-        orderBy: "created_at",
+        columns: "shop_domain, order_id, creator_id, user_id, brand_id, platform_type, attribution_source, order_value, currency, click_id, snapshot_id, fallback_reason, atribe_ref, coupon_code, processed_at, created_at",
+        orderBy: "processed_at",
         ascending: false,
         limit
       });
@@ -170,9 +175,9 @@ export const orderAttributionRepository = {
         clickId: row.click_id,
         snapshotId: row.snapshot_id,
         fallbackReason: row.fallback_reason || null,
-        atribeRef: null,
-        couponCode: null,
-        processedAt: row.created_at
+        atribeRef: row.atribe_ref || null,
+        couponCode: row.coupon_code || null,
+        processedAt: row.processed_at || row.created_at
       }));
     }
 
@@ -205,7 +210,7 @@ export const orderAttributionRepository = {
       const supabase = getSupabase();
       let query = supabase
         .from("shopify_order_attributions")
-        .select("shop_domain, order_id, creator_id, user_id, brand_id, platform_type, attribution_source, order_value, currency, click_id, snapshot_id, fallback_reason, created_at");
+        .select("shop_domain, order_id, creator_id, user_id, brand_id, platform_type, attribution_source, order_value, currency, click_id, snapshot_id, fallback_reason, atribe_ref, coupon_code, processed_at, created_at");
 
       if (brandId) {
         query = query.eq("brand_id", brandId);
@@ -215,7 +220,7 @@ export const orderAttributionRepository = {
         query = query.eq("shop_domain", shopDomain);
       }
 
-      query = query.order("created_at", { ascending: false }).limit(limit);
+      query = query.order("processed_at", { ascending: false }).limit(limit);
       const { data, error } = await query;
       if (error) {
         throw new Error(`Supabase read failed for shopify_order_attributions: ${error.message}`);
@@ -234,9 +239,9 @@ export const orderAttributionRepository = {
         clickId: row.click_id,
         snapshotId: row.snapshot_id,
         fallbackReason: row.fallback_reason || null,
-        atribeRef: null,
-        couponCode: null,
-        processedAt: row.created_at
+        atribeRef: row.atribe_ref || null,
+        couponCode: row.coupon_code || null,
+        processedAt: row.processed_at || row.created_at
       }));
     }
 
