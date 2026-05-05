@@ -10,33 +10,42 @@ import { webhookRouter } from "./routes/webhook-routes.js";
 import { shopRepository } from "./repositories/shop-repository.js";
 import { logger } from "./utils/logger.js";
 
-const appEntryHandler = (req, res) => {
-  const shopDomain = String(req.query.shop || "").trim();
-  const installedShop = shopDomain ? shopRepository.findByShopDomain(shopDomain) : null;
+const appEntryHandler = async (req, res) => {
+  try {
+    const shopDomain = String(req.query.shop || "").trim();
+    const installedShop = shopDomain ? await shopRepository.findByShopDomain(shopDomain) : null;
 
-  logger.info("Received Shopify app entry request", {
-    path: req.path,
-    shop: shopDomain || null,
-    hasInstalledShop: Boolean(installedShop),
-    embedded: String(req.query.embedded || "") || null
-  });
+    logger.info("Received Shopify app entry request", {
+      path: req.path,
+      shop: shopDomain || null,
+      hasInstalledShop: Boolean(installedShop),
+      embedded: String(req.query.embedded || "") || null
+    });
 
-  if (shopDomain && !installedShop) {
-    return res.redirect(`/auth?shop=${encodeURIComponent(shopDomain)}`);
-  }
-
-  return res.status(200).json({
-    ok: true,
-    service: "shopify-app-backend",
-    installed_shop: installedShop?.shopDomain || null,
-    routes: {
-      health: "/health",
-      auth: "/auth?shop={shop}.myshopify.com",
-      create_link: "/links/create",
-      user_route: "/u/{user_id}/route?url={encoded_url}",
-      storefront_script: "/storefront/atribe.js"
+    if (shopDomain && !installedShop) {
+      return res.redirect(`/auth?shop=${encodeURIComponent(shopDomain)}`);
     }
-  });
+
+    return res.status(200).json({
+      ok: true,
+      service: "shopify-app-backend",
+      installed_shop: installedShop?.shopDomain || null,
+      routes: {
+        health: "/health",
+        auth: "/auth?shop={shop}.myshopify.com",
+        create_link: "/links/create",
+        user_route: "/u/{user_id}/route?url={encoded_url}",
+        storefront_script: "/storefront/atribe.js"
+      }
+    });
+  } catch (error) {
+    logger.error("Failed to handle Shopify app entry request", {
+      error: error.message
+    });
+    return res.status(500).json({
+      error: "Failed to load app entry."
+    });
+  }
 };
 
 export const createApp = () => {

@@ -1,3 +1,5 @@
+import { brandIntegrationRepository } from "../repositories/brand-integration-repository.js";
+import { campaignRepository } from "../repositories/campaign-repository.js";
 import { clickWeightSnapshotRepository } from "../repositories/click-weight-snapshot-repository.js";
 import { linkClickRepository } from "../repositories/link-click-repository.js";
 import { orderAttributionRepository } from "../repositories/order-attribution-repository.js";
@@ -21,31 +23,33 @@ const parseSnapshot = (snapshotRecord) => {
   }
 };
 
-const getClickAttribution = (clickId) => {
+const getClickAttribution = async (clickId) => {
   if (!clickId) {
     return null;
   }
 
-  const click = linkClickRepository.findByClickId(clickId);
+  const click = await linkClickRepository.findByClickId(clickId);
   if (!click) {
     return null;
   }
 
   const snapshotRecord = click.snapshotId
-    ? clickWeightSnapshotRepository.findById(click.snapshotId)
+    ? await clickWeightSnapshotRepository.findById(click.snapshotId)
     : null;
 
   return {
     creatorId: click.selectedCreatorId || click.creatorId || null,
     clickId: click.clickId,
     userId: click.userId || snapshotRecord?.userId || null,
+    brandId: click.brandId || null,
     platformType: click.platformType || "legacy_single_creator",
     snapshotId: click.snapshotId || null,
-    snapshot: parseSnapshot(snapshotRecord)
+    snapshot: parseSnapshot(snapshotRecord),
+    fallbackReason: click.fallbackReason || null
   };
 };
 
-const getCouponCreatorAttribution = (discountCodes) => {
+const getCouponCreatorAttribution = async (discountCodes) => {
   if (!Array.isArray(discountCodes)) {
     return null;
   }
@@ -56,7 +60,7 @@ const getCouponCreatorAttribution = (discountCodes) => {
       continue;
     }
 
-    const mapping = couponService.findCreatorByCouponCode(code);
+    const mapping = await couponService.findCreatorByCouponCode(code);
     if (mapping) {
       return {
         creatorId: mapping.creatorId,
@@ -68,7 +72,7 @@ const getCouponCreatorAttribution = (discountCodes) => {
   return null;
 };
 
-const resolveAttribution = ({
+const resolveAttribution = async ({
   clickId,
   atribeUser,
   snapshotId,
@@ -76,35 +80,39 @@ const resolveAttribution = ({
   atribeRef,
   discountCodes
 }) => {
-  const clickAttribution = getClickAttribution(clickId);
-  const couponAttribution = getCouponCreatorAttribution(discountCodes);
+  const clickAttribution = await getClickAttribution(clickId);
+  const couponAttribution = await getCouponCreatorAttribution(discountCodes);
 
   if (clickAttribution) {
     return {
       creatorId: clickAttribution.creatorId,
       userId: clickAttribution.userId,
+      brandId: clickAttribution.brandId,
       platformType: clickAttribution.platformType,
       attributionSource: "click",
       clickId: clickAttribution.clickId,
       snapshotId: clickAttribution.snapshotId,
       snapshot: clickAttribution.snapshot,
+      fallbackReason: clickAttribution.fallbackReason,
       atribeRef: atribeRef || null,
       couponCode: couponAttribution?.couponCode || null
     };
   }
 
   if (snapshotId && atribeUser) {
-    const snapshotRecord = clickWeightSnapshotRepository.findById(snapshotId);
+    const snapshotRecord = await clickWeightSnapshotRepository.findById(snapshotId);
     const snapshot = parseSnapshot(snapshotRecord);
     if (snapshot.length > 0) {
       return {
         creatorId: atribeCreator || atribeRef || null,
         userId: atribeUser,
+        brandId: null,
         platformType: "atribe_shopify",
         attributionSource: "cookie",
         clickId: null,
         snapshotId,
         snapshot,
+        fallbackReason: null,
         atribeRef: atribeRef || null,
         couponCode: couponAttribution?.couponCode || null
       };
@@ -115,11 +123,13 @@ const resolveAttribution = ({
     return {
       creatorId: atribeCreator,
       userId: atribeUser || null,
+      brandId: null,
       platformType: "external",
       attributionSource: "cookie",
       clickId: null,
       snapshotId: snapshotId || null,
       snapshot: [],
+      fallbackReason: null,
       atribeRef: atribeRef || atribeCreator,
       couponCode: couponAttribution?.couponCode || null
     };
@@ -129,11 +139,13 @@ const resolveAttribution = ({
     return {
       creatorId: couponAttribution.creatorId,
       userId: null,
+      brandId: null,
       platformType: "legacy_single_creator",
       attributionSource: "coupon",
       clickId: null,
       snapshotId: null,
       snapshot: [],
+      fallbackReason: null,
       atribeRef: null,
       couponCode: couponAttribution.couponCode
     };
@@ -143,11 +155,13 @@ const resolveAttribution = ({
     return {
       creatorId: atribeRef,
       userId: atribeUser || null,
+      brandId: null,
       platformType: "legacy_single_creator",
       attributionSource: "cookie",
       clickId: null,
       snapshotId: snapshotId || null,
       snapshot: [],
+      fallbackReason: null,
       atribeRef,
       couponCode: couponAttribution?.couponCode || null
     };
@@ -157,7 +171,7 @@ const resolveAttribution = ({
 };
 
 export const orderAttributionService = {
-  processOrderWebhook({ shopDomain, orderPayload }) {
+  async processOrderWebhook({ shopDomain, orderPayload }) {
     const extractedOrder = orderWebhookService.extractOrderData(orderPayload);
     const {
       orderId,
@@ -179,14 +193,15 @@ export const orderAttributionService = {
       throw new Error("Order payload is missing total_price.");
     }
 
-    shopifyOrderRepository.upsert({
+    await shopifyOrderRepository.upsert({
       orderId,
       shopDomain,
       totalPrice,
-      currency
+      currency,
+      rawPayload: orderPayload
     });
 
-    const existingAttribution = orderAttributionRepository.findByOrderIdAndShopDomain(orderId, shopDomain);
+    const existingAttribution = await orderAttributionRepository.findByOrderIdAndShopDomain(orderId, shopDomain);
     if (existingAttribution) {
       logger.debug("Skipping duplicate order attribution", {
         orderId,
@@ -203,13 +218,14 @@ export const orderAttributionService = {
         currency: existingAttribution.currency,
         clickId: existingAttribution.clickId,
         snapshotId: existingAttribution.snapshotId,
+        fallbackReason: existingAttribution.fallbackReason || null,
         atribeRef: existingAttribution.atribeRef,
         couponCode: existingAttribution.couponCode,
         duplicate: true
       };
     }
 
-    const attribution = resolveAttribution({
+    const attribution = await resolveAttribution({
       clickId,
       atribeUser,
       snapshotId,
@@ -226,55 +242,73 @@ export const orderAttributionService = {
       return null;
     }
 
-    orderAttributionRepository.create({
+    await orderAttributionRepository.create({
       orderId,
       shopDomain,
       creatorId: attribution.platformType === "atribe_shopify" ? null : attribution.creatorId,
       userId: attribution.userId,
+      brandId: attribution.brandId || null,
       platformType: attribution.platformType,
       attributionSource: attribution.attributionSource,
       orderValue: totalPrice,
       currency,
       clickId: attribution.clickId,
       snapshotId: attribution.snapshotId,
+      fallbackReason: attribution.fallbackReason || null,
       atribeRef: attribution.atribeRef,
       couponCode: attribution.couponCode
     });
 
+    const [brandIntegration, activeCampaign] = await Promise.all([
+      brandIntegrationRepository.findByShopDomain(shopDomain),
+      campaignRepository.findLatestActiveByShopDomain(shopDomain)
+    ]);
+    const commissionRate =
+      activeCampaign?.commissionRate ??
+      brandIntegration?.defaultCommissionRate ??
+      undefined;
+
     let commission;
     if (attribution.platformType === "atribe_shopify" && attribution.snapshot.length > 0) {
-      commission = commissionService.createSplitOrderCommissions({
+      commission = await commissionService.createSplitOrderCommissions({
         orderId,
         shopDomain,
         userId: attribution.userId,
+        brandId: attribution.brandId || null,
         snapshotId: attribution.snapshotId,
         snapshot: attribution.snapshot,
         orderValue: totalPrice,
-        currency
+        currency,
+        commissionRate
       });
 
-      const totalWeight = attribution.snapshot.reduce((sum, item) => sum + Number(item.weight || 0), 0);
       for (const share of commission.commissions || []) {
         const snapshotItem = attribution.snapshot.find((item) => item.creator_id === share.creatorId);
-        const weight = Number(snapshotItem?.weight || 0);
-        const orderValueShare = totalWeight > 0 ? (Number(totalPrice) * weight) / totalWeight : 0;
-        userCreatorWeightRepository.incrementPerformance({
-          userId: attribution.userId,
-          creatorId: share.creatorId,
-          attributedValueIncrement: orderValueShare,
-          commissionValueIncrement: Number(share.creatorCommission),
-          eventCountIncrement: 1
-        });
+        const normalizedWeight = Number(
+          snapshotItem?.normalized_weight ?? snapshotItem?.weight ?? 0
+        );
+        const orderValueShare = Number(totalPrice) * normalizedWeight;
+        if (attribution.fallbackReason !== "house_fallback") {
+          await userCreatorWeightRepository.incrementPerformance({
+            userId: attribution.userId,
+            creatorId: share.creatorId,
+            attributedValueIncrement: orderValueShare,
+            commissionValueIncrement: Number(share.creatorCommission),
+            eventCountIncrement: 1
+          });
+        }
       }
     } else {
-      commission = commissionService.createOrderCommission({
+      commission = await commissionService.createOrderCommission({
         orderId,
         shopDomain,
         creatorId: attribution.creatorId,
         userId: attribution.userId,
+        brandId: attribution.brandId || null,
         snapshotId: attribution.snapshotId,
         orderValue: totalPrice,
-        currency
+        currency,
+        commissionRate
       });
 
       if (
@@ -284,7 +318,7 @@ export const orderAttributionService = {
         commission &&
         !commission.duplicate
       ) {
-        userCreatorWeightRepository.incrementPerformance({
+        await userCreatorWeightRepository.incrementPerformance({
           userId: attribution.userId,
           creatorId: attribution.creatorId,
           attributedValueIncrement: Number(totalPrice),
@@ -301,6 +335,7 @@ export const orderAttributionService = {
       userId: attribution.userId,
       platformType: attribution.platformType,
       attributionSource: attribution.attributionSource,
+      fallbackReason: attribution.fallbackReason || null,
       orderValue: totalPrice,
       commissionCount: Array.isArray(commission?.commissions) ? commission.commissions.length : 1
     });

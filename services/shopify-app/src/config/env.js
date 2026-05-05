@@ -16,6 +16,20 @@ for (const variableName of requiredVariables) {
   }
 }
 
+const dbProvider = process.env.DB_PROVIDER || "sqlite";
+
+if (!["sqlite", "supabase"].includes(dbProvider)) {
+  throw new Error("DB_PROVIDER must be either 'sqlite' or 'supabase'.");
+}
+
+if (dbProvider === "supabase") {
+  for (const variableName of ["SUPABASE_URL", "SUPABASE_SERVICE_ROLE_KEY"]) {
+    if (!process.env[variableName]) {
+      throw new Error(`Missing required environment variable for Supabase mode: ${variableName}`);
+    }
+  }
+}
+
 const normalizeBaseUrl = (value) => value.replace(/\/+$/, "");
 const normalizeOptionalUrl = (value) => {
   const normalized = String(value || "").trim();
@@ -23,6 +37,7 @@ const normalizeOptionalUrl = (value) => {
 };
 
 export const env = {
+  dbProvider,
   nodeEnv: process.env.NODE_ENV || "development",
   port: Number(process.env.PORT || 3001),
   host: process.env.HOST || "localhost",
@@ -35,6 +50,11 @@ export const env = {
   shopifyCallbackUrl: normalizeOptionalUrl(process.env.SHOPIFY_CALLBACK_URL),
   shopifyApiVersion: process.env.SHOPIFY_API_VERSION || "2026-04",
   sqliteDbPath: process.env.SQLITE_DB_PATH || "./shopify-app.db",
+  supabaseUrl: normalizeOptionalUrl(process.env.SUPABASE_URL),
+  supabaseServiceRoleKey: process.env.SUPABASE_SERVICE_ROLE_KEY || "",
   defaultCommissionRate: Number(process.env.DEFAULT_COMMISSION_RATE || 0.1),
-  platformFeeRate: Number(process.env.PLATFORM_FEE_RATE || 0)
+  platformFeeRate: Number(process.env.PLATFORM_FEE_RATE || 0),
+  atribeHouseCreatorId:
+    String(process.env.ATRIBE_HOUSE_CREATOR_ID || "").trim() ||
+    "00000000-0000-0000-0000-000000000001"
 };

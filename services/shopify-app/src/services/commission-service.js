@@ -46,12 +46,13 @@ const sumRefundAmount = (refundPayload) => {
   return lineItemTotal + orderAdjustmentsTotal;
 };
 
-const createStoredCommissionRecord = ({
+const createStoredCommissionRecord = async ({
   commissionKey,
   orderId,
   shopDomain,
   creatorId,
   userId,
+  brandId,
   snapshotId,
   eventType,
   orderValue,
@@ -68,6 +69,7 @@ const createStoredCommissionRecord = ({
     shopDomain,
     creatorId,
     userId: userId || null,
+    brandId: brandId || null,
     snapshotId: snapshotId || null,
     eventType,
     orderValue: roundCurrency(orderValue),
@@ -79,7 +81,7 @@ const createStoredCommissionRecord = ({
     referenceId: referenceId || null
   };
 
-  orderCommissionRepository.create(record);
+  await orderCommissionRepository.create(record);
   return record;
 };
 
@@ -109,11 +111,12 @@ export const commissionService = {
     };
   },
 
-  createOrderCommission({
+  async createOrderCommission({
     orderId,
     shopDomain,
     creatorId,
     userId,
+    brandId,
     snapshotId,
     orderValue,
     currency,
@@ -127,7 +130,7 @@ export const commissionService = {
       referenceId: creatorId
     });
 
-    const existing = orderCommissionRepository.findByCommissionKey(commissionKey);
+    const existing = await orderCommissionRepository.findByCommissionKey(commissionKey);
     if (existing) {
       return {
         ...existing,
@@ -159,12 +162,13 @@ export const commissionService = {
     });
 
     return {
-      ...createStoredCommissionRecord({
+      ...(await createStoredCommissionRecord({
         commissionKey,
         orderId,
         shopDomain,
         creatorId,
         userId,
+        brandId,
         snapshotId,
         eventType: "sale",
         orderValue: calculated.orderValue,
@@ -173,17 +177,20 @@ export const commissionService = {
         creatorCommission,
         platformFee,
         status: "active"
-      }),
+      })),
       duplicate: false
     };
   },
 
-  createSplitOrderCommissions({ orderId, shopDomain, userId, snapshotId, snapshot, orderValue, currency, commissionRate }) {
+  async createSplitOrderCommissions({ orderId, shopDomain, userId, brandId, snapshotId, snapshot, orderValue, currency, commissionRate }) {
     const calculated = this.calculateCommission({
       orderValue,
       commissionRate
     });
-    const totalWeight = snapshot.reduce((sum, item) => sum + Number(item.weight || 0), 0);
+    const totalWeight = snapshot.reduce(
+      (sum, item) => sum + Number(item.normalized_weight ?? item.weight ?? 0),
+      0
+    );
 
     if (totalWeight <= 0) {
       throw new Error("Snapshot weights must sum to a value greater than zero.");
@@ -192,8 +199,9 @@ export const commissionService = {
     let allocatedCreatorCommission = 0;
     let allocatedPlatformFee = 0;
 
-    const commissions = snapshot.map((item, index) => {
-      const share = Number(item.weight || 0) / totalWeight;
+    const commissions = [];
+    for (const [index, item] of snapshot.entries()) {
+      const share = Number(item.normalized_weight ?? item.weight ?? 0) / totalWeight;
       const creatorCommission = allocateRemainder({
         index,
         totalCount: snapshot.length,
@@ -212,19 +220,20 @@ export const commissionService = {
       allocatedCreatorCommission += creatorCommission;
       allocatedPlatformFee += platformFee;
 
-      return this.createOrderCommission({
+      commissions.push(await this.createOrderCommission({
         orderId,
         shopDomain,
         creatorId: item.creator_id,
         userId,
+        brandId,
         snapshotId,
         orderValue,
         currency,
         commissionRate: calculated.commissionRate,
         creatorCommissionOverride: creatorCommission,
         platformFeeOverride: platformFee
-      });
-    });
+      }));
+    }
 
     return {
       commissionKey: `${orderId}:${snapshotId || "split"}`,
@@ -233,39 +242,42 @@ export const commissionService = {
     };
   },
 
-  createCancelledOrderCommission({ orderId, shopDomain }) {
-    const saleCommissions = orderCommissionRepository.findSalesByOrderIdAndShopDomain(orderId, shopDomain);
+  async createCancelledOrderCommission({ orderId, shopDomain }) {
+    const saleCommissions = await orderCommissionRepository.findSalesByOrderIdAndShopDomain(orderId, shopDomain);
     if (saleCommissions.length === 0) {
       return null;
     }
 
-    const commissions = saleCommissions.map((saleCommission) => {
+    const commissions = [];
+    for (const saleCommission of saleCommissions) {
       const commissionKey = buildCommissionKey({
         orderId,
         eventType: "cancel",
         referenceId: saleCommission.commissionKey
       });
 
-      const existing = orderCommissionRepository.findByCommissionKey(commissionKey);
+      const existing = await orderCommissionRepository.findByCommissionKey(commissionKey);
       if (existing) {
         logger.debug("Skipping duplicate cancelled commission", {
           orderId,
           shopDomain,
           commissionKey
         });
-        return {
+        commissions.push({
           ...existing,
           duplicate: true
-        };
+        });
+        continue;
       }
 
-      return {
-        ...createStoredCommissionRecord({
+      commissions.push({
+        ...(await createStoredCommissionRecord({
           commissionKey,
           orderId,
           shopDomain,
           creatorId: saleCommission.creatorId,
           userId: saleCommission.userId,
+          brandId: saleCommission.brandId,
           snapshotId: saleCommission.snapshotId,
           eventType: "cancel",
           orderValue: -Number(saleCommission.orderValue),
@@ -275,10 +287,10 @@ export const commissionService = {
           platformFee: -Number(saleCommission.platformFee),
           status: "cancelled",
           referenceId: saleCommission.commissionKey
-        }),
+        })),
         duplicate: false
-      };
-    });
+      });
+    }
 
     return {
       commissions,
@@ -288,7 +300,7 @@ export const commissionService = {
     };
   },
 
-  createRefundCommission({ shopDomain, refundPayload }) {
+  async createRefundCommission({ shopDomain, refundPayload }) {
     const orderId = String(refundPayload?.order_id || "").trim();
     const refundId = String(refundPayload?.id || "").trim();
 
@@ -296,12 +308,12 @@ export const commissionService = {
       throw new Error("Refund payload is missing order_id or id.");
     }
 
-    const attribution = orderAttributionRepository.findByOrderIdAndShopDomain(orderId, shopDomain);
+    const attribution = await orderAttributionRepository.findByOrderIdAndShopDomain(orderId, shopDomain);
     if (!attribution) {
       return null;
     }
 
-    const saleCommissions = orderCommissionRepository.findSalesByOrderIdAndShopDomain(orderId, shopDomain);
+    const saleCommissions = await orderCommissionRepository.findSalesByOrderIdAndShopDomain(orderId, shopDomain);
     if (saleCommissions.length === 0) {
       return null;
     }
@@ -317,24 +329,26 @@ export const commissionService = {
     );
 
     let allocatedRefundValue = 0;
-    const commissions = saleCommissions.map((saleCommission, index) => {
+    const commissions = [];
+    for (const [index, saleCommission] of saleCommissions.entries()) {
       const commissionKey = buildCommissionKey({
         orderId,
         eventType: "refund",
         referenceId: `${refundId}:${saleCommission.commissionKey}`
       });
 
-      const existing = orderCommissionRepository.findByCommissionKey(commissionKey);
+      const existing = await orderCommissionRepository.findByCommissionKey(commissionKey);
       if (existing) {
         logger.debug("Skipping duplicate refund commission", {
           orderId,
           refundId,
           commissionKey
         });
-        return {
+        commissions.push({
           ...existing,
           duplicate: true
-        };
+        });
+        continue;
       }
 
       const proportionalOrderValue = allocateRemainder({
@@ -356,13 +370,14 @@ export const commissionService = {
         commissionRate: Number(saleCommission.commissionRate)
       });
 
-      return {
-        ...createStoredCommissionRecord({
+      commissions.push({
+        ...(await createStoredCommissionRecord({
           commissionKey,
           orderId,
           shopDomain,
           creatorId: saleCommission.creatorId,
           userId: saleCommission.userId,
+          brandId: saleCommission.brandId,
           snapshotId: saleCommission.snapshotId,
           eventType: "refund",
           orderValue: calculated.orderValue,
@@ -372,10 +387,10 @@ export const commissionService = {
           platformFee: calculated.platformFee,
           status: "refunded",
           referenceId: refundId
-        }),
+        })),
         duplicate: false
-      };
-    });
+      });
+    }
 
     logger.info("Calculated refund commissions", {
       orderId,

@@ -2,7 +2,9 @@
   "manifest_version": 3,
   "name": "Atribe Extension",
   "version": "1.0.0",
-  "description": "Atribe adds or replaces an Amazon affiliate tag on product pages.",
+  "description": "Atribe routes supported product pages through the backend attribution engine.",
+  "permissions": ["storage"],
+  "options_page": "options.html",
   "content_scripts": [
     {
       "matches": ["*://*.amazon.*/*"],

@@ -6,7 +6,7 @@ const normalizeCouponCode = (couponCode) => String(couponCode || "").trim().toUp
 const buildCouponCode = (creatorId) => normalizeCouponCode(`CREATOR_${normalizeCreatorId(creatorId)}`);
 
 export const couponService = {
-  ensureCreatorCoupon(creatorId) {
+  async ensureCreatorCoupon(creatorId) {
     const normalizedCreatorId = normalizeCreatorId(creatorId);
 
     if (!normalizedCreatorId) {
@@ -14,7 +14,7 @@ export const couponService = {
     }
 
     const couponCode = buildCouponCode(normalizedCreatorId);
-    creatorCouponRepository.upsert({
+    await creatorCouponRepository.upsert({
       couponCode,
       creatorId: normalizedCreatorId
     });
@@ -22,7 +22,7 @@ export const couponService = {
     return couponCode;
   },
 
-  findCreatorByCouponCode(couponCode) {
+  async findCreatorByCouponCode(couponCode) {
     if (!couponCode) {
       return null;
     }

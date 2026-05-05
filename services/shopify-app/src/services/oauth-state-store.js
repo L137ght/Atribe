@@ -2,9 +2,10 @@ const ttlMs = 10 * 60 * 1000;
 const stateStore = new Map();
 
 export const oauthStateStore = {
-  set(state, shop) {
+  set(state, shop, metadata = {}) {
     stateStore.set(state, {
       shop,
+      metadata,
       expiresAt: Date.now() + ttlMs
     });
   },

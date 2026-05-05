@@ -44,7 +44,7 @@ export const scriptTagService = {
     );
 
     if (existingScriptTag) {
-      shopScriptTagRepository.upsert({
+      await shopScriptTagRepository.upsert({
         shopDomain: shop,
         scriptTagId: existingScriptTag.id,
         src: existingScriptTag.src
@@ -78,7 +78,7 @@ export const scriptTagService = {
       throw new Error("Failed to register storefront ScriptTag: missing ScriptTag response.");
     }
 
-    shopScriptTagRepository.upsert({
+    await shopScriptTagRepository.upsert({
       shopDomain: shop,
       scriptTagId: createdScriptTag.id,
       src: createdScriptTag.src

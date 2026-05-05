@@ -1,0 +1,407 @@
+- generic [ref=e2]:
+  - generic [ref=e5]:
+    - generic [ref=e6]:
+      - link "Skip to content" [ref=e7] [cursor=pointer]:
+        - /url: "#checkout-main"
+      - generic [ref=e8]:
+        - banner [ref=e9]:
+          - generic [ref=e14]:
+            - link "Outlaw" [ref=e16] [cursor=pointer]:
+              - /url: https://outlaw-tk71w27i.myshopify.com
+              - generic: Outlaw
+            - link "Cart" [ref=e18] [cursor=pointer]:
+              - /url: https://outlaw-tk71w27i.myshopify.com/cart
+              - img [ref=e20]
+        - generic [ref=e22]:
+          - generic [ref=e24]:
+            - main [ref=e25]:
+              - heading "Outlaw Checkout" [level=1] [ref=e26]
+              - generic [ref=e28]:
+                - generic [ref=e29]:
+                  - region "Contact" [ref=e30]:
+                    - generic [ref=e34]:
+                      - generic [ref=e35]:
+                        - heading "Contact" [level=2] [ref=e36]
+                        - link "Sign in" [ref=e37] [cursor=pointer]:
+                          - /url: https://outlaw-tk71w27i.myshopify.com/customer_authentication/login?locale=en-US&return_to=%2Fcheckouts%2Fcn%2FhWNBhZQsWLzhuh6bmejPSMEu%2Fen-us%3F_r%3DAQABfv4BST4AO9VV1f0E9_dx3mehQzdXxt4FEWO6qhBvgJ4%26locale%3Den-US
+                      - generic [ref=e39]:
+                        - generic [ref=e44]:
+                          - generic:
+                            - generic:
+                              - generic: Email or mobile phone number
+                          - textbox "Email or mobile phone number" [active] [ref=e45]
+                        - generic [ref=e48]:
+                          - generic [ref=e49]:
+                            - checkbox "Email me with news and offers" [ref=e50] [cursor=pointer]
+                            - generic:
+                              - generic:
+                                - img
+                          - generic [ref=e51] [cursor=pointer]: Email me with news and offers
+                  - group "Delivery" [ref=e55]:
+                    - generic [ref=e56]:
+                      - heading "Delivery" [level=2] [ref=e58]
+                      - generic [ref=e64]:
+                        - generic [ref=e68]:
+                          - generic [ref=e69]:
+                            - generic [ref=e73]:
+                              - generic:
+                                - generic:
+                                  - generic: Country/Region
+                              - combobox "Country/Region" [ref=e74]:
+                                - option "Canada"
+                                - option "United States" [selected]
+                              - generic:
+                                - generic:
+                                  - img
+                            - generic [ref=e75]:
+                              - generic [ref=e77]:
+                                - generic:
+                                  - generic:
+                                    - generic: First name (optional)
+                                - textbox "First name (optional)" [ref=e78]
+                              - generic [ref=e80]:
+                                - generic:
+                                  - generic:
+                                    - generic: Last name
+                                - textbox "Last name" [ref=e81]
+                            - generic [ref=e87]:
+                              - generic:
+                                - generic:
+                                  - generic: Address
+                              - combobox "Address" [ref=e88]
+                              - img [ref=e91]
+                            - generic [ref=e95]:
+                              - generic:
+                                - generic:
+                                  - generic: Apartment, suite, etc. (optional)
+                              - textbox "Apartment, suite, etc. (optional)" [ref=e96]
+                            - generic [ref=e97]:
+                              - generic [ref=e99]:
+                                - generic:
+                                  - generic:
+                                    - generic: City
+                                - textbox "City" [ref=e100]
+                              - generic [ref=e103]:
+                                - generic:
+                                  - generic:
+                                    - generic: State
+                                - combobox "State" [ref=e104]:
+                                  - option "Alabama"
+                                  - option "Alaska"
+                                  - option "American Samoa"
+                                  - option "Arizona"
+                                  - option "Arkansas"
+                                  - option "California"
+                                  - option "Colorado"
+                                  - option "Connecticut"
+                                  - option "Delaware"
+                                  - option "Micronesia"
+                                  - option "Florida"
+                                  - option "Georgia"
+                                  - option "Guam"
+                                  - option "Hawaii"
+                                  - option "Idaho"
+                                  - option "Illinois"
+                                  - option "Indiana"
+                                  - option "Iowa"
+                                  - option "Kansas"
+                                  - option "Kentucky"
+                                  - option "Louisiana"
+                                  - option "Maine"
+                                  - option "Marshall Islands"
+                                  - option "Maryland"
+                                  - option "Massachusetts"
+                                  - option "Michigan"
+                                  - option "Minnesota"
+                                  - option "Mississippi"
+                                  - option "Missouri"
+                                  - option "Montana"
+                                  - option "Nebraska"
+                                  - option "Nevada"
+                                  - option "New Hampshire"
+                                  - option "New Jersey"
+                                  - option "New Mexico"
+                                  - option "New York"
+                                  - option "North Carolina"
+                                  - option "North Dakota"
+                                  - option "Northern Mariana Islands"
+                                  - option "Ohio"
+                                  - option "Oklahoma"
+                                  - option "Oregon"
+                                  - option "Palau"
+                                  - option "Pennsylvania"
+                                  - option "Puerto Rico"
+                                  - option "Rhode Island"
+                                  - option "South Carolina"
+                                  - option "South Dakota"
+                                  - option "Tennessee"
+                                  - option "Texas"
+                                  - option "Utah"
+                                  - option "Vermont"
+                                  - option "Virginia"
+                                  - option "Washington"
+                                  - option "Washington DC"
+                                  - option "West Virginia"
+                                  - option "Wisconsin"
+                                  - option "Wyoming"
+                                  - option "U.S. Virgin Islands"
+                                  - option "Armed Forces Americas"
+                                  - option "Armed Forces Europe"
+                                  - option "Armed Forces Pacific"
+                                - generic:
+                                  - generic:
+                                    - img
+                              - generic [ref=e107]:
+                                - generic:
+                                  - generic:
+                                    - generic: ZIP code
+                                - textbox "ZIP code" [ref=e108]
+                            - generic [ref=e110]:
+                              - generic [ref=e111]:
+                                - checkbox "Save this information for next time" [ref=e112] [cursor=pointer]
+                                - generic:
+                                  - generic:
+                                    - img
+                              - generic [ref=e113] [cursor=pointer]: Save this information for next time
+                          - generic [ref=e114]:
+                            - textbox [ref=e115]
+                            - textbox [ref=e116]
+                            - textbox [ref=e117]
+                            - textbox [ref=e118]
+                            - textbox [ref=e119]
+                            - textbox [ref=e120]: US
+                            - textbox [ref=e121]
+                            - textbox [ref=e122]
+                            - textbox [ref=e123]
+                            - textbox [ref=e124]
+                        - generic [ref=e125]:
+                          - heading "Shipping method" [level=2] [ref=e126]
+                          - paragraph [ref=e130]: Enter your shipping address to view available shipping methods.
+                  - region "Payment" [ref=e132]:
+                    - group "Payment" [ref=e136]:
+                      - generic [ref=e137]:
+                        - heading "Payment" [level=2] [ref=e138]
+                        - paragraph [ref=e139]: All transactions are secure and encrypted.
+                      - generic [ref=e141]:
+                        - generic [ref=e148]:
+                          - generic [ref=e149]:
+                            - heading "Credit card" [level=3] [ref=e151]
+                            - img "BOGUS" [ref=e156]
+                          - generic [ref=e163]:
+                            - generic [ref=e166]:
+                              - generic [ref=e168]:
+                                - generic:
+                                  - generic:
+                                    - generic: Card number
+                                - generic [ref=e169]:
+                                  - iframe [ref=e171]:
+                                    - generic [ref=f6e2]:
+                                      - generic [ref=f6e3]:
+                                        - generic [ref=f6e4]: Card number
+                                        - textbox "Card number" [ref=f6e5]
+                                      - generic [ref=f6e8]: Name on card
+                                      - textbox [ref=f6e9]
+                                      - generic [ref=f6e10]: Expiry month
+                                      - textbox [ref=f6e11]
+                                      - generic [ref=f6e12]: Expiry year
+                                      - textbox [ref=f6e13]
+                                      - generic [ref=f6e14]: Expiry date (MM / YY)
+                                      - textbox [ref=f6e15]
+                                      - generic [ref=f6e16]: Security code
+                                      - textbox [ref=f6e17]
+                                      - generic [ref=f6e18]: Issue date (MM / YY)
+                                      - textbox [ref=f6e19]
+                                      - generic [ref=f6e20]: Issue number
+                                      - textbox [ref=f6e21]
+                                      - button [ref=f6e22]
+                                  - img [ref=e174]
+                              - generic [ref=e178]:
+                                - generic [ref=e181]:
+                                  - generic:
+                                    - generic:
+                                      - generic: Expiration date (MM / YY)
+                                  - iframe [ref=e184]:
+                                    - generic [ref=f7e2]:
+                                      - generic [ref=f7e3]: Credit Card Number
+                                      - textbox [ref=f7e4]
+                                      - generic [ref=f7e5]: Name on card
+                                      - textbox [ref=f7e6]
+                                      - generic [ref=f7e7]: Expiry month
+                                      - textbox [ref=f7e8]
+                                      - generic [ref=f7e9]: Expiry year
+                                      - textbox [ref=f7e10]
+                                      - generic [ref=f7e11]:
+                                        - generic [ref=f7e12]: Expiration date (MM / YY)
+                                        - textbox "Expiration date (MM / YY)" [ref=f7e13]
+                                      - generic [ref=f7e16]: Security code
+                                      - textbox [ref=f7e17]
+                                      - generic [ref=f7e18]: Issue date (MM / YY)
+                                      - textbox [ref=f7e19]
+                                      - generic [ref=f7e20]: Issue number
+                                      - textbox [ref=f7e21]
+                                      - button [ref=f7e22]
+                                - generic [ref=e189]:
+                                  - generic:
+                                    - generic:
+                                      - generic: Security code
+                                  - generic [ref=e190]:
+                                    - iframe [ref=e192]:
+                                      - generic [ref=f8e2]:
+                                        - generic [ref=f8e3]: Credit Card Number
+                                        - textbox [ref=f8e4]
+                                        - generic [ref=f8e5]: Name on card
+                                        - textbox [ref=f8e6]
+                                        - generic [ref=f8e7]: Expiry month
+                                        - textbox [ref=f8e8]
+                                        - generic [ref=f8e9]: Expiry year
+                                        - textbox [ref=f8e10]
+                                        - generic [ref=f8e11]: Expiry date (MM / YY)
+                                        - textbox [ref=f8e12]
+                                        - generic [ref=f8e13]:
+                                          - generic [ref=f8e14]: Security code
+                                          - textbox "Security code" [ref=f8e15]
+                                        - generic [ref=f8e18]: Issue date (MM / YY)
+                                        - textbox [ref=f8e19]
+                                        - generic [ref=f8e20]: Issue number
+                                        - textbox [ref=f8e21]
+                                        - button [ref=f8e22]
+                                    - button "More information about Security code" [ref=e194] [cursor=pointer]:
+                                      - img [ref=e196]
+                              - generic [ref=e202]:
+                                - generic:
+                                  - generic:
+                                    - generic: Name on card
+                                - iframe [ref=e205]:
+                                  - generic [ref=f11e2]:
+                                    - generic [ref=f11e3]: Credit Card Number
+                                    - textbox [ref=f11e4]
+                                    - generic [ref=f11e5]:
+                                      - generic [ref=f11e6]: Name on card
+                                      - textbox "Name on card" [ref=f11e7]
+                                    - generic [ref=f11e10]: Expiry month
+                                    - textbox [ref=f11e11]
+                                    - generic [ref=f11e12]: Expiry year
+                                    - textbox [ref=f11e13]
+                                    - generic [ref=f11e14]: Expiry date (MM / YY)
+                                    - textbox [ref=f11e15]
+                                    - generic [ref=f11e16]: Security code
+                                    - textbox [ref=f11e17]
+                                    - generic [ref=f11e18]: Issue date (MM / YY)
+                                    - textbox [ref=f11e19]
+                                    - generic [ref=f11e20]: Issue number
+                                    - textbox [ref=f11e21]
+                                    - button [ref=f11e22]
+                            - generic [ref=e210]:
+                              - generic [ref=e211]:
+                                - checkbox "Use shipping address as billing address" [checked] [ref=e212] [cursor=pointer]
+                                - generic:
+                                  - generic:
+                                    - img
+                              - generic [ref=e213] [cursor=pointer]: Use shipping address as billing address
+                        - button "Add discount" [ref=e214] [cursor=pointer]:
+                          - generic:
+                            - generic:
+                              - generic:
+                                - img
+                              - generic: Add discount
+                    - generic [ref=e221]:
+                      - heading "Finalize order" [level=2] [ref=e222]
+                      - generic [ref=e225]:
+                        - button "Pay now" [disabled]:
+                          - generic:
+                            - generic: Pay now
+                - button [ref=e227] [cursor=pointer]: Submit
+            - contentinfo [ref=e228]:
+              - list [ref=e232]:
+                - listitem [ref=e233]:
+                  - button "Privacy policy" [ref=e234] [cursor=pointer]:
+                    - generic: Privacy policy
+                - listitem [ref=e235]:
+                  - button "Cancellations" [ref=e236] [cursor=pointer]:
+                    - generic: Cancellations
+          - complementary [ref=e239]:
+            - generic [ref=e242]:
+              - heading "Order summary" [level=2] [ref=e243]
+              - generic [ref=e246]:
+                - region "Shopping cart" [ref=e247]:
+                  - heading "Shopping cart" [level=3] [ref=e249]
+                  - table "Shopping cart" [ref=e250]:
+                    - rowgroup [ref=e251]:
+                      - row "Product image Description Quantity Price":
+                        - columnheader "Product image" [ref=e252]
+                        - columnheader "Description" [ref=e253]
+                        - columnheader "Quantity" [ref=e254]
+                        - columnheader "Price" [ref=e255]
+                    - rowgroup [ref=e256]:
+                      - 'row "Top and bottom view of a snowboard. The top view shows a stylized scene of water, trees, mountains, sky and a moon in blue colours. The bottom view has a blue liquid, drippy background with the text \"liquid\" in a stylized script typeface. Quantity 1 The Collection Snowboard: Liquid 1 $749.95" [ref=e257]':
+                        - cell "Top and bottom view of a snowboard. The top view shows a stylized scene of water, trees, mountains, sky and a moon in blue colours. The bottom view has a blue liquid, drippy background with the text \"liquid\" in a stylized script typeface. Quantity 1" [ref=e258]:
+                          - generic [ref=e259]:
+                            - img "Top and bottom view of a snowboard. The top view shows a stylized scene of water, trees, mountains, sky and a moon in blue colours. The bottom view has a blue liquid, drippy background with the text \"liquid\" in a stylized script typeface." [ref=e260]
+                            - generic [ref=e262]:
+                              - generic [ref=e263]: Quantity
+                              - text: "1"
+                        - 'cell "The Collection Snowboard: Liquid" [ref=e264]':
+                          - paragraph [ref=e266]: "The Collection Snowboard: Liquid"
+                        - cell "1":
+                          - generic [ref=e267]: "1"
+                        - cell "$749.95" [ref=e268]:
+                          - generic [ref=e270]: $749.95
+                - generic:
+                  - generic:
+                    - generic:
+                      - text: Scroll for more items
+                      - generic:
+                        - img
+              - generic [ref=e273]:
+                - heading "Discount code or gift card" [level=3] [ref=e274]
+                - generic [ref=e275]:
+                  - generic [ref=e276]:
+                    - generic [ref=e278]:
+                      - generic [ref=e280]:
+                        - generic [ref=e282]:
+                          - generic:
+                            - generic:
+                              - generic: Discount code or gift card
+                          - textbox "Discount code or gift card" [ref=e283]
+                        - button "Apply Discount Code" [disabled]:
+                          - generic: Apply
+                      - button [ref=e285] [cursor=pointer]: Submit
+                    - generic:
+                      - generic:
+                        - generic:
+                          - list "Discount code or gift card"
+                  - button "Back to finalize order" [ref=e286] [cursor=pointer]:
+                    - generic:
+                      - generic:
+                        - generic:
+                          - img
+                        - generic: Back to finalize order
+              - generic [ref=e287]:
+                - heading "Cost summary" [level=3] [ref=e289]
+                - table "Cost summary" [ref=e290]:
+                  - rowgroup [ref=e291]:
+                    - row "Item Value" [ref=e292]:
+                      - columnheader "Item" [ref=e293]
+                      - columnheader "Value" [ref=e294]
+                  - rowgroup [ref=e295]:
+                    - row "Subtotal $749.95" [ref=e296]:
+                      - rowheader "Subtotal" [ref=e297]
+                      - cell "$749.95" [ref=e298]
+                    - row "Shipping" [ref=e299]:
+                      - rowheader "Shipping" [ref=e300]:
+                        - generic [ref=e302]: Shipping
+                      - cell [ref=e303]
+                    - row "Total USD $749.95" [ref=e306]:
+                      - rowheader "Total" [ref=e307]:
+                        - strong [ref=e308]: Total
+                      - cell "USD $749.95" [ref=e309]:
+                        - generic [ref=e310]:
+                          - generic [ref=e311]: USD
+                          - strong [ref=e312]: $749.95
+    - generic:
+      - progressbar
+  - generic [ref=e313]: Opens external website in a new window.
+  - generic [ref=e314]: Opens in a new window.
+  - generic [ref=e315]: Opens external website.
+  - status [ref=e316]
+  - alert [ref=e317]

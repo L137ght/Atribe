@@ -1,12 +1,29 @@
 (function () {
   "use strict";
 
-  const AFFILIATE_TAG = "testtag-20";
-  const RELOAD_GUARD_KEY = "amazon-affiliate-reload";
+  const CONFIG_KEYS = {
+    backendBaseUrl: "atribeBackendBaseUrl",
+    userId: "atribeUserId"
+  };
+  const ROUTE_GUARD_KEY = "atribe-route-guard";
   const AMAZON_HOST_PATTERN = /(^|\.)amazon\.[a-z.]+$/i;
 
   let lastHandledUrl = "";
   let checkScheduled = false;
+
+  function normalizeBaseUrl(value) {
+    const normalized = String(value || "").trim().replace(/\/+$/, "");
+
+    if (!normalized) {
+      return "";
+    }
+
+    try {
+      return new URL(normalized).toString().replace(/\/+$/, "");
+    } catch {
+      return "";
+    }
+  }
 
   function isAmazonHost(url) {
     return AMAZON_HOST_PATTERN.test(url.hostname);
@@ -16,21 +33,54 @@
     return isAmazonHost(url) && url.pathname.includes("/dp/");
   }
 
-  function getTaggedUrl(url) {
-    const nextUrl = new URL(url.href);
-    nextUrl.searchParams.set("tag", AFFILIATE_TAG);
-    return nextUrl;
+  function hasAtribeParams(url) {
+    return url.searchParams.has("atribe_click") || url.searchParams.has("atribe_snapshot");
   }
 
-  function clearReloadGuardIfNeeded(url) {
-    const guardValue = sessionStorage.getItem(RELOAD_GUARD_KEY);
+  function isBackendUrl(currentUrl, backendBaseUrl) {
+    if (!backendBaseUrl) {
+      return false;
+    }
 
-    if (guardValue && guardValue !== url.href) {
-      sessionStorage.removeItem(RELOAD_GUARD_KEY);
+    try {
+      return currentUrl.origin === new URL(backendBaseUrl).origin;
+    } catch {
+      return false;
     }
   }
 
-  function processPage() {
+  function clearRouteGuardIfNeeded(url) {
+    const guardValue = sessionStorage.getItem(ROUTE_GUARD_KEY);
+
+    if (guardValue && guardValue !== url.href) {
+      sessionStorage.removeItem(ROUTE_GUARD_KEY);
+    }
+  }
+
+  function buildBackendRouteUrl(currentUrl, backendBaseUrl, userId) {
+    return `${backendBaseUrl}/u/${encodeURIComponent(userId)}/route?url=${encodeURIComponent(currentUrl.href)}`;
+  }
+
+  function getExtensionConfig() {
+    return new Promise((resolve) => {
+      if (!chrome?.storage?.sync) {
+        resolve({
+          backendBaseUrl: "",
+          userId: ""
+        });
+        return;
+      }
+
+      chrome.storage.sync.get([CONFIG_KEYS.backendBaseUrl, CONFIG_KEYS.userId], (result) => {
+        resolve({
+          backendBaseUrl: normalizeBaseUrl(result?.[CONFIG_KEYS.backendBaseUrl]),
+          userId: String(result?.[CONFIG_KEYS.userId] || "").trim()
+        });
+      });
+    });
+  }
+
+  async function processPage() {
     checkScheduled = false;
 
     const currentUrl = new URL(window.location.href);
@@ -40,29 +90,27 @@
     }
 
     lastHandledUrl = currentUrl.href;
-    clearReloadGuardIfNeeded(currentUrl);
+    clearRouteGuardIfNeeded(currentUrl);
 
-    if (!isProductPage(currentUrl)) {
+    if (!isProductPage(currentUrl) || hasAtribeParams(currentUrl)) {
       return;
     }
 
-    const currentTag = currentUrl.searchParams.get("tag");
+    const { backendBaseUrl, userId } = await getExtensionConfig();
 
-    if (currentTag === AFFILIATE_TAG) {
-      sessionStorage.removeItem(RELOAD_GUARD_KEY);
+    if (!backendBaseUrl || !userId || isBackendUrl(currentUrl, backendBaseUrl)) {
       return;
     }
 
-    const taggedUrl = getTaggedUrl(currentUrl);
-    const taggedHref = taggedUrl.href;
+    const routedUrl = buildBackendRouteUrl(currentUrl, backendBaseUrl, userId);
 
-    if (sessionStorage.getItem(RELOAD_GUARD_KEY) === taggedHref) {
-      sessionStorage.removeItem(RELOAD_GUARD_KEY);
+    if (sessionStorage.getItem(ROUTE_GUARD_KEY) === routedUrl) {
+      sessionStorage.removeItem(ROUTE_GUARD_KEY);
       return;
     }
 
-    sessionStorage.setItem(RELOAD_GUARD_KEY, taggedHref);
-    window.location.replace(taggedHref);
+    sessionStorage.setItem(ROUTE_GUARD_KEY, routedUrl);
+    window.location.replace(routedUrl);
   }
 
   function scheduleProcessPage() {
@@ -71,7 +119,9 @@
     }
 
     checkScheduled = true;
-    window.requestAnimationFrame(processPage);
+    window.requestAnimationFrame(() => {
+      void processPage();
+    });
   }
 
   function installHistoryListeners() {

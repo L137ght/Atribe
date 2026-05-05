@@ -57,6 +57,34 @@ const recreateTable = ({ tableName, createSql, copySql }) => {
 };
 
 db.exec(`
+  CREATE TABLE IF NOT EXISTS brand_integrations (
+    shop_domain TEXT PRIMARY KEY,
+    brand_id TEXT,
+    shop_name TEXT,
+    integration_status TEXT NOT NULL DEFAULT 'active',
+    default_commission_rate REAL,
+    installed_at TEXT,
+    uninstalled_at TEXT,
+    created_at TEXT NOT NULL,
+    updated_at TEXT NOT NULL
+  );
+`);
+
+db.exec(`
+  CREATE TABLE IF NOT EXISTS creator_brand_links (
+    id TEXT PRIMARY KEY,
+    brand_id TEXT,
+    shop_domain TEXT,
+    creator_id TEXT NOT NULL,
+    status TEXT NOT NULL DEFAULT 'active',
+    default_commission_rate REAL,
+    coupon_code TEXT,
+    created_at TEXT NOT NULL,
+    updated_at TEXT NOT NULL
+  );
+`);
+
+db.exec(`
   CREATE TABLE IF NOT EXISTS shops (
     shop_domain TEXT PRIMARY KEY,
     access_token TEXT NOT NULL,
@@ -105,6 +133,8 @@ db.exec(`
 `);
 
 ensureColumn("creators", "external_tags_json", "TEXT");
+ensureColumn("brand_integrations", "default_commission_rate", "REAL");
+ensureColumn("creator_brand_links", "default_commission_rate", "REAL");
 
 db.exec(`
   CREATE TABLE IF NOT EXISTS user_creator_weights (
@@ -160,6 +190,7 @@ if (hasTable("link_clicks") && !hasColumn("link_clicks", "user_id")) {
         brand_id TEXT,
         shop_domain TEXT,
         snapshot_id TEXT,
+        fallback_reason TEXT,
         clicked_at TEXT NOT NULL,
         ip_hash TEXT NOT NULL,
         user_agent TEXT NOT NULL,
@@ -179,6 +210,7 @@ if (hasTable("link_clicks") && !hasColumn("link_clicks", "user_id")) {
         brand_id,
         shop_domain,
         snapshot_id,
+        fallback_reason,
         clicked_at,
         ip_hash,
         user_agent
@@ -191,6 +223,7 @@ if (hasTable("link_clicks") && !hasColumn("link_clicks", "user_id")) {
         NULL,
         NULL,
         'legacy_single_creator',
+        NULL,
         NULL,
         NULL,
         NULL,
@@ -213,6 +246,7 @@ if (hasTable("link_clicks") && !hasColumn("link_clicks", "user_id")) {
       brand_id TEXT,
       shop_domain TEXT,
       snapshot_id TEXT,
+      fallback_reason TEXT,
       clicked_at TEXT NOT NULL,
       ip_hash TEXT NOT NULL,
       user_agent TEXT NOT NULL,
@@ -221,6 +255,8 @@ if (hasTable("link_clicks") && !hasColumn("link_clicks", "user_id")) {
     );
   `);
 }
+
+ensureColumn("link_clicks", "fallback_reason", "TEXT");
 
 db.exec(`
   CREATE TABLE IF NOT EXISTS creator_coupon_mappings (
@@ -242,6 +278,23 @@ db.exec(`
   );
 `);
 
+db.exec(`
+  CREATE TABLE IF NOT EXISTS shopify_campaigns (
+    id TEXT PRIMARY KEY,
+    brand_id TEXT,
+    shop_domain TEXT NOT NULL,
+    name TEXT NOT NULL,
+    shopper_offer_type TEXT,
+    shopper_offer_value TEXT,
+    commission_rate REAL NOT NULL,
+    starts_at TEXT,
+    ends_at TEXT,
+    status TEXT NOT NULL DEFAULT 'active',
+    created_at TEXT NOT NULL,
+    updated_at TEXT NOT NULL
+  );
+`);
+
 if (hasTable("order_attributions") && !hasColumn("order_attributions", "user_id")) {
   recreateTable({
     tableName: "order_attributions",
@@ -257,6 +310,7 @@ if (hasTable("order_attributions") && !hasColumn("order_attributions", "user_id"
         currency TEXT,
         click_id TEXT,
         snapshot_id TEXT,
+        fallback_reason TEXT,
         atribe_ref TEXT,
         coupon_code TEXT,
         processed_at TEXT NOT NULL,
@@ -275,6 +329,7 @@ if (hasTable("order_attributions") && !hasColumn("order_attributions", "user_id"
         currency,
         click_id,
         snapshot_id,
+        fallback_reason,
         atribe_ref,
         coupon_code,
         processed_at
@@ -289,6 +344,7 @@ if (hasTable("order_attributions") && !hasColumn("order_attributions", "user_id"
         order_value,
         NULL,
         click_id,
+        NULL,
         NULL,
         atribe_ref,
         coupon_code,
@@ -309,6 +365,7 @@ if (hasTable("order_attributions") && !hasColumn("order_attributions", "user_id"
       currency TEXT,
       click_id TEXT,
       snapshot_id TEXT,
+      fallback_reason TEXT,
       atribe_ref TEXT,
       coupon_code TEXT,
       processed_at TEXT NOT NULL,
@@ -316,6 +373,8 @@ if (hasTable("order_attributions") && !hasColumn("order_attributions", "user_id"
     );
   `);
 }
+
+ensureColumn("order_attributions", "fallback_reason", "TEXT");
 
 db.exec(`
   CREATE TABLE IF NOT EXISTS order_commissions (

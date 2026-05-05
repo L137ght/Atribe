@@ -103,7 +103,7 @@ export const webhookService = {
       }
 
       if (payload?.webhookSubscription) {
-        shopWebhookRegistrationRepository.upsert({
+        await shopWebhookRegistrationRepository.upsert({
           shopDomain: shop,
           topic: subscription.topic,
           webhookId: payload.webhookSubscription.id,

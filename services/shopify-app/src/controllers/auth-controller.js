@@ -7,9 +7,12 @@ import { logger } from "../utils/logger.js";
 export const authController = {
   start(req, res) {
     try {
-      const { installUrl } = oauthService.createInstallUrl(req.query.shop);
+      const { installUrl } = oauthService.createInstallUrl(req.query.shop, {
+        returnTo: req.query.mobile_redirect
+      });
       logger.info("Starting Shopify OAuth install", {
-        shop: req.query.shop || null
+        shop: req.query.shop || null,
+        hasMobileRedirect: Boolean(req.query.mobile_redirect)
       });
       return res.redirect(installUrl);
     } catch (error) {
@@ -25,13 +28,13 @@ export const authController = {
   async callback(req, res) {
     try {
       const rawQueryString = req.originalUrl.split("?")[1] || "";
-      const { shop, code } = oauthService.validateCallback({
+      const { shop, code, returnTo } = oauthService.validateCallback({
         query: req.query,
         rawQueryString
       });
       const tokenResponse = await oauthService.exchangeCodeForAccessToken({ shop, code });
 
-      shopRepository.upsert({
+      await shopRepository.upsert({
         shopDomain: shop,
         accessToken: tokenResponse.access_token,
         scope: tokenResponse.scope || null
@@ -53,8 +56,16 @@ export const authController = {
         shop,
         webhookCount: registeredWebhooks.registered.length,
         skippedWebhookCount: registeredWebhooks.skipped.length,
-        scriptTagId: registeredScriptTag.id
+        scriptTagId: registeredScriptTag.id,
+        hasMobileRedirect: Boolean(returnTo)
       });
+
+      if (returnTo) {
+        const redirectUrl = new URL(returnTo);
+        redirectUrl.searchParams.set("shop", shop);
+        redirectUrl.searchParams.set("status", "connected");
+        return res.redirect(302, redirectUrl.toString());
+      }
 
       return res.status(200).json({
         message: "Shop installed successfully.",

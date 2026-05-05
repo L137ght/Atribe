@@ -1,113 +1,50 @@
-import { db } from "../db/database.js";
+import crypto from "node:crypto";
+
 import { env } from "../config/env.js";
+import { clickWeightSnapshotRepository } from "../repositories/click-weight-snapshot-repository.js";
+import { linkClickRepository } from "../repositories/link-click-repository.js";
+import { orderAttributionRepository } from "../repositories/order-attribution-repository.js";
+import { shopRepository } from "../repositories/shop-repository.js";
 import { shopScriptTagRepository } from "../repositories/shop-script-tag-repository.js";
+import { shopifyOrderRepository } from "../repositories/shopify-order-repository.js";
 import { shopWebhookRegistrationRepository } from "../repositories/shop-webhook-registration-repository.js";
+import { userCreatorWeightRepository } from "../repositories/user-creator-weight-repository.js";
+import { linkRepository } from "../repositories/link-repository.js";
 
 export const debugService = {
-  getShops() {
-    const statement = db.prepare(`
-      SELECT
-        shop_domain AS shopDomain,
-        scope,
-        installed_at AS installedAt
-      FROM shops
-      ORDER BY installed_at DESC
-    `);
-
-    return statement.all();
+  async getShops() {
+    return shopRepository.findAll();
   },
 
-  getLatestClicks() {
-    const statement = db.prepare(`
-      SELECT
-        click_id AS clickId,
-        link_id AS linkId,
-        creator_id AS creatorId,
-        selected_creator_id AS selectedCreatorId,
-        user_id AS userId,
-        destination_url AS destinationUrl,
-        platform_type AS platformType,
-        brand_id AS brandId,
-        shop_domain AS shopDomain,
-        snapshot_id AS snapshotId,
-        clicked_at AS clickedAt,
-        ip_hash AS ipHash,
-        user_agent AS userAgent
-      FROM link_clicks
-      ORDER BY clicked_at DESC
-      LIMIT 20
-    `);
-
-    return statement.all();
+  async getLatestClicks() {
+    return linkClickRepository.findByBrandFilter({ shopDomain: null, brandId: null, limit: 20 });
   },
 
-  getLatestLinks() {
-    const statement = db.prepare(`
-      SELECT
-        link_id AS linkId,
-        creator_id AS creatorId,
-        brand_id AS brandId,
-        destination_url AS destinationUrl,
-        created_at AS createdAt
-      FROM links
-      ORDER BY created_at DESC
-      LIMIT 20
-    `);
-
-    return statement.all().map((link) => ({
+  async getLatestLinks() {
+    const links = await linkRepository.findLatest(20);
+    return links.map((link) => ({
       ...link,
-      trackingLink: `${env.atribeBaseUrl}/r/${encodeURIComponent(link.creatorId)}/${link.linkId}`
+      trackingLink:
+        link.trackingLink || `${env.atribeBaseUrl}/r/${encodeURIComponent(link.creatorId)}/${link.linkId}`
     }));
   },
 
-  getLatestOrders() {
-    const statement = db.prepare(`
-      SELECT
-        order_id AS orderId,
-        shop_domain AS shopDomain,
-        total_price AS totalPrice,
-        currency,
-        created_at AS createdAt,
-        updated_at AS updatedAt
-      FROM shopify_orders
-      ORDER BY updated_at DESC
-      LIMIT 20
-    `);
-
-    return statement.all();
+  async getLatestOrders() {
+    return shopifyOrderRepository.findLatest(20);
   },
 
-  getLatestAttributions() {
-    const statement = db.prepare(`
-      SELECT
-        order_id AS orderId,
-        shop_domain AS shopDomain,
-        creator_id AS creatorId,
-        user_id AS userId,
-        platform_type AS platformType,
-        attribution_source AS attributionSource,
-        order_value AS orderValue,
-        currency,
-        click_id AS clickId,
-        snapshot_id AS snapshotId,
-        atribe_ref AS atribeRef,
-        coupon_code AS couponCode,
-        processed_at AS processedAt
-      FROM order_attributions
-      ORDER BY processed_at DESC
-      LIMIT 20
-    `);
-
-    return statement.all();
+  async getLatestAttributions() {
+    return orderAttributionRepository.findLatest(20);
   },
 
-  getStorefrontScriptInfo() {
+  async getStorefrontScriptInfo() {
+    const registeredScriptTags = await shopScriptTagRepository.findAll();
     return {
       script_url: `${env.shopifyAppUrl}/storefront/atribe.js`,
       expected_script_tag_src: `${env.shopifyAppUrl}/storefront/atribe.js`,
       expected_script_tag_registration_status:
-        shopScriptTagRepository.findAll().length > 0 ? "registered_for_at_least_one_shop" : "not_registered_yet",
-      registered_script_tags: shopScriptTagRepository.findAll(),
+        registeredScriptTags.length > 0 ? "registered_for_at_least_one_shop" : "not_registered_yet",
+      registered_script_tags: registeredScriptTags,
       preferred_injection_method: "theme_app_extension_embed",
       theme_app_extension: {
         extension_directory: "extensions/atribe-theme-extension",
@@ -142,61 +79,27 @@ export const debugService = {
     };
   },
 
-  getShopifyInstallStatus() {
+  async getShopifyInstallStatus() {
     return {
-      installed_shops: this.getShops(),
-      registered_webhooks: shopWebhookRegistrationRepository.findAll(),
-      registered_script_tags: shopScriptTagRepository.findAll(),
+      installed_shops: await this.getShops(),
+      registered_webhooks: await shopWebhookRegistrationRepository.findAll(),
+      registered_script_tags: await shopScriptTagRepository.findAll(),
       current_app_url: env.shopifyAppUrl,
       current_atribe_base_url: env.atribeBaseUrl,
       current_callback_url: env.shopifyCallbackUrl || `${env.shopifyAppUrl}/auth/callback`
     };
   },
 
-  getUserCreatorWeights(userId) {
-    const statement = db.prepare(`
-      SELECT
-        id,
-        user_id AS userId,
-        creator_id AS creatorId,
-        weight,
-        active,
-        attributed_value_total AS attributedValueTotal,
-        commission_value_total AS commissionValueTotal,
-        event_count AS eventCount,
-        created_at AS createdAt,
-        updated_at AS updatedAt
-      FROM user_creator_weights
-      WHERE user_id = ?
-      ORDER BY updated_at DESC
-    `);
-
-    return statement.all(userId);
+  async getUserCreatorWeights(userId) {
+    return userCreatorWeightRepository.findActiveByUserId(userId);
   },
 
-  getLatestUserRouteClicks() {
-    const statement = db.prepare(`
-      SELECT
-        click_id AS clickId,
-        user_id AS userId,
-        selected_creator_id AS selectedCreatorId,
-        destination_url AS destinationUrl,
-        platform_type AS platformType,
-        brand_id AS brandId,
-        shop_domain AS shopDomain,
-        snapshot_id AS snapshotId,
-        clicked_at AS clickedAt
-      FROM link_clicks
-      WHERE user_id IS NOT NULL
-      ORDER BY clicked_at DESC
-      LIMIT 20
-    `);
-
-    return statement.all();
+  async getLatestUserRouteClicks() {
+    return linkClickRepository.findLatestUserRouteClicks(20);
   },
 
-  getUserValueDistribution(userId) {
-    const weights = this.getUserCreatorWeights(userId);
+  async getUserValueDistribution(userId) {
+    const weights = await this.getUserCreatorWeights(userId);
     const totalAttributedValue = weights.reduce(
       (sum, item) => sum + Number(item.attributedValueTotal || 0),
       0
@@ -218,18 +121,41 @@ export const debugService = {
     }));
   },
 
-  getSnapshot(snapshotId) {
-    const statement = db.prepare(`
-      SELECT
-        id,
-        click_id AS clickId,
-        user_id AS userId,
-        snapshot_json AS snapshotJson,
-        created_at AS createdAt
-      FROM click_weight_snapshots
-      WHERE id = ?
-    `);
+  async getSnapshot(snapshotId) {
+    return clickWeightSnapshotRepository.findById(snapshotId);
+  },
 
-    return statement.get(snapshotId) || null;
+  async seedUserWeights({ userId, weights }) {
+    const normalizedUserId = String(userId || "").trim();
+    if (!normalizedUserId) {
+      throw new Error("user_id is required.");
+    }
+
+    if (!Array.isArray(weights) || weights.length === 0) {
+      throw new Error("weights must be a non-empty array.");
+    }
+
+    for (const weight of weights) {
+      const creatorId = String(weight?.creator_id || "").trim();
+      const numericWeight = Number(weight?.weight || 0);
+
+      if (!creatorId) {
+        throw new Error("Each weight entry requires creator_id.");
+      }
+
+      if (!Number.isFinite(numericWeight) || numericWeight <= 0) {
+        throw new Error("Each weight entry requires a positive numeric weight.");
+      }
+
+      await userCreatorWeightRepository.upsert({
+        id: crypto.randomUUID(),
+        userId: normalizedUserId,
+        creatorId,
+        weight: numericWeight,
+        active: true
+      });
+    }
+
+    return this.getUserCreatorWeights(normalizedUserId);
   }
 };

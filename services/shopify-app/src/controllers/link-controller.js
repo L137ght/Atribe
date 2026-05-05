@@ -15,9 +15,9 @@ const getClientIp = (req) => {
 };
 
 export const linkController = {
-  create(req, res) {
+  async create(req, res) {
     try {
-      const link = linkService.createLink({
+      const link = await linkService.createLink({
         creatorId: req.body.creator_id,
         brandId: req.body.brand_id,
         destinationUrl: req.body.destination_url
@@ -47,9 +47,9 @@ export const linkController = {
     }
   },
 
-  userRoute(req, res) {
+  async userRoute(req, res) {
     try {
-      const result = linkService.createUserRoute({
+      const result = await linkService.createUserRoute({
         userId: req.params.user_id,
         destinationUrl: req.query.url,
         ipAddress: getClientIp(req),
@@ -62,6 +62,7 @@ export const linkController = {
         snapshotId: result.snapshotId,
         platformType: result.platformType,
         selectedCreatorId: result.selectedCreatorId,
+        fallbackReason: result.fallbackReason || null,
         redirectUrl: result.redirectUrl
       });
 
@@ -77,9 +78,9 @@ export const linkController = {
     }
   },
 
-  redirect(req, res) {
+  async redirect(req, res) {
     try {
-      const result = linkService.resolveLink({
+      const result = await linkService.resolveLink({
         creatorId: req.params.creator_id,
         linkId: req.params.link_id,
         ipAddress: getClientIp(req),

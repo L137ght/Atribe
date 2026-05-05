@@ -1,68 +1,68 @@
 import { debugService } from "../services/debug-service.js";
 
 export const debugController = {
-  shops(_req, res) {
+  async shops(_req, res) {
     return res.status(200).json({
-      shops: debugService.getShops()
+      shops: await debugService.getShops()
     });
   },
 
-  latestClicks(_req, res) {
+  async latestClicks(_req, res) {
     return res.status(200).json({
-      clicks: debugService.getLatestClicks()
+      clicks: await debugService.getLatestClicks()
     });
   },
 
-  latestLinks(_req, res) {
+  async latestLinks(_req, res) {
     return res.status(200).json({
-      links: debugService.getLatestLinks()
+      links: await debugService.getLatestLinks()
     });
   },
 
-  latestOrders(_req, res) {
+  async latestOrders(_req, res) {
     return res.status(200).json({
-      orders: debugService.getLatestOrders()
+      orders: await debugService.getLatestOrders()
     });
   },
 
-  latestAttributions(_req, res) {
+  async latestAttributions(_req, res) {
     return res.status(200).json({
-      attributions: debugService.getLatestAttributions()
+      attributions: await debugService.getLatestAttributions()
     });
   },
 
-  storefrontScript(_req, res) {
+  async storefrontScript(_req, res) {
     return res.status(200).json({
-      storefront_script: debugService.getStorefrontScriptInfo()
+      storefront_script: await debugService.getStorefrontScriptInfo()
     });
   },
 
-  shopifyInstallStatus(_req, res) {
+  async shopifyInstallStatus(_req, res) {
     return res.status(200).json({
-      shopify_install_status: debugService.getShopifyInstallStatus()
+      shopify_install_status: await debugService.getShopifyInstallStatus()
     });
   },
 
-  userCreatorWeights(req, res) {
+  async userCreatorWeights(req, res) {
     return res.status(200).json({
-      user_creator_weights: debugService.getUserCreatorWeights(String(req.query.user_id || ""))
+      user_creator_weights: await debugService.getUserCreatorWeights(String(req.query.user_id || ""))
     });
   },
 
-  latestUserRouteClicks(_req, res) {
+  async latestUserRouteClicks(_req, res) {
     return res.status(200).json({
-      user_route_clicks: debugService.getLatestUserRouteClicks()
+      user_route_clicks: await debugService.getLatestUserRouteClicks()
     });
   },
 
-  userValueDistribution(req, res) {
+  async userValueDistribution(req, res) {
     return res.status(200).json({
-      user_value_distribution: debugService.getUserValueDistribution(String(req.query.user_id || ""))
+      user_value_distribution: await debugService.getUserValueDistribution(String(req.query.user_id || ""))
     });
   },
 
-  snapshot(req, res) {
-    const snapshot = debugService.getSnapshot(req.params.snapshot_id);
+  async snapshot(req, res) {
+    const snapshot = await debugService.getSnapshot(req.params.snapshot_id);
     if (!snapshot) {
       return res.status(404).json({ error: "Snapshot not found." });
     }
@@ -70,5 +70,22 @@ export const debugController = {
     return res.status(200).json({
       snapshot
     });
+  },
+
+  async seedUserWeights(req, res) {
+    try {
+      const seededWeights = await debugService.seedUserWeights({
+        userId: req.body.user_id,
+        weights: req.body.weights
+      });
+
+      return res.status(200).json({
+        user_creator_weights: seededWeights
+      });
+    } catch (error) {
+      return res.status(400).json({
+        error: error.message
+      });
+    }
   }
 };

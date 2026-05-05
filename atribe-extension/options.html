@@ -1,0 +1,87 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Atribe Extension Settings</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        max-width: 640px;
+        margin: 24px auto;
+        padding: 0 16px;
+        color: #111827;
+      }
+
+      h1 {
+        font-size: 24px;
+        margin-bottom: 8px;
+      }
+
+      p {
+        color: #4b5563;
+        line-height: 1.5;
+      }
+
+      form {
+        display: grid;
+        gap: 16px;
+        margin-top: 24px;
+      }
+
+      label {
+        display: grid;
+        gap: 8px;
+        font-weight: 600;
+      }
+
+      input {
+        font: inherit;
+        padding: 10px 12px;
+        border: 1px solid #d1d5db;
+        border-radius: 8px;
+      }
+
+      button {
+        width: fit-content;
+        padding: 10px 16px;
+        border: 0;
+        border-radius: 8px;
+        background: #111827;
+        color: #fff;
+        font: inherit;
+        cursor: pointer;
+      }
+
+      #status {
+        min-height: 20px;
+        color: #047857;
+        font-size: 14px;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Atribe Extension Settings</h1>
+    <p>
+      Configure the backend base URL and the supporter user id. The extension will route supported product URLs through
+      the Atribe backend instead of applying a hardcoded affiliate tag.
+    </p>
+
+    <form id="settings-form">
+      <label>
+        Atribe backend URL
+        <input id="backend-url" name="backend-url" placeholder="https://your-backend.example.com" />
+      </label>
+
+      <label>
+        Supporter user id
+        <input id="user-id" name="user-id" placeholder="uuid" />
+      </label>
+
+      <button type="submit">Save settings</button>
+      <div id="status" aria-live="polite"></div>
+    </form>
+
+    <script src="options.js"></script>
+  </body>
+  </html>

@@ -1,8 +1,11 @@
 import crypto from "node:crypto";
 
 import { env } from "../config/env.js";
+import { brandIntegrationRepository } from "../repositories/brand-integration-repository.js";
+import { campaignRepository } from "../repositories/campaign-repository.js";
 import { clickWeightSnapshotRepository } from "../repositories/click-weight-snapshot-repository.js";
 import { creatorRepository } from "../repositories/creator-repository.js";
+import { creatorBrandLinkRepository } from "../repositories/creator-brand-link-repository.js";
 import { linkClickRepository } from "../repositories/link-click-repository.js";
 import { linkRepository } from "../repositories/link-repository.js";
 import { shopRepository } from "../repositories/shop-repository.js";
@@ -14,6 +17,7 @@ import { logger } from "../utils/logger.js";
 import { appendQueryParams } from "../utils/url.js";
 
 const createId = (size = 12) => crypto.randomBytes(size).toString("hex");
+const createUuid = () => crypto.randomUUID();
 
 const normalizeRequiredString = (value, fieldName) => {
   const normalized = String(value || "").trim();
@@ -56,32 +60,113 @@ const getTrackingBaseUrl = () => {
 };
 
 const normalizeShopDomain = (value) => String(value || "").trim().toLowerCase();
+const normalizeDomain = (value) => normalizeShopDomain(String(value || "").replace(/^www\./i, ""));
+const FLIPKART_HOST_PATTERN = /(^|\.)flipkart\.com$/i;
 
-const detectPlatformType = (destinationUrl) => {
+const detectPlatformType = async (destinationUrl) => {
   const parsed = new URL(destinationUrl);
   const hostname = normalizeShopDomain(parsed.hostname);
-  const knownShop = shopRepository.findByShopDomain(hostname);
+  const knownShop = await shopRepository.findByShopDomain(hostname);
+  const brandIntegration = await brandIntegrationRepository.findByShopDomain(hostname);
 
-  if (knownShop) {
+  if (
+    knownShop &&
+    brandIntegration &&
+    brandIntegration.integrationStatus === "active" &&
+    !brandIntegration.uninstalledAt
+  ) {
+    const brandId = brandIntegration?.brandId || (env.dbProvider === "supabase" ? null : hostname);
+
     return {
       platformType: "atribe_shopify",
       shopDomain: hostname,
-      brandId: hostname
+      brandId,
+      brandIntegration
     };
   }
 
   return {
     platformType: "external",
     shopDomain: null,
-    brandId: hostname
+    brandId: env.dbProvider === "supabase" ? null : hostname,
+    brandIntegration: null
   };
 };
 
-const buildSnapshot = (weights) =>
-  weights.map((weight) => ({
+const buildSnapshot = (weights) => {
+  const totalWeight = weights.reduce((sum, weight) => sum + Number(weight.weight || 0), 0);
+
+  return weights.map((weight) => ({
     creator_id: weight.creatorId,
-    weight: Number(weight.weight)
+    raw_weight: Number(weight.weight || 0),
+    normalized_weight:
+      totalWeight > 0 ? Number(weight.weight || 0) / totalWeight : 0
   }));
+};
+
+const buildHouseFallbackSnapshot = () => {
+  if (!env.atribeHouseCreatorId) {
+    throw new Error("ATRIBE_HOUSE_CREATOR_ID must be configured for Shopify house fallback.");
+  }
+
+  return [
+    {
+      creator_id: env.atribeHouseCreatorId,
+      raw_weight: 100,
+      normalized_weight: 1
+    }
+  ];
+};
+
+const creatorSupportsDomain = (creator, hostname) => {
+  const normalizedHostname = normalizeDomain(hostname);
+  if (!creator) {
+    return false;
+  }
+
+  if (
+    creator.links?.some(
+      (link) => link.url && normalizeDomain(link.domain) === normalizedHostname
+    )
+  ) {
+    return true;
+  }
+
+  if (resolveExternalTagConfig(creator.externalTagsJson, normalizedHostname)) {
+    return true;
+  }
+
+  return normalizedHostname.includes("amazon.") && Boolean(creator.affiliateTag);
+};
+
+const rewriteUrlFromAffiliateLink = (inputUrl, affiliateUrl) => {
+  const destinationUrl = new URL(inputUrl.trim());
+  const sourceUrl = new URL(affiliateUrl.trim());
+
+  sourceUrl.searchParams.forEach((value, key) => {
+    destinationUrl.searchParams.set(key, value);
+  });
+
+  return destinationUrl.toString();
+};
+
+const rewriteFlipkartUrl = (inputUrl, affid) => {
+  const destinationUrl = new URL(inputUrl.trim());
+  const normalizedAffid = String(affid || "").trim();
+
+  if (!FLIPKART_HOST_PATTERN.test(normalizeDomain(destinationUrl.hostname)) || !normalizedAffid) {
+    return inputUrl;
+  }
+
+  destinationUrl.protocol = "https:";
+  destinationUrl.hostname = "dl.flipkart.com";
+  destinationUrl.pathname = destinationUrl.pathname.startsWith("/dl/")
+    ? destinationUrl.pathname
+    : `/dl${destinationUrl.pathname.startsWith("/") ? "" : "/"}${destinationUrl.pathname}`;
+  destinationUrl.searchParams.set("affid", normalizedAffid);
+
+  return destinationUrl.toString();
+};
 
 const resolveExternalTagConfig = (externalTagsJson, hostname) => {
   if (!externalTagsJson) {
@@ -102,11 +187,28 @@ const resolveExternalTagConfig = (externalTagsJson, hostname) => {
 
 const applyExternalCreatorTag = (destinationUrl, creator) => {
   const url = new URL(destinationUrl);
-  const hostname = normalizeShopDomain(url.hostname);
+  const hostname = normalizeDomain(url.hostname);
+  const matchingLink = creator?.links?.find(
+    (link) => normalizeDomain(link.domain) === hostname && link.url
+  );
+
+  if (matchingLink?.url) {
+    return rewriteUrlFromAffiliateLink(destinationUrl, matchingLink.url);
+  }
+
   const tagConfig = resolveExternalTagConfig(creator?.externalTagsJson, hostname);
 
   if (!tagConfig?.param || !tagConfig?.value) {
+    if (creator?.affiliateTag && hostname.includes("amazon.")) {
+      url.searchParams.set("tag", String(creator.affiliateTag));
+      return url.toString();
+    }
+
     return destinationUrl;
+  }
+
+  if (FLIPKART_HOST_PATTERN.test(hostname) && String(tagConfig.param) === "affid") {
+    return rewriteFlipkartUrl(destinationUrl, tagConfig.value);
   }
 
   url.searchParams.set(String(tagConfig.param), String(tagConfig.value));
@@ -114,16 +216,16 @@ const applyExternalCreatorTag = (destinationUrl, creator) => {
 };
 
 export const linkService = {
-  createLink({ creatorId, brandId, destinationUrl }) {
+  async createLink({ creatorId, brandId, destinationUrl }) {
     const normalizedCreatorId = normalizeRequiredString(creatorId, "creator_id");
     const normalizedBrandId = normalizeRequiredString(brandId, "brand_id");
     const normalizedDestinationUrl = validateDestinationUrl(destinationUrl);
     const trackingBaseUrl = getTrackingBaseUrl();
     const linkId = createId(8);
-    creatorRepository.upsert({ id: normalizedCreatorId });
-    const couponCode = couponService.ensureCreatorCoupon(normalizedCreatorId);
+    await creatorRepository.upsert({ id: normalizedCreatorId });
+    const couponCode = await couponService.ensureCreatorCoupon(normalizedCreatorId);
 
-    linkRepository.create({
+    await linkRepository.create({
       linkId,
       creatorId: normalizedCreatorId,
       brandId: normalizedBrandId,
@@ -151,10 +253,10 @@ export const linkService = {
     };
   },
 
-  resolveLink({ creatorId, linkId, ipAddress, userAgent }) {
+  async resolveLink({ creatorId, linkId, ipAddress, userAgent }) {
     const normalizedCreatorId = normalizeRequiredString(creatorId, "creator_id");
     const normalizedLinkId = normalizeRequiredString(linkId, "link_id");
-    const link = linkRepository.findByCreatorAndLinkId({
+    const link = await linkRepository.findByCreatorAndLinkId({
       creatorId: normalizedCreatorId,
       linkId: normalizedLinkId
     });
@@ -164,8 +266,8 @@ export const linkService = {
     }
 
     const clickId = createId(10);
-    const detectedPlatform = detectPlatformType(link.destinationUrl);
-    linkClickRepository.create({
+    const detectedPlatform = await detectPlatformType(link.destinationUrl);
+    await linkClickRepository.create({
       clickId,
       linkId: link.linkId,
       creatorId: link.creatorId,
@@ -189,54 +291,92 @@ export const linkService = {
     };
   },
 
-  createUserRoute({ userId, destinationUrl, ipAddress, userAgent }) {
+  async createUserRoute({ userId, destinationUrl, ipAddress, userAgent }) {
     const normalizedUserId = normalizeRequiredString(userId, "user_id");
     const normalizedDestinationUrl = validateDestinationUrl(destinationUrl);
-    const user = userRepository.findById(normalizedUserId);
+    const user = await userRepository.findById(normalizedUserId);
 
     if (!user) {
       throw new Error("User not found.");
     }
 
-    const weights = userCreatorWeightRepository.findActiveByUserId(normalizedUserId);
+    const weights = await userCreatorWeightRepository.findActiveByUserId(normalizedUserId);
     if (weights.length === 0) {
       throw new Error("User has no active creator weights.");
     }
 
-    const { platformType, brandId, shopDomain } = detectPlatformType(normalizedDestinationUrl);
+    const { platformType, brandId, shopDomain, brandIntegration } = await detectPlatformType(normalizedDestinationUrl);
     const clickId = createId(10);
-    const snapshotId = createId(10);
-    const snapshot = buildSnapshot(weights);
-
-    clickWeightSnapshotRepository.create({
-      id: snapshotId,
-      clickId,
-      userId: normalizedUserId,
-      snapshotJson: JSON.stringify(snapshot)
-    });
-
+    const snapshotId = createUuid();
     let selectedCreatorId = null;
+    let snapshot = [];
+    let fallbackReason = null;
+
     if (platformType === "external") {
-      const selectedWeight = externalSelectionService.selectCreator(weights);
+      const destinationHostname = normalizeDomain(new URL(normalizedDestinationUrl).hostname);
+      const weightedCreators = await Promise.all(
+        weights.map(async (weight) => ({
+          weight,
+          creator: await creatorRepository.findById(weight.creatorId)
+        }))
+      );
+
+      const supportedWeights = weightedCreators
+        .filter(({ creator }) => creatorSupportsDomain(creator, destinationHostname))
+        .map(({ weight }) => weight);
+
+      if (supportedWeights.length === 0) {
+        throw new Error("No selected creators currently support this domain.");
+      }
+
+      snapshot = buildSnapshot(supportedWeights);
+      const selectedWeight = externalSelectionService.selectCreator(supportedWeights);
       selectedCreatorId = selectedWeight?.creatorId || null;
 
       if (!selectedCreatorId) {
         throw new Error("No creator could be selected for external attribution.");
       }
 
-      creatorRepository.upsert({ id: selectedCreatorId });
-      couponService.ensureCreatorCoupon(selectedCreatorId);
+      await couponService.ensureCreatorCoupon(selectedCreatorId);
+    } else {
+      const hasActiveCampaign = shopDomain
+        ? await campaignRepository.hasActiveCampaign(shopDomain)
+        : false;
+      const eligibleCreatorLinks = shopDomain && hasActiveCampaign
+        ? await creatorBrandLinkRepository.findActiveByShopDomain(shopDomain)
+        : [];
+      const eligibleCreatorIds = new Set(
+        eligibleCreatorLinks
+          .filter((link) => link.status === "active")
+          .map((link) => link.creatorId)
+      );
+
+      const eligibleWeights = weights.filter((weight) => eligibleCreatorIds.has(weight.creatorId));
+
+      if (eligibleWeights.length === 0) {
+        snapshot = buildHouseFallbackSnapshot();
+        fallbackReason = "house_fallback";
+      } else {
+        snapshot = buildSnapshot(eligibleWeights);
+      }
     }
 
+    await clickWeightSnapshotRepository.create({
+      id: snapshotId,
+      clickId,
+      userId: normalizedUserId,
+      snapshotJson: JSON.stringify(snapshot)
+    });
+
     const selectedCreator = selectedCreatorId
-      ? creatorRepository.findById(selectedCreatorId)
+      ? await creatorRepository.findById(selectedCreatorId)
       : null;
     const finalDestinationUrl =
       platformType === "external" && selectedCreator
         ? applyExternalCreatorTag(normalizedDestinationUrl, selectedCreator)
         : normalizedDestinationUrl;
 
-    linkClickRepository.create({
+    await linkClickRepository.create({
       clickId,
       userId: normalizedUserId,
       selectedCreatorId,
@@ -245,6 +385,7 @@ export const linkService = {
       brandId,
       shopDomain,
       snapshotId,
+      fallbackReason,
       ipHash: hashIp(ipAddress),
       userAgent: String(userAgent || "unknown")
     });
@@ -265,7 +406,9 @@ export const linkService = {
       userId: normalizedUserId,
       snapshotId,
       platformType,
+      brandId: brandIntegration?.brandId || brandId,
       selectedCreatorId,
+      fallbackReason,
       redirectUrl: appendQueryParams(finalDestinationUrl, redirectParams)
     };
   }

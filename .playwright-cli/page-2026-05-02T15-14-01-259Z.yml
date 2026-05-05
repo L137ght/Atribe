@@ -1,0 +1,193 @@
+- generic [active] [ref=e1]:
+  - link "Skip to content" [ref=e2] [cursor=pointer]:
+    - /url: "#MainContent"
+  - banner [ref=e5]:
+    - navigation [ref=e6]:
+      - list [ref=e7]:
+        - listitem [ref=e8]:
+          - link "Home" [ref=e9] [cursor=pointer]:
+            - /url: /
+            - generic [ref=e10]: Home
+        - listitem [ref=e11]:
+          - link "Catalog" [ref=e12] [cursor=pointer]:
+            - /url: /collections/all
+            - generic [ref=e13]: Catalog
+        - listitem [ref=e14]:
+          - link "Contact" [ref=e15] [cursor=pointer]:
+            - /url: /pages/contact
+            - generic [ref=e16]: Contact
+    - heading "Outlaw" [level=1] [ref=e17]:
+      - link "Outlaw" [ref=e18] [cursor=pointer]:
+        - /url: /
+    - generic [ref=e19]:
+      - group [ref=e21]:
+        - button "Search" [ref=e22] [cursor=pointer]:
+          - img [ref=e24]
+      - link "Log in" [ref=e26] [cursor=pointer]:
+        - /url: https://outlaw-tk71w27i.myshopify.com/customer_authentication/redirect?locale=en&region_country=US
+        - img [ref=e27]
+        - generic [ref=e28]: Log in
+      - button "Cart" [ref=e29] [cursor=pointer]:
+        - img [ref=e30]
+        - generic [ref=e32]: Cart
+  - main [ref=e33]:
+    - generic [ref=e38]:
+      - heading "Generated test data" [level=2] [ref=e39]
+      - paragraph [ref=e41]: A theme and populated test store by Shopify to help you test commerce primitives.
+      - link "Shop products" [ref=e43] [cursor=pointer]:
+        - /url: /collections/all
+    - generic [ref=e46]:
+      - heading "Featured products" [level=2] [ref=e48]:
+        - strong [ref=e49]: Featured products
+      - generic [ref=e50]:
+        - list "Slider" [ref=e51]:
+          - listitem [ref=e52]:
+            - generic [ref=e54]:
+              - img "Top and bottom view of a snowboard. The top view shows a stylized scene of water, trees, mountains, sky and a moon in blue colours. The bottom view has a blue liquid, drippy background with the text \"liquid\" in a stylized script typeface." [ref=e58]
+              - generic [ref=e61]:
+                - 'heading "The Collection Snowboard: Liquid" [level=3] [ref=e62]':
+                  - 'link "The Collection Snowboard: Liquid" [ref=e63] [cursor=pointer]':
+                    - /url: /products/the-collection-snowboard-liquid
+                - generic [ref=e67]:
+                  - generic [ref=e68]: Regular price
+                  - generic [ref=e69]: $749.95
+          - listitem [ref=e70]:
+            - generic [ref=e72]:
+              - img "Top and bottom view of a snowboard. The top view shows an illustration with varied outlined shapes in black. The bottom view shows a black box character with an H pointing, and surrounded by black outlined illustrative elements." [ref=e76]
+              - generic [ref=e79]:
+                - heading "The Multi-managed Snowboard" [level=3] [ref=e80]:
+                  - link "The Multi-managed Snowboard" [ref=e81] [cursor=pointer]:
+                    - /url: /products/the-multi-managed-snowboard
+                - generic [ref=e85]:
+                  - generic [ref=e86]: Regular price
+                  - generic [ref=e87]: $629.95
+          - listitem [ref=e88]:
+            - generic [ref=e90]:
+              - img "Top and bottom view of a snowboard. The top view shows a pixelated Shopify bag logo and a pixelated character reviewing a clipboard with a questioning expression with a bright green-blue background. The bottom view is a pattern of many pixel characters with a bright green-blue background." [ref=e94]
+              - generic [ref=e97]:
+                - heading "The Multi-location Snowboard" [level=3] [ref=e98]:
+                  - link "The Multi-location Snowboard" [ref=e99] [cursor=pointer]:
+                    - /url: /products/the-multi-location-snowboard
+                - generic [ref=e103]:
+                  - generic [ref=e104]: Regular price
+                  - generic [ref=e105]: $729.95
+          - listitem [ref=e106]:
+            - generic [ref=e108]:
+              - img "Top and bottom view of a snowboard. The top view shows stylized hydrogen bonds and the bottom view shows \"H2\" in a brush script typeface." [ref=e112]
+              - generic [ref=e115]:
+                - 'heading "The Collection Snowboard: Hydrogen" [level=3] [ref=e116]':
+                  - 'link "The Collection Snowboard: Hydrogen" [ref=e117] [cursor=pointer]':
+                    - /url: /products/the-collection-snowboard-hydrogen
+                - generic [ref=e121]:
+                  - generic [ref=e122]: Regular price
+                  - generic [ref=e123]: $600.00
+          - listitem [ref=e124]:
+            - generic [ref=e126]:
+              - img "Top and bottom view of a snowboard. The top view shows abstract circles and lines in shades of teal. The bottom view shows abstract circles and lines in shades of purple and blue with the text “SHOPIFY” in a sans serif typeface on top." [ref=e130]
+              - generic [ref=e133]:
+                - heading "The Complete Snowboard" [level=3] [ref=e134]:
+                  - link "The Complete Snowboard" [ref=e135] [cursor=pointer]:
+                    - /url: /products/the-complete-snowboard
+                - generic [ref=e139]:
+                  - generic [ref=e140]: Regular price
+                  - generic [ref=e141]: $699.95
+          - listitem [ref=e142]:
+            - generic [ref=e144]:
+              - generic [ref=e145]:
+                - img "Top and bottom view of a snowboard. The top view shows pixelated clouds, with the top-most one being the shape of the Shopify bag logo. The bottom view has a pixelated cloudy sky with blue, pink and purple colours." [ref=e148]
+                - generic [ref=e151]: Sale
+              - generic [ref=e153]:
+                - heading "The Compare at Price Snowboard Sale" [level=3] [ref=e154]:
+                  - link "The Compare at Price Snowboard Sale" [ref=e155] [cursor=pointer]:
+                    - /url: /products/the-compare-at-price-snowboard
+                    - text: The Compare at Price Snowboard
+                - generic [ref=e159]:
+                  - generic [ref=e160]: Regular price
+                  - generic [ref=e162]: $885.95
+                  - generic [ref=e163]: Sale price
+                  - generic [ref=e164]: $785.95
+        - generic [ref=e165]:
+          - button "Slide left" [disabled] [ref=e166] [cursor=pointer]:
+            - img [ref=e167]
+          - generic [ref=e168]:
+            - generic [ref=e169]: "1"
+            - generic [ref=e170]: /
+            - generic [ref=e171]: of
+            - generic [ref=e172]: "4"
+          - button "Slide right" [ref=e173] [cursor=pointer]:
+            - img [ref=e174]
+    - generic [ref=e181]:
+      - heading "Stay hydrated" [level=2] [ref=e182]
+      - paragraph [ref=e184]: Try our wax subscription so you can fly high, but never dry.
+      - link "Get waxy now" [ref=e185] [cursor=pointer]:
+        - /url: /products/selling-plans-ski-wax
+    - generic [ref=e188]:
+      - heading "Collections" [level=2] [ref=e190]:
+        - strong [ref=e191]: Collections
+      - list [ref=e193]:
+        - listitem [ref=e194]:
+          - heading "Hydrogen" [level=3] [ref=e203]:
+            - link "Hydrogen" [ref=e204] [cursor=pointer]:
+              - /url: /collections/hydrogen
+              - text: Hydrogen
+              - img [ref=e206]
+        - listitem [ref=e207]:
+          - heading "Automated Collection" [level=3] [ref=e216]:
+            - link "Automated Collection" [ref=e217] [cursor=pointer]:
+              - /url: /collections/automated-collection
+              - text: Automated Collection
+              - img [ref=e219]
+  - contentinfo [ref=e221]:
+    - generic [ref=e223]:
+      - generic [ref=e224]:
+        - heading "Quick links" [level=2] [ref=e225]
+        - list [ref=e226]:
+          - listitem [ref=e227]:
+            - link "Home" [ref=e228] [cursor=pointer]:
+              - /url: /
+          - listitem [ref=e229]:
+            - link "Catalog" [ref=e230] [cursor=pointer]:
+              - /url: /collections/all
+          - listitem [ref=e231]:
+            - link "Contact" [ref=e232] [cursor=pointer]:
+              - /url: /pages/contact
+      - generic [ref=e234]:
+        - heading "© 2023 / Shopify, Inc." [level=2] [ref=e235]
+        - paragraph [ref=e237]: ©2023/ Shopify, Inc.
+      - generic [ref=e238]:
+        - heading "Resources" [level=2] [ref=e239]
+        - list [ref=e241]:
+          - listitem [ref=e242]:
+            - link "Generated test data docs" [ref=e243] [cursor=pointer]:
+              - /url: https://shopify.dev/docs/apps/tools/development-stores/generated-data
+          - listitem [ref=e244]:
+            - link "GraphiQL API explorer" [ref=e245] [cursor=pointer]:
+              - /url: https://shopify.dev/docs/apps/tools/graphiql-admin-api
+    - generic [ref=e246]:
+      - generic [ref=e249]:
+        - generic [ref=e250]: Payment methods
+        - list [ref=e251]:
+          - listitem [ref=e252]:
+            - img "Visa" [ref=e253]
+          - listitem [ref=e257]:
+            - img "Mastercard" [ref=e258]
+          - listitem [ref=e264]:
+            - img "American Express" [ref=e265]
+          - listitem [ref=e274]:
+            - img "PayPal" [ref=e275]
+          - listitem [ref=e281]:
+            - img "Diners Club" [ref=e282]
+          - listitem [ref=e286]:
+            - img "Discover" [ref=e287]
+      - generic [ref=e297]:
+        - generic [ref=e298]:
+          - text: © 2026,
+          - link "Outlaw" [ref=e299] [cursor=pointer]:
+            - /url: /
+        - link "Powered by Shopify" [ref=e301] [cursor=pointer]:
+          - /url: https://www.shopify.com?utm_campaign=poweredby&utm_medium=shopify&utm_source=onlinestore
+        - list [ref=e302]:
+          - listitem [ref=e303]:
+            - text: ·
+            - link "Privacy policy" [ref=e305] [cursor=pointer]:
+              - /url: /policies/privacy-policy

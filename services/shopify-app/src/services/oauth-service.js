@@ -3,6 +3,20 @@ import { createNonce, safeCompare, toHexHmac } from "../utils/crypto.js";
 import { isValidShopDomain, normalizeShopDomain } from "../utils/shopify-validators.js";
 import { oauthStateStore } from "./oauth-state-store.js";
 
+const isValidReturnTo = (value) => {
+  const normalized = String(value || "").trim();
+  if (!normalized) {
+    return false;
+  }
+
+  try {
+    const parsed = new URL(normalized);
+    return Boolean(parsed.protocol);
+  } catch {
+    return false;
+  }
+};
+
 const buildInstallRedirectUrl = ({ shop, state }) => {
   const redirectUri = env.shopifyCallbackUrl || `${env.shopifyAppUrl}/auth/callback`;
   const installUrl = new URL(`https://${shop}/admin/oauth/authorize`);
@@ -24,7 +38,7 @@ const buildCallbackHmacMessage = (rawQueryString) =>
     .join("&");
 
 export const oauthService = {
-  createInstallUrl(rawShop) {
+  createInstallUrl(rawShop, { returnTo = null } = {}) {
     const shop = normalizeShopDomain(rawShop);
 
     if (!isValidShopDomain(shop)) {
@@ -32,7 +46,9 @@ export const oauthService = {
     }
 
     const state = createNonce();
-    oauthStateStore.set(state, shop);
+    oauthStateStore.set(state, shop, {
+      returnTo: isValidReturnTo(returnTo) ? String(returnTo).trim() : null
+    });
 
     return {
       shop,
@@ -67,7 +83,11 @@ export const oauthService = {
       throw new Error("Invalid OAuth callback HMAC.");
     }
 
-    return { shop, code };
+    return {
+      shop,
+      code,
+      returnTo: stateRecord.metadata?.returnTo || null
+    };
   },
 
   async exchangeCodeForAccessToken({ shop, code }) {
