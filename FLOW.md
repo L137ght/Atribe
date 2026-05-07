@@ -29,8 +29,8 @@ Primary implementation references:
 
 ### Mobile app
 
-- Role: current primary product surface for supporters and creators
-- Current maturity: active UI with working supporter routing, creator onboarding, creator affiliate-link management, and partial Shopify creator-brand connection support
+- Role: current primary product surface for supporters, creators, and brands
+- Current maturity: active UI with working supporter routing, creator onboarding, creator affiliate-link management, partial Shopify creator-brand connection support, and brand onboarding/Shopify connection/campaign creation
 - Main files/folders:
   - Implemented in: `apps/mobile/App.js`
   - Implemented in: `apps/mobile/src/navigation/AppNavigator.js`
@@ -38,13 +38,17 @@ Primary implementation references:
   - Implemented in: `apps/mobile/src/screens/*`
 - What it currently owns:
   - auth entry
-  - role selection
+  - role selection (supporter, creator, brand)
   - supporter creator discovery and tribe selection
   - supporter link routing entry
   - creator onboarding
   - creator affiliate-link management
   - creator brand-program browsing
   - partial Shopify creator-brand connection through backend endpoints
+  - brand Shopify store connection flow
+  - brand campaign creation and gating
+  - brand home status view
+  - price history inspection for Amazon/Flipkart product links via PriceHistoryApp
 
 ### Browser extension
 
@@ -64,7 +68,7 @@ Primary implementation references:
 ### Shopify backend/app
 
 - Role: server-side attribution engine and Shopify commerce integration
-- Current maturity: operational backend with proven Shopify attribution, multi-creator snapshot splitting, creator-brand link storage, and creator/brand JSON endpoints
+- Current maturity: operational backend with proven Shopify attribution, multi-creator snapshot splitting, creator-brand link storage, campaign creation, and creator/brand JSON endpoints
 - Main files/folders:
   - Implemented in: `services/shopify-app/src/app.js`
   - Implemented in: `services/shopify-app/src/routes/*`
@@ -79,6 +83,7 @@ Primary implementation references:
   - commission ledger
   - creator-brand association APIs
   - creator and brand reporting APIs
+  - brand campaign creation APIs
 
 ### Supabase data layer
 
@@ -93,8 +98,11 @@ Primary implementation references:
   - auth sessions
   - profiles
   - creator profiles
+  - creator social accounts and audience snapshots
   - tribe memberships
   - external affiliate links
+  - domain requests
+  - routing events
   - Shopify-prefixed attribution tables when `DB_PROVIDER=supabase`
 
 ## 3. User Roles
@@ -117,6 +125,7 @@ Primary implementation references:
   - `Settings`
   - `FallbackState`
   - `Feedback`
+  - `WebView`
 - Current data written/read:
   - reads `profiles`, `creator_profiles`, `creator_affiliate_links`, `tribe_memberships`
   - writes `tribe_memberships`
@@ -164,28 +173,34 @@ Primary implementation references:
 
 ### Brand
 
-- Goal: install Shopify integration, connect creators, and inspect attributed orders/commissions
+- Goal: install Shopify integration, create campaigns, connect creators, and inspect attributed orders/commissions
 - Current entry point:
-  - UI entry point is not implemented as a dedicated brand experience
-  - `IntentSelection` maps `"brand"` to `"supporter"`
+  - `IntentSelection` maps `"brand"` to the brand onboarding flow
   - Implemented in: `apps/mobile/src/screens/IntentSelectionScreen.js`
+  - Navigated by: `apps/mobile/src/navigation/AppNavigator.js`
 - Current screens:
-  - no dedicated brand screens confirmed in code
+  - `BrandOnboarding` — enter Shopify store domain
+  - `BrandConnecting` — opens Shopify OAuth install, polls backend for install confirmation
+  - `BrandShopifySuccess` — confirms connected shop, prompts campaign creation
+  - `CampaignGate` — requires an active campaign before accessing `BrandHome`
+  - `CreateCampaign` — campaign name, shopper offer, commission rate, duration
+  - `CampaignSuccess` — confirmation with share/invite action
+  - `BrandHome` — minimal brand status view (connected shop, campaign status, commission pool)
 - Current data written/read:
-  - backend reads and writes Shopify-prefixed install, attribution, and commission tables
-  - mobile app does not expose a brand dashboard
+  - reads `shopify_brand_integrations`, `shopify_shops`, `shopify_campaigns` via backend endpoints
+  - writes `shopify_campaigns` via `POST /brand/campaigns`
+  - persists `brandShopDomain` in app state via AsyncStorage
+  - Implemented in: `apps/mobile/src/context/AppContext.js`
 - Current backend endpoints used:
-  - not used by current mobile UI
-  - backend surface exists:
-    - `GET /brand/shopify/install-status`
-    - `GET /brand/orders`
-    - `GET /brand/commissions`
-    - `GET /brand/creators`
-    - `GET /brand/clicks`
+  - `GET /brand/shopify/install-status?shop_domain=...`
+  - `POST /brand/campaigns`
+  - `GET /auth?shop=...` (for Shopify install URL construction)
   - Implemented in: `services/shopify-app/src/routes/dashboard-routes.js`
+  - Used by: `apps/mobile/src/context/AppContext.js`
 - Missing backend integration if any:
-  - all brand-facing product UI is missing
+  - brand reporting endpoints (`/brand/orders`, `/brand/commissions`, `/brand/creators`, `/brand/clicks`) exist but are not consumed by mobile UI
   - brand ownership/auth model is only minimally hardened
+  - `BrandHome` is a minimal status view; creator management and detailed analytics are not yet surfaced
 
 ## 4. Navigation Map
 
@@ -253,7 +268,7 @@ Primary implementation references:
   - indirect writes through `setIntent`
   - Implemented in: `apps/mobile/src/context/AppContext.js`
 - Current UX issues:
-  - `"Brand"` choice currently normalizes to `"supporter"` rather than a real brand flow
+  - `"Brand"` choice navigates to the brand onboarding flow; brand is now an independent role with dedicated screens
 - Implementation notes:
   - Implemented in: `apps/mobile/src/screens/IntentSelectionScreen.js`
 
@@ -278,11 +293,15 @@ Primary implementation references:
 - Backend/Supabase calls:
   - constructs backend `/u/:userId/route` URL
   - writes `routing_events` via `recordRoutingEvent`
+  - calls backend `GET /api/price-history/lookup?url=...` when Amazon or Flipkart link detected (debounced, 800ms)
   - Used by backend: `services/shopify-app/src/routes/redirect-routes.js`
+  - Used by backend: `services/shopify-app/src/routes/price-history-routes.js`
 - Current UX issues:
   - the screen still previews tribe members and local weights, but backend is the final authority for eligible creator selection and Shopify snapshot construction
+  - Amazon/Flipkart price history card appears below the shopping intel card; ProductHistory.in is tried first, PriceHistoryApp.com is fallback
 - Implementation notes:
   - no client-side affiliate rewrite remains in this screen
+  - price history uses dual-provider backend orchestration with caching
 
 ### CreatorDiscovery
 
@@ -406,6 +425,7 @@ Primary implementation references:
   - none directly in this screen
 - Current UX issues:
   - “Added brands” count is currently derived from `currentCreator.links` and does not clearly represent backend `creatorBrandLinks` Shopify associations
+  - no creator earnings/orders reporting is surfaced here yet
 - Implementation notes:
   - no creator earnings/orders reporting is surfaced here yet
 
@@ -512,6 +532,175 @@ Primary implementation references:
 - Implementation notes:
   - provider-account choice modal exists for Google/Facebook-family cases
 
+### WebView
+
+- Screen name: `WebView`
+- File path: `apps/mobile/src/screens/WebViewScreen.js`
+- User role: supporter (available to all signed-in roles)
+- Purpose: generic in-app browser for any URL
+- Entry path:
+  - navigated to programmatically from any screen with `route.params.initialUrl`
+- Exit/next actions:
+  - close (navigate back)
+  - navigate within webview
+  - open external links in system browser
+- Data source:
+  - `route.params.initialUrl`
+- Backend/Supabase calls:
+  - none directly
+- Current UX issues:
+  - only available on iOS and Android; web platform shows empty state
+- Implementation notes:
+  - renders `react-native-webview` with cookie/storage support and URL allow-list filtering
+
+### BrandOnboarding
+
+- Screen name: `BrandOnboarding`
+- File path: `apps/mobile/src/screens/BrandOnboardingScreen.js`
+- User role: brand
+- Purpose: enter Shopify store domain and initiate Shopify connection
+- Entry path:
+  - `IntentSelection` when role is `"brand"` and no connected store exists
+- Exit/next actions:
+  - `BrandConnecting` — opens Shopify OAuth install
+  - `CampaignGate` — if store already connected and active campaign exists
+  - `BrandHome` — if store is connected with active campaign
+  - `Settings` — skip for now
+- Data source:
+  - `brandInstallStatus`, `brandInstallStatusLoading`, `brandShopDomain`
+  - `setBrandShopDomain`, `refreshBrandInstallStatus`
+- Backend/Supabase calls:
+  - `GET /brand/shopify/install-status` through `refreshBrandInstallStatus`
+  - `setBrandShopDomain` persists shop domain to AsyncStorage and fetches install status
+- Current UX issues:
+  - requires backend URL configuration (`EXPO_PUBLIC_ATRIBE_BACKEND_URL`)
+- Implementation notes:
+  - shows connection status card and backend-configuration notice
+
+### BrandConnecting
+
+- Screen name: `BrandConnecting`
+- File path: `apps/mobile/src/screens/BrandConnectingScreen.js`
+- User role: brand
+- Purpose: open Shopify OAuth install flow and poll for connection confirmation
+- Entry path:
+  - `BrandOnboarding` after entering shop domain
+- Exit/next actions:
+  - `BrandShopifySuccess` — after install is confirmed
+  - stay on screen with error message if install not detected
+- Data source:
+  - `route.params.shopDomain`
+  - `setBrandShopDomain`, `refreshBrandInstallStatus`
+- Backend/Supabase calls:
+  - builds backend `/auth?shop=...` URL via `buildBrandShopifyInstallUrl`
+  - opens Shopify OAuth install URL
+  - polls `GET /brand/shopify/install-status` on "I connected my store"
+- Current UX issues:
+  - polling requires user to manually tap "I connected my store" after completing Shopify OAuth
+
+### BrandShopifySuccess
+
+- Screen name: `BrandShopifySuccess`
+- File path: `apps/mobile/src/screens/BrandShopifySuccessScreen.js`
+- User role: brand
+- Purpose: confirm store is connected and prompt campaign creation
+- Entry path:
+  - `BrandConnecting` after install confirmation
+  - deep link `brand/shopify-connected`
+- Exit/next actions:
+  - `CreateCampaign` — create first campaign
+  - `CampaignGate` — skip for now
+- Data source:
+  - `brandInstallStatus`, `brandInstallStatusLoading`, `brandShopDomain`
+  - `setBrandShopDomain`, `refreshBrandInstallStatus`
+- Backend/Supabase calls:
+  - `GET /brand/shopify/install-status` on mount to sync connected shop state
+- Current UX issues:
+  - screen auto-syncs install status on mount; loading state while checking
+
+### CampaignGate
+
+- Screen name: `CampaignGate`
+- File path: `apps/mobile/src/screens/CampaignGateScreen.js`
+- User role: brand
+- Purpose: gate screen requiring an active campaign before accessing BrandHome
+- Entry path:
+  - `BrandOnboarding` when store connected but no active campaign
+  - `BrandShopifySuccess` when skipping campaign creation
+  - any redirect when `brandHasActiveCampaign` is false
+- Exit/next actions:
+  - `CreateCampaign`
+  - auto-redirect to `BrandHome` if campaign becomes active
+- Data source:
+  - `brandHasActiveCampaign`, `brandShopDomain`
+- Backend/Supabase calls:
+  - none directly
+- Current UX issues:
+  - UX is a hard gate; no way to skip past this screen without creating a campaign
+
+### CreateCampaign
+
+- Screen name: `CreateCampaign`
+- File path: `apps/mobile/src/screens/CreateCampaignScreen.js`
+- User role: brand
+- Purpose: form to create a creator campaign with name, shopper offer, payout rate, and duration
+- Entry path:
+  - `CampaignGate`
+  - `BrandShopifySuccess`
+  - `BrandHome`
+- Exit/next actions:
+  - `CampaignSuccess` — on successful creation
+  - `CampaignGate` — skip for now
+- Data source:
+  - `brandInstallStatus`, `brandShopDomain`
+  - `createBrandCampaign`
+- Backend/Supabase calls:
+  - `POST /brand/campaigns` via `createBrandCampaign`
+  - Writes: `shopify_campaigns`
+- Current UX issues:
+  - shopper offer parsing is regex-based for percentages and free shipping; other offer types may not parse correctly
+
+### CampaignSuccess
+
+- Screen name: `CampaignSuccess`
+- File path: `apps/mobile/src/screens/CampaignSuccessScreen.js`
+- User role: brand
+- Purpose: confirmation after campaign creation with share/invite action
+- Entry path:
+  - `CreateCampaign` after successful campaign creation
+- Exit/next actions:
+  - `BrandHome`
+  - share invite via system share sheet
+- Data source:
+  - `route.params.campaignId`, `route.params.commissionRatePercent`, `route.params.shopDomain`
+  - `brandShopDomain`
+- Backend/Supabase calls:
+  - none directly
+- Implementation notes:
+  - share action uses React Native `Share.share` with campaign details
+
+### BrandHome
+
+- Screen name: `BrandHome`
+- File path: `apps/mobile/src/screens/BrandHomeScreen.js`
+- User role: brand
+- Purpose: minimal brand status view showing connected shop, campaign status, and commission pool
+- Entry path:
+  - app start when brand has active campaign
+  - `CampaignSuccess`
+  - `Settings`
+- Exit/next actions:
+  - `CreateCampaign` — create another campaign
+  - `Settings`
+  - auto-redirect to `CampaignGate` if no active campaign
+- Data source:
+  - `brandHasActiveCampaign`, `brandInstallStatus`, `brandShopDomain`
+- Backend/Supabase calls:
+  - none directly in the screen; data flows from `brandInstallStatus` (populated via `refreshBrandInstallStatus` elsewhere)
+- Current UX issues:
+  - commission pool display uses campaign rate or default rate from install status; actual backend commission data is not queried
+  - no creator management or detailed order analytics surfaced
+
 ### Settings
 
 - Screen name: `Settings`
@@ -533,7 +722,7 @@ Primary implementation references:
 - Backend/Supabase calls:
   - indirect state writes through `setIntent`, `setDistributionMode`, `signOut`
 - Current UX issues:
-  - “Brand” is not represented as an actual independent role here
+  - “Brand” is now a real independent role with dedicated screens and flow
 - Implementation notes:
   - routing mode is a UI preference over supporter weights, not the final backend split logic
 
@@ -639,7 +828,28 @@ Primary implementation references:
     - Shopify eligible subset split
     - house fallback
 
-### 5. Open shopping destination
+### 5. Price history check (Amazon / Flipkart only)
+
+- What user sees:
+  - when an Amazon or Flipkart link is pasted, a price history card appears below the input after a brief check
+  - the card shows product title, current/lowest/highest/average prices, deal verdict, a price trend chart, provider source (ProductHistory or PriceHistoryApp), and a link to the full provider page
+- What code currently does:
+  - detects Amazon/Flipkart domain from the pasted URL
+  - extracts product title from the URL path
+  - calls backend `GET /api/price-history/lookup?url=...` with 800ms debounce
+  - backend tries ProductHistory.in first (search-based, no suffix guessing), then falls back to PriceHistoryApp.com
+  - backend caches results in memory (6h success TTL, 30min empty TTL)
+  - renders a themed `PriceHistoryCard` below the shopping intel card
+- Whether it uses backend `/u/:userId/route`:
+  - no (separate backend endpoint)
+- Whether it writes directly to Supabase:
+  - no
+- Current friction/UX issues:
+  - ProductHistory search-based resolution depends on their search page markup, which may change
+  - PriceHistoryApp fallback uses slug approximation which may not always match
+  - price history is supplemental only; primary routing flow is unaffected by failures
+
+### 6. Open shopping destination
 
 - What user sees:
   - final destination opens after the backend redirect
@@ -656,7 +866,7 @@ Primary implementation references:
 - Current friction/UX issues:
   - final routing decision is opaque to the user in the mobile UI
 
-### 6. Attribution behavior
+### 7. Attribution behavior
 
 - What user sees:
   - no explicit supporter-facing attribution audit UI
@@ -753,9 +963,18 @@ Primary implementation references:
 
 ### Implemented UI
 
-- No dedicated brand dashboard UI is confirmed in code.
-- `IntentSelection` shows a `Brand` option, but selecting it maps to supporter mode.
+- Brand has a dedicated mobile flow with 7 screens: `BrandOnboarding`, `BrandConnecting`, `BrandShopifySuccess`, `CampaignGate`, `CreateCampaign`, `CampaignSuccess`, `BrandHome`.
+  - Implemented in: `apps/mobile/src/screens/BrandOnboardingScreen.js`
+  - Implemented in: `apps/mobile/src/screens/BrandConnectingScreen.js`
+  - Implemented in: `apps/mobile/src/screens/BrandShopifySuccessScreen.js`
+  - Implemented in: `apps/mobile/src/screens/CampaignGateScreen.js`
+  - Implemented in: `apps/mobile/src/screens/CreateCampaignScreen.js`
+  - Implemented in: `apps/mobile/src/screens/CampaignSuccessScreen.js`
+  - Implemented in: `apps/mobile/src/screens/BrandHomeScreen.js`
+
+- `IntentSelection` presents `Brand` as a real, independent role choice that navigates to the brand flow.
   - Implemented in: `apps/mobile/src/screens/IntentSelectionScreen.js`
+  - Navigated by: `apps/mobile/src/navigation/AppNavigator.js`
 
 ### Implemented backend
 
@@ -763,23 +982,65 @@ Primary implementation references:
 - creator-brand link storage
 - shop integration state
 - order attribution and commissions
+- brand campaign creation and status
 - brand reporting endpoints
   - Implemented in: `services/shopify-app/src/app.js`
   - Implemented in: `services/shopify-app/src/routes/dashboard-routes.js`
 
-### Missing UI
+### Brand journey
 
-- no brand install-status screen
-- no brand creator-management screen
-- no brand orders/commissions screen
-- no brand auth/ownership UI
+1. **Select brand role** — `IntentSelection` -> Brand
+   - Screen/file: `apps/mobile/src/screens/IntentSelectionScreen.js`
+   - Data written: `profiles.preferred_intent` = `"brand"`
+   - Navigator routes to `BrandOnboarding` (no store) or `CampaignGate`/`BrandHome` (connected store)
+
+2. **Enter Shopify domain** — `BrandOnboarding`
+   - Screen/file: `apps/mobile/src/screens/BrandOnboardingScreen.js`
+   - Data read: `brandInstallStatus`, `brandShopDomain` from AppContext
+   - Backend call: `GET /brand/shopify/install-status`
+   - Exit: `BrandConnecting`
+
+3. **Connect Shopify** — `BrandConnecting`
+   - Screen/file: `apps/mobile/src/screens/BrandConnectingScreen.js`
+   - Opens Shopify OAuth install URL via `Linking.openURL(buildBrandShopifyInstallUrl(...))`
+   - Backend call: builds backend `/auth?shop=...` URL
+   - User taps "I connected my store" to poll backend install status
+   - Exit: `BrandShopifySuccess` when install confirmed
+
+4. **Confirm connection** — `BrandShopifySuccess`
+   - Screen/file: `apps/mobile/src/screens/BrandShopifySuccessScreen.js`
+   - Auto-syncs install status on mount via `refreshBrandInstallStatus`
+   - Exit: `CreateCampaign` or `CampaignGate`
+
+5. **Campaign gate** — `CampaignGate`
+   - Screen/file: `apps/mobile/src/screens/CampaignGateScreen.js`
+   - Requires active campaign to access `BrandHome`; auto-redirects if campaign becomes active
+   - Exit: `CreateCampaign`
+
+6. **Create campaign** — `CreateCampaign`
+   - Screen/file: `apps/mobile/src/screens/CreateCampaignScreen.js`
+   - Backend call: `POST /brand/campaigns` via `createBrandCampaign`
+   - Writes: `shopify_campaigns`
+   - Exit: `CampaignSuccess`
+
+7. **Campaign success** — `CampaignSuccess`
+   - Screen/file: `apps/mobile/src/screens/CampaignSuccessScreen.js`
+   - Shows confirmation with share/invite-creators action
+   - Exit: `BrandHome`
+
+8. **Brand home** — `BrandHome`
+   - Screen/file: `apps/mobile/src/screens/BrandHomeScreen.js`
+   - Minimal status view: connected shop domain, campaign status, commission pool
+   - Auto-redirects to `CampaignGate` if no active campaign
+   - Exit: `CreateCampaign`, `Settings`
 
 ### Shopify install flow
 
-- Merchant opens custom install link
-- Shopify opens app entry
-- backend bootstraps to `/auth` when needed
-- OAuth callback stores offline token and register webhooks/embed support
+- Brand enters shop domain in mobile
+- Mobile builds backend `/auth?shop=...` URL and opens it
+- Backend bootstraps to Shopify OAuth when needed
+- OAuth callback stores offline token and registers webhooks/script tags
+- Mobile polls `GET /brand/shopify/install-status` to confirm
   - Implemented in: `services/shopify-app/src/app.js`
   - Implemented in: `services/shopify-app/src/controllers/auth-controller.js`
 
@@ -796,7 +1057,15 @@ Primary implementation references:
 - `GET /brand/commissions`
 - `GET /brand/creators`
 - `GET /brand/clicks`
+- `POST /brand/campaigns`
   - Implemented in: `services/shopify-app/src/routes/dashboard-routes.js`
+
+### Missing UI
+
+- no brand creator-management screen (list/invite/manage creators)
+- no brand orders/commissions analytics screen
+- no brand campaign management beyond creation (no editing, pausing, or archiving in UI)
+- BrandHome is a minimal status view only
 
 ## 8. Browser Extension Flow
 
@@ -824,7 +1093,7 @@ Primary implementation references:
 
 ```text
 Landing / Login → Supabase auth + local navigation state → same → no major gap
-IntentSelection → local app-state role switch → same → brand choice is not a real brand flow
+IntentSelection → local app-state role switch (supporter/creator/brand) → same → brand now has dedicated flow
 Home routing → backend /u + local routing_events → backend /u + richer supporter feedback → UI does not expose final routing outcome
 ShareRoute → backend /u + local routing_events → same → outcome transparency gap
 CreatorDiscovery → direct Supabase tribe_memberships → same for selection storage → discover model still creator-centric
@@ -837,25 +1106,33 @@ ConnectBrands Shopify → backend creator/brands via addAffiliateLink branch / w
 BrandProgramWebView external → direct Supabase creator_affiliate_links → same for now → mixed model in one screen
 BrandProgramWebView Shopify → backend creator/brands → same → UI combines two different workflows
 CreatorDashboard → local creator state only → should eventually include backend reporting → backend data exists but is unused
-Brand flow → backend only → backend + dedicated UI → product UI missing
+BrandOnboarding → backend GET /brand/shopify/install-status + local AsyncStorage → same → requires backend URL config
+BrandConnecting → backend /auth?shop=... + GET /brand/shopify/install-status poll → same → manual poll after OAuth
+BrandShopifySuccess → backend GET /brand/shopify/install-status sync → same → polling on mount
+CampaignGate → local brandHasActiveCampaign (from install status) → same → hard gate, no skip
+CreateCampaign → backend POST /brand/campaigns → same → writes shopify_campaigns
+CampaignSuccess → local route params + Share.share → same → no backend call
+BrandHome → local brandInstallStatus/brandHasActiveCampaign (from earlier fetch) → backend reporting data exists but unused → minimal status view
 Extension → backend /u with stored config → backend /u with stronger identity model → auth/config gap
+Home price-history → backend /api/price-history/lookup (ProductHistory.in → PriceHistoryApp.com fallback) → same → parsing depends on external site markup
 ```
 
 ## 10. UX Contradiction List
 
-### 1. Brand role is presented in UI but not implemented as a real brand product flow
+### 1. Brand role is presented in UI and has a real brand product flow, but the flow is still minimal
 
 - Current UI behavior:
-  - `IntentSelection` shows `Brand` as a role choice
+  - `IntentSelection` shows `Brand` as a role choice and navigates to a real brand onboarding flow with Shopify connection, campaign creation, and a BrandHome screen.
 - Current backend capability:
-  - backend has brand reporting/install endpoints, but no corresponding product UI
+  - backend has brand reporting/install/campaign endpoints; mobile now consumes install-status and campaign-creation endpoints
 - Why it matters:
-  - users can infer a brand dashboard exists when it does not
+  - brand flow is no longer a false promise, but BrandHome is still a minimal status view lacking creator management, order analytics, and commission tracking
 - Files involved:
   - `apps/mobile/src/screens/IntentSelectionScreen.js`
+  - `apps/mobile/src/screens/BrandHomeScreen.js`
   - `services/shopify-app/src/routes/dashboard-routes.js`
 - Suggested fix direction:
-  - either hide the brand choice or back it with a real brand flow
+  - expand BrandHome to surface backend reporting data and creator management
 
 ### 2. Creator dashboard implies brand-management progress but does not reflect backend Shopify creator-brand state cleanly
 
@@ -879,7 +1156,7 @@ Extension → backend /u with stored config → backend /u with stronger identit
 - Current backend capability:
   - backend distinguishes `external` vs `atribe_shopify` during routing
 - Why it matters:
-  - the product model is mixed: “discover creators” and “connect brands” are separate, but users do not see the attribution-type distinction
+  - the product model is mixed: "discover creators" and "connect brands" are separate, but users do not see the attribution-type distinction
 - Files involved:
   - `apps/mobile/src/screens/CreatorDiscoveryScreen.js`
   - `apps/mobile/src/screens/ConnectBrandsScreen.js`
@@ -893,9 +1170,9 @@ Extension → backend /u with stored config → backend /u with stronger identit
   - `ConnectBrands` uses local `brandPrograms` data
   - `BrandProgramWebView` opens third-party program pages
 - Current backend capability:
-  - backend can attribute Shopify stores, but there is no user-facing product/store discovery surface for those brands
+  - backend can attribute Shopify stores and manage campaigns, but there is no user-facing product/store discovery surface for those brands
 - Why it matters:
-  - Atribe-powered Shopify commerce exists in backend logic, but not as a native in-app shopping surface
+  - Atribe-powered Shopify commerce exists in backend logic and brand campaigns exist in the mobile flow, but not as a native in-app supporter shopping surface
 - Files involved:
   - `apps/mobile/src/data/brandPrograms.js`
   - `apps/mobile/src/screens/BrandProgramWebViewScreen.js`
@@ -917,6 +1194,21 @@ Extension → backend /u with stored config → backend /u with stronger identit
   - `services/shopify-app/src/routes/redirect-routes.js`
 - Suggested fix direction:
   - confirm whether these screens still belong in the current routing journey
+
+### 6. Brand flow has Shopify connection and campaign creation but lacks post-campaign analytics and creator management
+
+- Current UI behavior:
+  - `BrandHome` shows connected shop, campaign status, and commission pool but no actual order/commission data
+  - no UI to invite, manage, or view creators
+- Current backend capability:
+  - `/brand/orders`, `/brand/commissions`, `/brand/creators`, `/brand/clicks` endpoints exist but are unused by mobile
+- Why it matters:
+  - brands can create campaigns but cannot see their impact; campaign management beyond creation is missing
+- Files involved:
+  - `apps/mobile/src/screens/BrandHomeScreen.js`
+  - `services/shopify-app/src/routes/dashboard-routes.js`
+- Suggested fix direction:
+  - surface backend reporting data in BrandHome or a dedicated analytics screen; add campaign editing/pausing
 
 ## 11. Discover Model
 
@@ -987,20 +1279,20 @@ Based on current contradictions only:
    - Current state: implemented for Shopify store domains
    - Remaining work: make the UI distinction between external and Shopify connection types stronger
 
-3. update Discover to distinguish creators, external brands, and Atribe-powered brands
+3. expand BrandHome beyond minimal status to surface backend reporting data
+   - Current state: BrandHome exists as minimal status view
+   - Remaining work: surface `/brand/orders`, `/brand/commissions`, `/brand/creators` data; add creator management
+
+4. update Discover to distinguish creators, external brands, and Atribe-powered brands
    - Current state: not implemented as a clear user-facing model
 
-4. update extension to backend-driven routing
-   - Current state: implemented for Amazon product pages only
-   - Remaining work: identity/config maturity and broader domain coverage
-
 5. add auth hardening before production dashboard work
-   - Current state: minimal auth guard exists
+   - Current state: minimal auth guard exists with dev bypass
    - Remaining work: stronger brand ownership enforcement and production-grade access control
 
 ## Areas Not Confirmed In Code
 
-- A dedicated brand UI flow beyond the placeholder `Brand` role choice
-- A first-class “collections” model
+- A first-class "collections" model
 - Whether `FallbackState` and `Feedback` are still part of the active routed-link journey
-- A mobile or web surface that consumes backend brand reporting endpoints
+- A mobile or web surface that consumes backend brand reporting endpoints (orders, commissions, creators, clicks)
+- Campaign editing, pausing, or archiving beyond creation

@@ -4,9 +4,11 @@ import { authRouter } from "./routes/auth-routes.js";
 import { dashboardRouter } from "./routes/dashboard-routes.js";
 import { debugRouter } from "./routes/debug-routes.js";
 import { linkRouter } from "./routes/link-routes.js";
+import { priceHistoryRouter } from "./routes/price-history-routes.js";
 import { redirectRouter } from "./routes/redirect-routes.js";
 import { storefrontRouter } from "./routes/storefront-routes.js";
 import { webhookRouter } from "./routes/webhook-routes.js";
+import { corsMiddleware } from "./middleware/cors.js";
 import { shopRepository } from "./repositories/shop-repository.js";
 import { logger } from "./utils/logger.js";
 
@@ -54,6 +56,7 @@ export const createApp = () => {
   // Webhook routes must see the untouched raw body for HMAC verification.
   app.use("/webhooks", webhookRouter);
   app.use(express.json());
+  app.use(corsMiddleware);
 
   app.get("/health", (_req, res) => {
     res.status(200).json({ ok: true });
@@ -68,6 +71,8 @@ export const createApp = () => {
     app.use("/debug", debugRouter);
   }
   app.use("/links", linkRouter);
+  app.use("/price-history", priceHistoryRouter);
+  app.use("/api/price-history", priceHistoryRouter);
   app.use("/storefront", storefrontRouter);
   app.use("/", redirectRouter);
 

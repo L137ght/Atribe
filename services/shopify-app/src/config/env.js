@@ -35,6 +35,11 @@ const normalizeOptionalUrl = (value) => {
   const normalized = String(value || "").trim();
   return normalized ? normalizeBaseUrl(normalized) : null;
 };
+const parseOptionalCsv = (value) =>
+  String(value || "")
+    .split(",")
+    .map((entry) => entry.trim())
+    .filter(Boolean);
 
 export const env = {
   dbProvider,
@@ -52,6 +57,7 @@ export const env = {
   sqliteDbPath: process.env.SQLITE_DB_PATH || "./shopify-app.db",
   supabaseUrl: normalizeOptionalUrl(process.env.SUPABASE_URL),
   supabaseServiceRoleKey: process.env.SUPABASE_SERVICE_ROLE_KEY || "",
+  corsAllowedOrigins: parseOptionalCsv(process.env.CORS_ALLOWED_ORIGINS),
   defaultCommissionRate: Number(process.env.DEFAULT_COMMISSION_RATE || 0.1),
   platformFeeRate: Number(process.env.PLATFORM_FEE_RATE || 0),
   atribeHouseCreatorId:

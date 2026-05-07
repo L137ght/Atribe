@@ -30,10 +30,11 @@ Documentation-only rule:
 
 ### Active subsystems
 
-- `apps/mobile` is the current supporter-facing and creator-facing product surface.
+- `apps/mobile` is the current supporter-facing, creator-facing, and brand-facing product surface.
   - Implemented in: `apps/mobile/App.js`
   - Implemented in: `apps/mobile/src/navigation/AppNavigator.js`
   - Implemented in: `apps/mobile/src/context/AppContext.js`
+  - Active screens: `LandingScreen`, `LoginScreen`, `IntentSelectionScreen`, `HomeScreen`, `CreatorDiscoveryScreen`, `CreatorSelectionScreen`, `ShareRouteScreen`, `SettingsScreen`, `FallbackStateScreen`, `FeedbackScreen`, `CreatorOnboardingScreen`, `CreatorDashboardScreen`, `ConnectBrandsScreen`, `ConnectSocialAccountsScreen`, `BrandProgramWebViewScreen`, `AddAffiliateLinksScreen`, `WebViewScreen`, `BrandOnboardingScreen`, `BrandConnectingScreen`, `BrandShopifySuccessScreen`, `CampaignGateScreen`, `CreateCampaignScreen`, `CampaignSuccessScreen`, `BrandHomeScreen`
 
 - `services/shopify-app` is the only implemented server-side attribution engine in this repo.
   - Implemented in: `services/shopify-app/src/app.js`
@@ -48,7 +49,7 @@ Documentation-only rule:
   - Not currently used by mobile UI: `apps/mobile/src/screens/HomeScreen.js`
   - Not currently used by mobile UI: `apps/mobile/src/screens/ShareRouteScreen.js`
 
-- Supabase is the live app data source for mobile identity, tribe selection, creator profiles, and affiliate links.
+- Supabase is the live app data source for mobile identity, tribe selection, creator profiles, social accounts, affiliate links, domain requests, routing events, and brand roles.
   - Implemented in: `apps/mobile/src/context/AppContext.js`
   - Implemented in: `apps/mobile/src/lib/supabase.js`
   - Implemented in: `services/shopify-app/src/db/supabase.js`
@@ -82,6 +83,7 @@ The implemented backend mounts from `services/shopify-app/src/app.js`. It serves
 - creator and brand reporting endpoints
 - Shopify webhook ingestion
 - storefront attribution script
+- price history lookup for Amazon/Flipkart product links
 - dev-only debug endpoints
 
 Implemented in: `services/shopify-app/src/app.js`
@@ -111,6 +113,9 @@ Implemented in: `services/shopify-app/src/repositories/order-attribution-reposit
   - Implemented in: `apps/mobile/src/screens/ShareRouteScreen.js`
   - Implemented in: `apps/mobile/src/screens/ConnectBrandsScreen.js`
   - Implemented in: `apps/mobile/src/screens/BrandProgramWebViewScreen.js`
+  - Implemented in: `apps/mobile/src/screens/WebViewScreen.js`
+  - Implemented in: `apps/mobile/src/screens/CreatorDiscoveryScreen.js`
+  - Implemented in: `apps/mobile/src/screens/CreatorSelectionScreen.js`
 
 ### Local/demo or client-side-only paths
 
@@ -139,6 +144,7 @@ Implemented in: `services/shopify-app/src/repositories/order-attribution-reposit
   - Implemented in: `services/shopify-app/src/routes/auth-routes.js`
   - Implemented in: `services/shopify-app/src/controllers/auth-controller.js`
   - Implemented in: `services/shopify-app/src/services/oauth-service.js`
+  - Used by: Shopify embedded app entry and brand mobile flow via `buildBrandShopifyInstallUrl` in `apps/mobile/src/lib/backend.js`
 
 - `GET /auth/callback`
   - Exchanges code for offline token, stores shop install state, registers webhooks, registers legacy ScriptTag fallback.
@@ -217,6 +223,28 @@ Implemented in: `services/shopify-app/src/repositories/order-attribution-reposit
 - GDPR-related webhooks are acknowledged/logged but do not drive product features.
   - Implemented in: `services/shopify-app/src/controllers/webhook-controller.js`
 
+### Price history surface
+
+- `GET /price-history/lookup?url=...` and `GET /api/price-history/lookup?url=...`
+  - Looks up price history data from ProductHistory.in (primary) and falls back to PriceHistoryApp.com for Amazon and Flipkart product links.
+  - Extracts marketplace, product title, and product ID from URL. Resolves ProductHistory product pages through search (never guesses unique suffixes). Falls back to PriceHistoryApp via direct slug and search.
+  - Returns normalized response with provider, product title, price stats (as formatted strings), deal verdict, recommendation text, chart data, confidence score, and cache metadata.
+  - In-memory cache with 6-hour TTL for successes and 30-minute TTL for empty results.
+  - 8s per-request timeout, 12s total provider timeout, 1 retry max.
+  - Only fetches from producthistory.in and pricehistoryapp.com (SSRF-safe).
+  - Implemented in: `services/shopify-app/src/routes/price-history-routes.js`
+  - Implemented in: `services/shopify-app/src/controllers/price-history-controller.js`
+  - Implemented in: `services/shopify-app/src/services/priceHistory/index.js` (orchestrator)
+  - Implemented in: `services/shopify-app/src/services/priceHistory/productInfo.js` (URL parsing)
+  - Implemented in: `services/shopify-app/src/services/priceHistory/productHistoryProvider.js` (primary)
+  - Implemented in: `services/shopify-app/src/services/priceHistory/priceHistoryAppProvider.js` (fallback)
+  - Implemented in: `services/shopify-app/src/services/priceHistory/htmlParsers.js` (HTML parsing)
+  - Implemented in: `services/shopify-app/src/services/priceHistory/confidence.js` (candidate scoring)
+  - Implemented in: `services/shopify-app/src/services/priceHistory/cache.js` (in-memory cache)
+  - Implemented in: `services/shopify-app/src/services/priceHistory/providers.js` (shared fetch)
+  - Used by: `apps/mobile/src/lib/priceHistory.js`
+  - Used by: `apps/mobile/src/screens/HomeScreen.js` (via `PriceHistoryCard`)
+
 ### Creator-facing endpoints
 
 - `GET /creator/links?creator_id=...`
@@ -252,6 +280,8 @@ Implemented in: `services/shopify-app/src/repositories/order-attribution-reposit
   - Implemented in: `services/shopify-app/src/controllers/dashboard-controller.js`
   - Implemented in: `services/shopify-app/src/services/dashboard-service.js`
   - Reads/writes: `shopify_creator_brand_links`, `shopify_brand_integrations`
+  - `PATCH` and `DELETE` guarded by `requireCreatorBrandLinkOwnership` middleware.
+  - Implemented in: `services/shopify-app/src/middleware/auth-context.js`
   - Used by: `apps/mobile/src/context/AppContext.js`
   - Used by: `apps/mobile/src/screens/AddAffiliateLinksScreen.js`
   - Used by: `apps/mobile/src/screens/BrandProgramWebViewScreen.js`
@@ -259,11 +289,13 @@ Implemented in: `services/shopify-app/src/repositories/order-attribution-reposit
 ### Brand-facing endpoints
 
 - `GET /brand/shopify/install-status?brand_id=...|shop_domain=...`
-  - Returns install status, webhook registrations, script tags, app URL, base URL, and default commission rate.
+  - Returns install status, webhook registrations, script tags, app URL, base URL, default commission rate, and active campaign data.
   - Implemented in: `services/shopify-app/src/routes/dashboard-routes.js`
   - Implemented in: `services/shopify-app/src/services/dashboard-service.js`
-  - Reads: `shopify_brand_integrations`, `shopify_shops`, `shopify_script_tags`, `shopify_webhook_registrations`
-  - Not currently used by mobile UI: `apps/mobile/src/screens/*`
+  - Reads: `shopify_brand_integrations`, `shopify_shops`, `shopify_script_tags`, `shopify_webhook_registrations`, `shopify_campaigns`
+  - Used by: `apps/mobile/src/screens/BrandOnboardingScreen.js`
+  - Used by: `apps/mobile/src/screens/BrandConnectingScreen.js`
+  - Used by: `apps/mobile/src/screens/BrandShopifySuccessScreen.js`
 
 - `GET /brand/orders?brand_id=...|shop_domain=...`
   - Returns order attribution rows filtered by brand or shop.
@@ -292,6 +324,22 @@ Implemented in: `services/shopify-app/src/repositories/order-attribution-reposit
   - Implemented in: `services/shopify-app/src/services/dashboard-service.js`
   - Reads: `shopify_link_clicks`
   - Not currently used by mobile UI: `apps/mobile/src/screens/*`
+
+- `POST /brand/campaigns`
+  - Creates a brand campaign with name, shopper offer, commission rate, and duration.
+  - Implemented in: `services/shopify-app/src/routes/dashboard-routes.js`
+  - Implemented in: `services/shopify-app/src/controllers/dashboard-controller.js`
+  - Implemented in: `services/shopify-app/src/services/dashboard-service.js`
+  - Writes: `shopify_campaigns`
+  - Used by: `apps/mobile/src/screens/CreateCampaignScreen.js`
+  - Used by: `apps/mobile/src/context/AppContext.js` (`createBrandCampaign`)
+
+- `GET /brand/campaigns` (included in install-status response)
+  - Campaign data flows through the install-status endpoint for mobile consumption.
+  - Implemented in: `services/shopify-app/src/services/dashboard-service.js`
+  - Reads: `shopify_campaigns`
+  - Used by: `apps/mobile/src/screens/BrandHomeScreen.js`
+  - Used by: `apps/mobile/src/screens/CampaignGateScreen.js`
 
 ### Debug endpoints
 
@@ -331,6 +379,26 @@ Not currently used by production UI: `apps/mobile/src/screens/*`
   - Used for external domain support and external URL rewrite/tagging.
   - Implemented in: `services/shopify-app/src/repositories/creator-repository.js`
   - Written directly by mobile UI in current app flow: `apps/mobile/src/context/AppContext.js`
+
+- `creator_social_accounts`
+  - Stores creator social platform connections (platform, username, permissions).
+  - Implemented in: `apps/mobile/src/context/AppContext.js` (`connectSocialAccount`)
+  - Upserted on conflict: `creator_profile_id,platform`
+
+- `creator_social_audience_snapshots`
+  - Stores audience metrics snapshots (follower counts, demographics) for social accounts.
+  - Implemented in: `apps/mobile/src/context/AppContext.js` (`buildAudienceSnapshot`)
+
+- `domain_requests`
+  - Stores user-submitted domain requests for unsupported domains.
+  - Implemented in: `apps/mobile/src/context/AppContext.js` (`submitDomainRequest`)
+  - Used by: `apps/mobile/src/screens/FallbackStateScreen.js`
+
+- `routing_events`
+  - Stores analytics events for supporter routing actions.
+  - Implemented in: `apps/mobile/src/context/AppContext.js` (`recordRoutingEvent`)
+  - Used by: `apps/mobile/src/screens/HomeScreen.js`
+  - Used by: `apps/mobile/src/screens/ShareRouteScreen.js`
 
 - `tribe_memberships`
   - Current live supporter selection source in Supabase mode.
@@ -383,6 +451,15 @@ Not currently used by production UI: `apps/mobile/src/screens/*`
 - `shopify_creator_coupon_mappings`
   - Backend coupon fallback mapping.
   - Implemented in: `services/shopify-app/src/repositories/creator-coupon-repository.js`
+
+- `shopify_campaigns`
+  - Brand campaign records with name, shopper offer type/value, commission rate, duration, and status.
+  - Implemented in: `services/shopify-app/src/repositories/campaign-repository.js`
+  - Created by: `POST /brand/campaigns`
+  - Read by: brand install-status endpoint for mobile consumption
+  - Used by: `apps/mobile/src/screens/CreateCampaignScreen.js`
+  - Used by: `apps/mobile/src/screens/CampaignGateScreen.js`
+  - Used by: `apps/mobile/src/screens/BrandHomeScreen.js`
 
 ### Authoritative data ownership
 
@@ -490,20 +567,58 @@ Not currently used by production UI: `apps/mobile/src/screens/*`
 
 #### Current UI journey
 
-- There is no implemented brand dashboard UI in the mobile app or another frontend in this repo.
-  - Not currently used by UI: `apps/mobile/src/screens/*`
+- Brand flow is implemented in the mobile app with dedicated onboarding, Shopify connection, campaign creation, and a brand home screen.
+  - Implemented in: `apps/mobile/src/screens/BrandOnboardingScreen.js`
+  - Implemented in: `apps/mobile/src/screens/BrandConnectingScreen.js`
+  - Implemented in: `apps/mobile/src/screens/BrandShopifySuccessScreen.js`
+  - Implemented in: `apps/mobile/src/screens/CampaignGateScreen.js`
+  - Implemented in: `apps/mobile/src/screens/CreateCampaignScreen.js`
+  - Implemented in: `apps/mobile/src/screens/CampaignSuccessScreen.js`
+  - Implemented in: `apps/mobile/src/screens/BrandHomeScreen.js`
+
+- Brand entry point:
+  - `IntentSelectionScreen` presents `Brand` as a real, independent role choice that navigates to the brand flow.
+  - Implemented in: `apps/mobile/src/screens/IntentSelectionScreen.js`
+  - Navigated by: `apps/mobile/src/navigation/AppNavigator.js`
+
+- Brand onboarding flow:
+  1. `BrandOnboarding` — enter Shopify store domain and connect.
+  2. `BrandConnecting` — opens Shopify OAuth install flow via backend `/auth`, then polls install status.
+  3. `BrandShopifySuccess` — confirms store is connected, prompts campaign creation.
+  4. `CampaignGate` — gate screen requiring an active campaign before accessing `BrandHome`.
+  5. `CreateCampaign` — form for campaign name, shopper offer, creator payout commission rate, duration.
+  6. `CampaignSuccess` — confirmation after campaign creation with invite-creators share action.
+  7. `BrandHome` — minimal brand status view showing connected shop, campaign status, commission pool.
 
 #### Current backend/API usage
 
-- Brand install status, orders, commissions, creator associations, and clicks are exposed by backend JSON endpoints.
+- Brand mobile flow uses backend endpoints:
+  - `GET /brand/shopify/install-status` — polled from `BrandConnectingScreen`, `BrandShopifySuccessScreen`, and `BrandOnboardingScreen` to check Shopify connection.
+    - Implemented in: `apps/mobile/src/context/AppContext.js` (`refreshBrandInstallStatus`, `fetchBrandInstallStatus`)
+  - `POST /brand/campaigns` — called from `CreateCampaignScreen` via `createBrandCampaign`.
+    - Implemented in: `apps/mobile/src/context/AppContext.js`
+  - `GET /auth?shop=...` — build Shopify install URL via `buildBrandShopifyInstallUrl`.
+    - Implemented in: `apps/mobile/src/lib/backend.js`
+    - Opened in: `apps/mobile/src/screens/BrandConnectingScreen.js`
+
+- Backend brand reporting endpoints exist but are not yet consumed by mobile UI:
+  - `GET /brand/orders`, `GET /brand/commissions`, `GET /brand/creators`, `GET /brand/clicks`
   - Implemented in: `services/shopify-app/src/routes/dashboard-routes.js`
-  - Implemented in: `services/shopify-app/src/services/dashboard-service.js`
+  - Not currently used by UI: `apps/mobile/src/screens/BrandHomeScreen.js`
 
 #### Current backend-owned brand integration behavior
 
 - Shopify install state is tracked on the backend and used to determine whether a store is an active Atribe Shopify shop.
   - Implemented in: `services/shopify-app/src/repositories/brand-integration-repository.js`
   - Implemented in: `services/shopify-app/src/services/link-service.js`
+
+- Brand campaigns are stored in backend `shopify_campaigns` table, created via `POST /brand/campaigns`, and the active campaign status flows back to mobile via the install-status response.
+  - Implemented in: `services/shopify-app/src/repositories/campaign-repository.js`
+  - Implemented in: `services/shopify-app/src/services/dashboard-service.js`
+  - Reads: `shopify_campaigns`
+  - Used by: `apps/mobile/src/screens/CreateCampaignScreen.js`
+  - Used by: `apps/mobile/src/screens/CampaignGateScreen.js`
+  - Used by: `apps/mobile/src/screens/BrandHomeScreen.js`
 
 ## Current Contradictions
 
@@ -542,7 +657,7 @@ Not currently used by production UI: `apps/mobile/src/screens/*`
 ### 3. Backend auth is minimal and only partially hardened
 
 - Current behavior:
-  - backend now accepts optional bearer tokens, verifies Supabase users in Supabase mode, enforces self-routing for authenticated `/u` requests, and enforces creator ownership on creator endpoints.
+  - backend now accepts optional bearer tokens, verifies Supabase users in Supabase mode, enforces self-routing for authenticated `/u` requests, enforces creator ownership on creator endpoints, and enforces creator-brand-link ownership on `PATCH /creator/brands/:id` and `DELETE /creator/brands/:id`.
   - Implemented in: `services/shopify-app/src/routes/dashboard-routes.js`
   - Implemented in: `services/shopify-app/src/middleware/auth-context.js`
 
@@ -550,14 +665,15 @@ Not currently used by production UI: `apps/mobile/src/screens/*`
   - brand endpoints still require authentication but do not yet enforce brand ownership, and dev bypass remains active outside production.
   - Implemented in: `services/shopify-app/src/routes/dashboard-routes.js`
   - Implemented in: `services/shopify-app/src/middleware/auth-context.js`
+  - However, the brand mobile flow now provides a real product surface for brand onboarding, Shopify connection, and campaign creation, which exercises these endpoints.
 
 - Conflicting UI expectation:
-  - mobile app is built around signed-in user ownership and role-based surfaces.
+  - mobile app is built around signed-in user ownership and role-based surfaces for supporter, creator, and brand roles.
   - Implemented in: `apps/mobile/src/context/AppContext.js`
   - Used by: `apps/mobile/src/screens/*`
 
 - Impact:
-  - creator paths are guarded enough for current integration work, but brand reporting paths are still not production-grade ownership-checked APIs.
+  - creator paths are guarded enough for current integration work, brand campaign creation is functional through the mobile flow, but brand reporting paths are still not production-grade ownership-checked APIs.
 
 ## Current Supported Capabilities
 
@@ -601,15 +717,38 @@ Not currently used by production UI: `apps/mobile/src/screens/*`
   - Implemented in: `atribe-extension/content.js`
   - Implemented in: `atribe-extension/options.js`
 
+- Mobile brand onboarding, Shopify connection, and campaign creation through backend endpoints.
+  - Implemented in: `apps/mobile/src/screens/BrandOnboardingScreen.js`
+  - Implemented in: `apps/mobile/src/screens/BrandConnectingScreen.js`
+  - Implemented in: `apps/mobile/src/screens/BrandShopifySuccessScreen.js`
+  - Implemented in: `apps/mobile/src/screens/CreateCampaignScreen.js`
+  - Implemented in: `apps/mobile/src/screens/BrandHomeScreen.js`
+  - Used by backend: `services/shopify-app/src/routes/dashboard-routes.js`
+
+- Backend campaign creation and active-campaign gating.
+  - Implemented in: `services/shopify-app/src/repositories/campaign-repository.js`
+  - Used by: `apps/mobile/src/screens/CampaignGateScreen.js`
+  - Used by: `apps/mobile/src/screens/CampaignSuccessScreen.js`
+
+- Price history lookup for Amazon and Flipkart product links via ProductHistory.in (primary) and PriceHistoryApp.com (fallback).
+  - Backend: dual-provider orchestration with search-based resolution, confidence scoring, caching, and SSRF-safe outbound fetching.
+  - Implemented in: `services/shopify-app/src/services/priceHistory/index.js`
+  - Mobile: debounced lookup and themed price history card on HomeScreen.
+  - Implemented in: `apps/mobile/src/lib/priceHistory.js`
+  - Implemented in: `apps/mobile/src/components/PriceHistoryCard.js`
+  - Used by: `apps/mobile/src/screens/HomeScreen.js`
+
 ### Implemented but not currently wired into UI
 
-- Brand reporting endpoints.
+- Brand reporting endpoints (orders, commissions, creators, clicks) beyond install-status.
   - Implemented in: `services/shopify-app/src/routes/dashboard-routes.js`
   - Not currently used by UI: `apps/mobile/src/screens/*`
 
 - Backend creator reporting endpoints.
   - Implemented in: `services/shopify-app/src/routes/dashboard-routes.js`
   - Not currently used by UI: `apps/mobile/src/screens/CreatorDashboardScreen.js`
+
+- Brand home screen is minimal status display only — does not yet surface detailed orders, commissions, or creator management data from backend reporting.
 
 ## Known Documentation Limits
 

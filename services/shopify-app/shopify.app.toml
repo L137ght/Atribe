@@ -2,7 +2,7 @@
 
 client_id = "6f1b15dd970f4535404ddd0d71402124"
 name = "Atribe"
-application_url = "https://crumpled-vanish-debtor.ngrok-free.dev"
+application_url = "https://api.atribe.io"
 embedded = false
 
 [build]
@@ -23,4 +23,4 @@ optional_scopes = [ ]
 use_legacy_install_flow = false
 
 [auth]
-redirect_urls = [ "https://crumpled-vanish-debtor.ngrok-free.dev/auth/callback" ]
+redirect_urls = [ "https://api.atribe.io/auth/callback" ]
