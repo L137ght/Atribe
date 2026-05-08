@@ -1,5 +1,5 @@
 /**
- * services/shopify-app — Shopify integration server.
+ * services/backend/shopify-app — Shopify integration server.
  *
  * Owns:
  *   - Shopify OAuth install/auth
@@ -15,7 +15,8 @@ import { shopifyDebugRouter } from "./routes/shopify-debug-routes.js";
 import { storefrontRouter } from "./routes/storefront-routes.js";
 import { webhookRouter } from "./routes/webhook-routes.js";
 import { shopRepository } from "./repositories/shop-repository.js";
-import { corsMiddleware, logger } from "@atribe/http";
+import { corsMiddleware } from "./middleware/cors.js";
+import { logger } from "./utils/logger.js";
 
 const appEntryHandler = async (req, res) => {
   try {

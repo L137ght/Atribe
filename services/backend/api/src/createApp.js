@@ -1,5 +1,5 @@
 /**
- * services/api — Business & Domain API server.
+ * services/backend/api — Business & Domain API server.
  *
  * Owns:
  *   - Dashboard routes (creator/brand reporting, brand campaigns)
@@ -10,7 +10,7 @@
  * Runs standalone or composed via services/backend.
  */
 import express from "express";
-import { corsMiddleware } from "@atribe/http";
+import { corsMiddleware } from "../../shopify-app/src/middleware/cors.js";
 
 import { dashboardRouter } from "./routes/dashboard-routes.js";
 import { debugRouter } from "./routes/debug-routes.js";

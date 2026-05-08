@@ -1,4 +1,4 @@
-import { debugService } from "@atribe/domain";
+import { debugService } from "../../../shopify-app/src/services/debug-service.js";
 
 export const debugController = {
   async latestClicks(_req, res) {

@@ -1,4 +1,4 @@
-import { debugService } from "@atribe/domain";
+import { debugService } from "../services/debug-service.js";
 
 export const shopifyDebugController = {
   async shops(_req, res) {

@@ -1,1 +1,1 @@
-export { verifyWebhookSignature } from "../../../services/shopify-app/src/middleware/webhook-verification.js";
+export { verifyWebhookSignature } from "../../../services/backend/shopify-app/src/middleware/webhook-verification.js";

@@ -8,11 +8,11 @@
  * Phase 2: each service moves to its own Render service; this file is removed.
  */
 import express from "express";
-import { corsMiddleware } from "@atribe/http";
+import { corsMiddleware } from "../shopify-app/src/middleware/cors.js";
 
-import { createApiApp } from "../../api/src/createApp.js";
-import { createRedirectApp } from "../../redirect/src/createApp.js";
-import { createShopifyApp } from "../../shopify-app/src/createShopifyApp.js";
+import { createApiApp } from "../api/src/createApp.js";
+import { createRedirectApp } from "../redirect/src/createApp.js";
+import { createShopifyApp } from "../shopify-app/src/createShopifyApp.js";
 
 export function createBackendApp() {
   const app = express();

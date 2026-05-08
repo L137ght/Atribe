@@ -22,7 +22,7 @@ Primary implementation references:
 - Implemented in: `apps/client/src/navigation/AppNavigator.js`
 - Implemented in: `apps/client/src/context/AppContext.js`
 - Implemented in: `atribe-extension/content.js`
-- Implemented in: `services/shopify-app/src/app.js`
+- Implemented in: `services/backend/shopify-app/src/app.js`
 - Cross-system reference: `IMPLEMENTATION.md`
 
 ## 2. App Surfaces
@@ -70,16 +70,16 @@ Primary implementation references:
 - Role: server-side attribution engine and Shopify commerce integration
 - Current maturity: operational backend split into three service modules composed by a compatibility layer
 - Service modules:
-  - `services/api` — business APIs (dashboard, price history, debug)
-  - `services/redirect` — link creation, supporter routing, click tracking
-  - `services/shopify-app` — Shopify OAuth, webhooks, storefront scripts
+  - `services/backend/api` — business APIs (dashboard, price history, debug)
+  - `services/backend/redirect` — link creation, supporter routing, click tracking
+  - `services/backend/shopify-app` — Shopify OAuth, webhooks, storefront scripts
   - `services/backend` — Phase 1 composition layer (no domain logic)
 - Main files/folders:
   - Implemented in: `services/backend/src/createApp.js` (composition)
-  - Implemented in: `services/api/src/createApp.js`
-  - Implemented in: `services/redirect/src/createApp.js`
-  - Implemented in: `services/shopify-app/src/createShopifyApp.js`
-  - Shared source: `services/shopify-app/src/` (domain services, repositories, config, utils)
+  - Implemented in: `services/backend/api/src/createApp.js`
+  - Implemented in: `services/backend/redirect/src/createApp.js`
+  - Implemented in: `services/backend/shopify-app/src/createShopifyApp.js`
+  - Shared source: `services/backend/shopify-app/src/` (domain services, repositories, config, utils)
 - What it currently owns:
   - Shopify install/auth
   - `/u/:userId/route`
@@ -99,7 +99,7 @@ Primary implementation references:
 - Main files/folders:
   - Implemented in: `apps/client/src/lib/supabase.js`
   - Implemented in: `apps/client/src/context/AppContext.js`
-  - Implemented in: `services/shopify-app/src/db/supabase.js`
+  - Implemented in: `services/backend/shopify-app/src/db/supabase.js`
   - Implemented in: `supabase/migrations/*`
 - What it currently owns:
   - auth sessions
@@ -141,7 +141,7 @@ Primary implementation references:
   - Implemented in: `apps/client/src/context/AppContext.js`
 - Current backend endpoints used:
   - `GET /u/:user_id/route?url=...`
-  - Implemented in: `services/shopify-app/src/routes/redirect-routes.js`
+  - Implemented in: `services/backend/shopify-app/src/routes/redirect-routes.js`
   - Used by: `apps/client/src/screens/HomeScreen.js`
   - Used by: `apps/client/src/screens/ShareRouteScreen.js`
 - Missing backend integration if any:
@@ -172,7 +172,7 @@ Primary implementation references:
   - `GET /creator/brands?creator_id=...`
   - `POST /creator/brands`
   - `DELETE /creator/brands/:id`
-  - Implemented in: `services/shopify-app/src/routes/dashboard-routes.js`
+  - Implemented in: `services/backend/shopify-app/src/routes/dashboard-routes.js`
   - Used by: `apps/client/src/context/AppContext.js`
 - Missing backend integration if any:
   - creator dashboard does not consume backend reporting endpoints such as `/creator/earnings`, `/creator/orders`, or `/creator/links`
@@ -202,7 +202,7 @@ Primary implementation references:
   - `GET /brand/shopify/install-status?shop_domain=...`
   - `POST /brand/campaigns`
   - `GET /auth?shop=...` (for Shopify install URL construction)
-  - Implemented in: `services/shopify-app/src/routes/dashboard-routes.js`
+  - Implemented in: `services/backend/shopify-app/src/routes/dashboard-routes.js`
   - Used by: `apps/client/src/context/AppContext.js`
 - Missing backend integration if any:
   - brand reporting endpoints (`/brand/orders`, `/brand/commissions`, `/brand/creators`, `/brand/clicks`) exist but are not consumed by mobile UI
@@ -301,8 +301,8 @@ Primary implementation references:
   - constructs backend `/u/:userId/route` URL
   - writes `routing_events` via `recordRoutingEvent`
   - calls backend `GET /api/price-history/lookup?url=...` when Amazon or Flipkart link detected (debounced, 800ms)
-  - Used by backend: `services/shopify-app/src/routes/redirect-routes.js`
-  - Used by backend: `services/shopify-app/src/routes/price-history-routes.js`
+  - Used by backend: `services/backend/shopify-app/src/routes/redirect-routes.js`
+  - Used by backend: `services/backend/shopify-app/src/routes/price-history-routes.js`
 - Current UX issues:
   - the screen still previews tribe members and local weights, but backend is the final authority for eligible creator selection and Shopify snapshot construction
   - Amazon/Flipkart price history card appears below the shopping intel card; ProductHistory.in is tried first, PriceHistoryApp.com is fallback
@@ -991,8 +991,8 @@ Primary implementation references:
 - order attribution and commissions
 - brand campaign creation and status
 - brand reporting endpoints
-  - Implemented in: `services/shopify-app/src/app.js`
-  - Implemented in: `services/shopify-app/src/routes/dashboard-routes.js`
+  - Implemented in: `services/backend/shopify-app/src/app.js`
+  - Implemented in: `services/backend/shopify-app/src/routes/dashboard-routes.js`
 
 ### Brand journey
 
@@ -1048,14 +1048,14 @@ Primary implementation references:
 - Backend bootstraps to Shopify OAuth when needed
 - OAuth callback stores offline token and registers webhooks/script tags
 - Mobile polls `GET /brand/shopify/install-status` to confirm
-  - Implemented in: `services/shopify-app/src/app.js`
-  - Implemented in: `services/shopify-app/src/controllers/auth-controller.js`
+  - Implemented in: `services/backend/shopify-app/src/app.js`
+  - Implemented in: `services/backend/shopify-app/src/controllers/auth-controller.js`
 
 ### Creator-brand link model
 
 - Shopify creator-brand links live in backend storage and are used for eligibility-aware supporter routing.
-  - Implemented in: `services/shopify-app/src/repositories/creator-brand-link-repository.js`
-  - Used by: `services/shopify-app/src/services/link-service.js`
+  - Implemented in: `services/backend/shopify-app/src/repositories/creator-brand-link-repository.js`
+  - Used by: `services/backend/shopify-app/src/services/link-service.js`
 
 ### Brand dashboard endpoints
 
@@ -1065,7 +1065,7 @@ Primary implementation references:
 - `GET /brand/creators`
 - `GET /brand/clicks`
 - `POST /brand/campaigns`
-  - Implemented in: `services/shopify-app/src/routes/dashboard-routes.js`
+  - Implemented in: `services/backend/shopify-app/src/routes/dashboard-routes.js`
 
 ### Missing UI
 
@@ -1137,7 +1137,7 @@ Home price-history → backend /api/price-history/lookup (ProductHistory.in → 
 - Files involved:
   - `apps/client/src/screens/IntentSelectionScreen.js`
   - `apps/client/src/screens/BrandHomeScreen.js`
-  - `services/shopify-app/src/routes/dashboard-routes.js`
+  - `services/backend/shopify-app/src/routes/dashboard-routes.js`
 - Suggested fix direction:
   - expand BrandHome to surface backend reporting data and creator management
 
@@ -1167,7 +1167,7 @@ Home price-history → backend /api/price-history/lookup (ProductHistory.in → 
 - Files involved:
   - `apps/client/src/screens/CreatorDiscoveryScreen.js`
   - `apps/client/src/screens/ConnectBrandsScreen.js`
-  - `services/shopify-app/src/services/link-service.js`
+  - `services/backend/shopify-app/src/services/link-service.js`
 - Suggested fix direction:
   - add explicit program-type labelling in the UI
 
@@ -1183,7 +1183,7 @@ Home price-history → backend /api/price-history/lookup (ProductHistory.in → 
 - Files involved:
   - `apps/client/src/data/brandPrograms.js`
   - `apps/client/src/screens/BrandProgramWebViewScreen.js`
-  - `services/shopify-app/src/services/link-service.js`
+  - `services/backend/shopify-app/src/services/link-service.js`
 - Suggested fix direction:
   - define whether brand pages are catalog pages, partner pages, or simple routing entry points
 
@@ -1198,7 +1198,7 @@ Home price-history → backend /api/price-history/lookup (ProductHistory.in → 
 - Files involved:
   - `apps/client/src/screens/FallbackStateScreen.js`
   - `apps/client/src/screens/FeedbackScreen.js`
-  - `services/shopify-app/src/routes/redirect-routes.js`
+  - `services/backend/shopify-app/src/routes/redirect-routes.js`
 - Suggested fix direction:
   - confirm whether these screens still belong in the current routing journey
 
@@ -1213,7 +1213,7 @@ Home price-history → backend /api/price-history/lookup (ProductHistory.in → 
   - brands can create campaigns but cannot see their impact; campaign management beyond creation is missing
 - Files involved:
   - `apps/client/src/screens/BrandHomeScreen.js`
-  - `services/shopify-app/src/routes/dashboard-routes.js`
+  - `services/backend/shopify-app/src/routes/dashboard-routes.js`
 - Suggested fix direction:
   - surface backend reporting data in BrandHome or a dedicated analytics screen; add campaign editing/pausing
 
@@ -1260,7 +1260,7 @@ Current practical categories:
 - `coupon_only / future types`
   - not confirmed in current mobile runtime as a first-class type
   - backend has coupon mapping support
-  - Implemented in: `services/shopify-app/src/repositories/creator-coupon-repository.js`
+  - Implemented in: `services/backend/shopify-app/src/repositories/creator-coupon-repository.js`
 
 Current UI limitation:
 

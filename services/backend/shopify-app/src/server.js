@@ -1,5 +1,5 @@
 import { createShopifyApp } from "./createShopifyApp.js";
-import { env } from "@atribe/config/shopify";
+import { env } from "./config/shopify-env.js";
 
 const app = createShopifyApp();
 

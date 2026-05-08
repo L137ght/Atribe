@@ -1,5 +1,5 @@
-import { getBestPriceHistoryForProductUrl } from "@atribe/domain";
-import { logger } from "@atribe/http";
+import { getBestPriceHistoryForProductUrl } from "../../../shopify-app/src/services/priceHistory/index.js";
+import { logger } from "../../../shopify-app/src/utils/logger.js";
 
 export const priceHistoryController = {
   async lookup(req, res) {

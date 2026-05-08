@@ -1,5 +1,5 @@
-import { linkService } from "@atribe/domain";
-import { logger } from "@atribe/http";
+import { linkService } from "../../../shopify-app/src/services/link-service.js";
+import { logger } from "../../../shopify-app/src/utils/logger.js";
 
 const buildCookie = ({ name, value, maxAgeSeconds = 60 * 60 * 24 * 30 }) =>
   `${name}=${encodeURIComponent(value)}; Path=/; HttpOnly; SameSite=Lax; Max-Age=${maxAgeSeconds}`;

@@ -1,7 +1,10 @@
 import { Router } from "express";
 
 import { linkController } from "../controllers/link-controller.js";
-import { attachAuthContext, requireSelfUserRouteIfAuthenticated } from "@atribe/http";
+import {
+  attachAuthContext,
+  requireSelfUserRouteIfAuthenticated
+} from "../../../shopify-app/src/middleware/auth-context.js";
 
 export const redirectRouter = Router();
 

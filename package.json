@@ -5,6 +5,7 @@
   "workspaces": [
     "apps/*",
     "services/*",
+    "services/backend/*",
     "packages/*"
   ],
   "scripts": {

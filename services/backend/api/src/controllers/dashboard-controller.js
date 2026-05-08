@@ -1,4 +1,4 @@
-import { dashboardService } from "@atribe/domain";
+import { dashboardService } from "../../../shopify-app/src/services/dashboard-service.js";
 
 const handleRequest = (res, handler) => {
   try {

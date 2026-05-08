@@ -6,7 +6,7 @@ import {
   requireAuthenticatedUser,
   requireCreatorBrandLinkOwnership,
   requireCreatorOwnership
-} from "@atribe/http";
+} from "../../../shopify-app/src/middleware/auth-context.js";
 
 export const dashboardRouter = Router();
 

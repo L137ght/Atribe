@@ -1,5 +1,5 @@
 /**
- * services/redirect — Link routing & redirect server.
+ * services/backend/redirect — Link routing & redirect server.
  *
  * Owns:
  *   - Link creation (POST /links/create)
@@ -10,7 +10,7 @@
  * Runs standalone or composed via services/backend.
  */
 import express from "express";
-import { corsMiddleware } from "@atribe/http";
+import { corsMiddleware } from "../../shopify-app/src/middleware/cors.js";
 
 import { linkRouter } from "./routes/link-routes.js";
 import { redirectRouter } from "./routes/redirect-routes.js";

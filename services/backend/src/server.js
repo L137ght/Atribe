@@ -1,5 +1,5 @@
 import { createBackendApp } from "./createApp.js";
-import { sharedEnv } from "@atribe/config";
+import { sharedEnv } from "../shopify-app/src/config/shared-env.js";
 
 const app = createBackendApp();
 

@@ -1,1 +1,1 @@
-export { sharedEnv } from "../../../services/shopify-app/src/config/shared-env.js";
+export { sharedEnv } from "../../../services/backend/shopify-app/src/config/shared-env.js";
