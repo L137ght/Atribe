@@ -1,0 +1,14 @@
+{
+  "name": "@atribe/http",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "main": "src/index.js",
+  "exports": {
+    ".": "./src/index.js",
+    "./shopify": "./src/shopify.js"
+  },
+  "dependencies": {
+    "express": "^4.21.2"
+  }
+}

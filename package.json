@@ -8,11 +8,17 @@
     "packages/*"
   ],
   "scripts": {
-    "mobile:start": "npm --workspace @atribe/mobile run start",
-    "mobile:ios": "npm --workspace @atribe/mobile run ios",
-    "mobile:android": "npm --workspace @atribe/mobile run android",
-    "mobile:web": "npm --workspace @atribe/mobile run web",
-    "shopify-app:dev": "npm --workspace @atribe/shopify-app run dev",
-    "shopify-app:start": "npm --workspace @atribe/shopify-app run start"
+    "client:start": "npm --workspace @atribe/client run start",
+    "client:ios": "npm --workspace @atribe/client run ios",
+    "client:android": "npm --workspace @atribe/client run android",
+    "client:web": "npm --workspace @atribe/client run web",
+    "backend:start": "npm --workspace @atribe/backend run start",
+    "backend:dev": "npm --workspace @atribe/backend run dev",
+    "api:start": "npm --workspace @atribe/api run start",
+    "api:dev": "npm --workspace @atribe/api run dev",
+    "redirect:start": "npm --workspace @atribe/redirect run start",
+    "redirect:dev": "npm --workspace @atribe/redirect run dev",
+    "shopify:start": "npm --workspace @atribe/shopify-app run start",
+    "shopify:dev": "npm --workspace @atribe/shopify-app run dev"
   }
 }

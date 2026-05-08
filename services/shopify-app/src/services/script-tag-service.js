@@ -1,5 +1,5 @@
 import { buildOfflineSession, shopify } from "../config/shopify.js";
-import { env } from "../config/env.js";
+import { shopifyEnv as env } from "../config/shopify-env.js";
 import { shopScriptTagRepository } from "../repositories/shop-script-tag-repository.js";
 
 const storefrontScriptSrc = `${env.shopifyAppUrl}/storefront/atribe.js`;

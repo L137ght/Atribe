@@ -19,8 +19,8 @@ This file is documentation only.
 
 Primary implementation references:
 
-- Implemented in: `apps/mobile/src/navigation/AppNavigator.js`
-- Implemented in: `apps/mobile/src/context/AppContext.js`
+- Implemented in: `apps/client/src/navigation/AppNavigator.js`
+- Implemented in: `apps/client/src/context/AppContext.js`
 - Implemented in: `atribe-extension/content.js`
 - Implemented in: `services/shopify-app/src/app.js`
 - Cross-system reference: `IMPLEMENTATION.md`
@@ -32,10 +32,10 @@ Primary implementation references:
 - Role: current primary product surface for supporters, creators, and brands
 - Current maturity: active UI with working supporter routing, creator onboarding, creator affiliate-link management, partial Shopify creator-brand connection support, and brand onboarding/Shopify connection/campaign creation
 - Main files/folders:
-  - Implemented in: `apps/mobile/App.js`
-  - Implemented in: `apps/mobile/src/navigation/AppNavigator.js`
-  - Implemented in: `apps/mobile/src/context/AppContext.js`
-  - Implemented in: `apps/mobile/src/screens/*`
+  - Implemented in: `apps/client/App.js`
+  - Implemented in: `apps/client/src/navigation/AppNavigator.js`
+  - Implemented in: `apps/client/src/context/AppContext.js`
+  - Implemented in: `apps/client/src/screens/*`
 - What it currently owns:
   - auth entry
   - role selection (supporter, creator, brand)
@@ -68,12 +68,18 @@ Primary implementation references:
 ### Shopify backend/app
 
 - Role: server-side attribution engine and Shopify commerce integration
-- Current maturity: operational backend with proven Shopify attribution, multi-creator snapshot splitting, creator-brand link storage, campaign creation, and creator/brand JSON endpoints
+- Current maturity: operational backend split into three service modules composed by a compatibility layer
+- Service modules:
+  - `services/api` — business APIs (dashboard, price history, debug)
+  - `services/redirect` — link creation, supporter routing, click tracking
+  - `services/shopify-app` — Shopify OAuth, webhooks, storefront scripts
+  - `services/backend` — Phase 1 composition layer (no domain logic)
 - Main files/folders:
-  - Implemented in: `services/shopify-app/src/app.js`
-  - Implemented in: `services/shopify-app/src/routes/*`
-  - Implemented in: `services/shopify-app/src/services/*`
-  - Implemented in: `services/shopify-app/extensions/atribe-theme-extension/*`
+  - Implemented in: `services/backend/src/createApp.js` (composition)
+  - Implemented in: `services/api/src/createApp.js`
+  - Implemented in: `services/redirect/src/createApp.js`
+  - Implemented in: `services/shopify-app/src/createShopifyApp.js`
+  - Shared source: `services/shopify-app/src/` (domain services, repositories, config, utils)
 - What it currently owns:
   - Shopify install/auth
   - `/u/:userId/route`
@@ -84,14 +90,15 @@ Primary implementation references:
   - creator-brand association APIs
   - creator and brand reporting APIs
   - brand campaign creation APIs
+  - price history lookup via ProductHistory.in / PriceHistoryApp.com
 
 ### Supabase data layer
 
 - Role: main app identity and data store for mobile, plus one backend provider for Shopify backend
 - Current maturity: active
 - Main files/folders:
-  - Implemented in: `apps/mobile/src/lib/supabase.js`
-  - Implemented in: `apps/mobile/src/context/AppContext.js`
+  - Implemented in: `apps/client/src/lib/supabase.js`
+  - Implemented in: `apps/client/src/context/AppContext.js`
   - Implemented in: `services/shopify-app/src/db/supabase.js`
   - Implemented in: `supabase/migrations/*`
 - What it currently owns:
@@ -111,9 +118,9 @@ Primary implementation references:
 
 - Goal: discover creators, build a tribe, and route shopping links so attribution follows the supporter’s creator preferences
 - Current entry point:
-  - Implemented in: `apps/mobile/src/screens/LandingScreen.js`
-  - Implemented in: `apps/mobile/src/screens/LoginScreen.js`
-  - Implemented in: `apps/mobile/src/screens/IntentSelectionScreen.js`
+  - Implemented in: `apps/client/src/screens/LandingScreen.js`
+  - Implemented in: `apps/client/src/screens/LoginScreen.js`
+  - Implemented in: `apps/client/src/screens/IntentSelectionScreen.js`
 - Current screens:
   - `Landing`
   - `Login`
@@ -131,12 +138,12 @@ Primary implementation references:
   - writes `tribe_memberships`
   - writes `routing_events`
   - routes through backend `/u/:userId/route`
-  - Implemented in: `apps/mobile/src/context/AppContext.js`
+  - Implemented in: `apps/client/src/context/AppContext.js`
 - Current backend endpoints used:
   - `GET /u/:user_id/route?url=...`
   - Implemented in: `services/shopify-app/src/routes/redirect-routes.js`
-  - Used by: `apps/mobile/src/screens/HomeScreen.js`
-  - Used by: `apps/mobile/src/screens/ShareRouteScreen.js`
+  - Used by: `apps/client/src/screens/HomeScreen.js`
+  - Used by: `apps/client/src/screens/ShareRouteScreen.js`
 - Missing backend integration if any:
   - no authenticated ownership check from mobile token is passed on supporter `/u` calls today
   - `FallbackState` still describes unsupported-domain handling, but current primary flow routes through backend and may not hit that screen for Shopify cases
@@ -145,8 +152,8 @@ Primary implementation references:
 
 - Goal: create a creator identity, connect socials, add affiliate links, and connect brands/stores
 - Current entry point:
-  - Implemented in: `apps/mobile/src/screens/LoginScreen.js`
-  - Implemented in: `apps/mobile/src/screens/IntentSelectionScreen.js`
+  - Implemented in: `apps/client/src/screens/LoginScreen.js`
+  - Implemented in: `apps/client/src/screens/IntentSelectionScreen.js`
 - Current screens:
   - `CreatorOnboarding`
   - `CreatorDashboard`
@@ -160,13 +167,13 @@ Primary implementation references:
   - writes `creator_social_connections`-style data through AppContext social methods
   - writes `creator_affiliate_links` directly for external affiliate URLs
   - uses backend `creator/brands` endpoints for Shopify store connections
-  - Implemented in: `apps/mobile/src/context/AppContext.js`
+  - Implemented in: `apps/client/src/context/AppContext.js`
 - Current backend endpoints used:
   - `GET /creator/brands?creator_id=...`
   - `POST /creator/brands`
   - `DELETE /creator/brands/:id`
   - Implemented in: `services/shopify-app/src/routes/dashboard-routes.js`
-  - Used by: `apps/mobile/src/context/AppContext.js`
+  - Used by: `apps/client/src/context/AppContext.js`
 - Missing backend integration if any:
   - creator dashboard does not consume backend reporting endpoints such as `/creator/earnings`, `/creator/orders`, or `/creator/links`
   - external affiliate-link flow still writes directly to Supabase, not through backend
@@ -176,8 +183,8 @@ Primary implementation references:
 - Goal: install Shopify integration, create campaigns, connect creators, and inspect attributed orders/commissions
 - Current entry point:
   - `IntentSelection` maps `"brand"` to the brand onboarding flow
-  - Implemented in: `apps/mobile/src/screens/IntentSelectionScreen.js`
-  - Navigated by: `apps/mobile/src/navigation/AppNavigator.js`
+  - Implemented in: `apps/client/src/screens/IntentSelectionScreen.js`
+  - Navigated by: `apps/client/src/navigation/AppNavigator.js`
 - Current screens:
   - `BrandOnboarding` — enter Shopify store domain
   - `BrandConnecting` — opens Shopify OAuth install, polls backend for install confirmation
@@ -190,13 +197,13 @@ Primary implementation references:
   - reads `shopify_brand_integrations`, `shopify_shops`, `shopify_campaigns` via backend endpoints
   - writes `shopify_campaigns` via `POST /brand/campaigns`
   - persists `brandShopDomain` in app state via AsyncStorage
-  - Implemented in: `apps/mobile/src/context/AppContext.js`
+  - Implemented in: `apps/client/src/context/AppContext.js`
 - Current backend endpoints used:
   - `GET /brand/shopify/install-status?shop_domain=...`
   - `POST /brand/campaigns`
   - `GET /auth?shop=...` (for Shopify install URL construction)
   - Implemented in: `services/shopify-app/src/routes/dashboard-routes.js`
-  - Used by: `apps/mobile/src/context/AppContext.js`
+  - Used by: `apps/client/src/context/AppContext.js`
 - Missing backend integration if any:
   - brand reporting endpoints (`/brand/orders`, `/brand/commissions`, `/brand/creators`, `/brand/clicks`) exist but are not consumed by mobile UI
   - brand ownership/auth model is only minimally hardened
@@ -207,18 +214,18 @@ Primary implementation references:
 ### Landing
 
 - Screen name: `Landing`
-- File path: `apps/mobile/src/screens/LandingScreen.js`
+- File path: `apps/client/src/screens/LandingScreen.js`
 - User role: unauthenticated user
 - Purpose: marketing-style landing page and login entry
 - Entry path:
   - first screen when no `session`
-  - Implemented in: `apps/mobile/src/navigation/AppNavigator.js`
+  - Implemented in: `apps/client/src/navigation/AppNavigator.js`
 - Exit/next actions:
   - `Login`
   - auto-redirect to `IntentSelection`, `CreatorDashboard`, `CreatorOnboarding`, or `Home` if already signed in
 - Data source:
   - `session`, `intent`, `currentCreator`
-  - Implemented in: `apps/mobile/src/context/AppContext.js`
+  - Implemented in: `apps/client/src/context/AppContext.js`
 - Backend/Supabase calls:
   - none directly in the screen
 - Current UX issues:
@@ -229,7 +236,7 @@ Primary implementation references:
 ### Login
 
 - Screen name: `Login`
-- File path: `apps/mobile/src/screens/LoginScreen.js`
+- File path: `apps/client/src/screens/LoginScreen.js`
 - User role: unauthenticated supporter or creator
 - Purpose: Google auth, password auth, or demo entry
 - Entry path:
@@ -244,7 +251,7 @@ Primary implementation references:
     - `signInWithIdToken`
     - `signInWithOAuth`
     - `signInWithPassword`
-  - Implemented in: `apps/mobile/src/context/AppContext.js`
+  - Implemented in: `apps/client/src/context/AppContext.js`
 - Current UX issues:
   - sign-in copy is generic and does not explain the difference between supporter and creator data paths
 - Implementation notes:
@@ -253,7 +260,7 @@ Primary implementation references:
 ### IntentSelection
 
 - Screen name: `IntentSelection`
-- File path: `apps/mobile/src/screens/IntentSelectionScreen.js`
+- File path: `apps/client/src/screens/IntentSelectionScreen.js`
 - User role: authenticated user choosing mode
 - Purpose: choose supporter vs creator role
 - Entry path:
@@ -266,16 +273,16 @@ Primary implementation references:
   - `setIntent`
 - Backend/Supabase calls:
   - indirect writes through `setIntent`
-  - Implemented in: `apps/mobile/src/context/AppContext.js`
+  - Implemented in: `apps/client/src/context/AppContext.js`
 - Current UX issues:
   - `"Brand"` choice navigates to the brand onboarding flow; brand is now an independent role with dedicated screens
 - Implementation notes:
-  - Implemented in: `apps/mobile/src/screens/IntentSelectionScreen.js`
+  - Implemented in: `apps/client/src/screens/IntentSelectionScreen.js`
 
 ### Home
 
 - Screen name: `Home`
-- File path: `apps/mobile/src/screens/HomeScreen.js`
+- File path: `apps/client/src/screens/HomeScreen.js`
 - User role: supporter
 - Purpose: paste a destination URL and route through backend attribution
 - Entry path:
@@ -306,7 +313,7 @@ Primary implementation references:
 ### CreatorDiscovery
 
 - Screen name: `CreatorDiscovery`
-- File path: `apps/mobile/src/screens/CreatorDiscoveryScreen.js`
+- File path: `apps/client/src/screens/CreatorDiscoveryScreen.js`
 - User role: supporter
 - Purpose: search creators and add/remove them from tribe
 - Entry path:
@@ -322,7 +329,7 @@ Primary implementation references:
   - `removeFromTribe`
 - Backend/Supabase calls:
   - writes `tribe_memberships` through `updatePreference`
-  - Implemented in: `apps/mobile/src/context/AppContext.js`
+  - Implemented in: `apps/client/src/context/AppContext.js`
 - Current UX issues:
   - discover surface is creator-centric; it does not clearly distinguish creator entities from brand-program entities
 - Implementation notes:
@@ -331,7 +338,7 @@ Primary implementation references:
 ### CreatorSelection
 
 - Screen name: `CreatorSelection`
-- File path: `apps/mobile/src/screens/CreatorSelectionScreen.js`
+- File path: `apps/client/src/screens/CreatorSelectionScreen.js`
 - User role: supporter
 - Purpose: manage selected creators and their weights
 - Entry path:
@@ -356,7 +363,7 @@ Primary implementation references:
 ### ShareRoute
 
 - Screen name: `ShareRoute`
-- File path: `apps/mobile/src/screens/ShareRouteScreen.js`
+- File path: `apps/client/src/screens/ShareRouteScreen.js`
 - User role: supporter or unauthenticated user opening a shared/deep-linked URL
 - Purpose: process shared URLs and open backend route
 - Entry path:
@@ -382,7 +389,7 @@ Primary implementation references:
 ### CreatorOnboarding
 
 - Screen name: `CreatorOnboarding`
-- File path: `apps/mobile/src/screens/CreatorOnboardingScreen.js`
+- File path: `apps/client/src/screens/CreatorOnboardingScreen.js`
 - User role: creator
 - Purpose: create creator profile, select platforms/niches, connect socials
 - Entry path:
@@ -408,7 +415,7 @@ Primary implementation references:
 ### CreatorDashboard
 
 - Screen name: `CreatorDashboard`
-- File path: `apps/mobile/src/screens/CreatorDashboardScreen.js`
+- File path: `apps/client/src/screens/CreatorDashboardScreen.js`
 - User role: creator
 - Purpose: launch creator tools
 - Entry path:
@@ -432,7 +439,7 @@ Primary implementation references:
 ### ConnectBrands
 
 - Screen name: `ConnectBrands`
-- File path: `apps/mobile/src/screens/ConnectBrandsScreen.js`
+- File path: `apps/client/src/screens/ConnectBrandsScreen.js`
 - User role: creator
 - Purpose: browse static brand programs and initiate external affiliate-link or Shopify-brand connection flows
 - Entry path:
@@ -458,7 +465,7 @@ Primary implementation references:
 ### BrandProgramWebView
 
 - Screen name: `BrandProgramWebView`
-- File path: `apps/mobile/src/screens/BrandProgramWebViewScreen.js`
+- File path: `apps/client/src/screens/BrandProgramWebViewScreen.js`
 - User role: creator
 - Purpose: open partner program page and save either external affiliate link or Shopify store association
 - Entry path:
@@ -485,7 +492,7 @@ Primary implementation references:
 ### AddAffiliateLinks
 
 - Screen name: `AddAffiliateLinks`
-- File path: `apps/mobile/src/screens/AddAffiliateLinksScreen.js`
+- File path: `apps/client/src/screens/AddAffiliateLinksScreen.js`
 - User role: creator
 - Purpose: directly add external affiliate links or Shopify store domains
 - Entry path:
@@ -510,7 +517,7 @@ Primary implementation references:
 ### ConnectSocialAccounts
 
 - Screen name: `ConnectSocialAccounts`
-- File path: `apps/mobile/src/screens/ConnectSocialAccountsScreen.js`
+- File path: `apps/client/src/screens/ConnectSocialAccountsScreen.js`
 - User role: creator
 - Purpose: connect creator social platforms
 - Entry path:
@@ -535,7 +542,7 @@ Primary implementation references:
 ### WebView
 
 - Screen name: `WebView`
-- File path: `apps/mobile/src/screens/WebViewScreen.js`
+- File path: `apps/client/src/screens/WebViewScreen.js`
 - User role: supporter (available to all signed-in roles)
 - Purpose: generic in-app browser for any URL
 - Entry path:
@@ -556,7 +563,7 @@ Primary implementation references:
 ### BrandOnboarding
 
 - Screen name: `BrandOnboarding`
-- File path: `apps/mobile/src/screens/BrandOnboardingScreen.js`
+- File path: `apps/client/src/screens/BrandOnboardingScreen.js`
 - User role: brand
 - Purpose: enter Shopify store domain and initiate Shopify connection
 - Entry path:
@@ -580,7 +587,7 @@ Primary implementation references:
 ### BrandConnecting
 
 - Screen name: `BrandConnecting`
-- File path: `apps/mobile/src/screens/BrandConnectingScreen.js`
+- File path: `apps/client/src/screens/BrandConnectingScreen.js`
 - User role: brand
 - Purpose: open Shopify OAuth install flow and poll for connection confirmation
 - Entry path:
@@ -601,7 +608,7 @@ Primary implementation references:
 ### BrandShopifySuccess
 
 - Screen name: `BrandShopifySuccess`
-- File path: `apps/mobile/src/screens/BrandShopifySuccessScreen.js`
+- File path: `apps/client/src/screens/BrandShopifySuccessScreen.js`
 - User role: brand
 - Purpose: confirm store is connected and prompt campaign creation
 - Entry path:
@@ -621,7 +628,7 @@ Primary implementation references:
 ### CampaignGate
 
 - Screen name: `CampaignGate`
-- File path: `apps/mobile/src/screens/CampaignGateScreen.js`
+- File path: `apps/client/src/screens/CampaignGateScreen.js`
 - User role: brand
 - Purpose: gate screen requiring an active campaign before accessing BrandHome
 - Entry path:
@@ -641,7 +648,7 @@ Primary implementation references:
 ### CreateCampaign
 
 - Screen name: `CreateCampaign`
-- File path: `apps/mobile/src/screens/CreateCampaignScreen.js`
+- File path: `apps/client/src/screens/CreateCampaignScreen.js`
 - User role: brand
 - Purpose: form to create a creator campaign with name, shopper offer, payout rate, and duration
 - Entry path:
@@ -663,7 +670,7 @@ Primary implementation references:
 ### CampaignSuccess
 
 - Screen name: `CampaignSuccess`
-- File path: `apps/mobile/src/screens/CampaignSuccessScreen.js`
+- File path: `apps/client/src/screens/CampaignSuccessScreen.js`
 - User role: brand
 - Purpose: confirmation after campaign creation with share/invite action
 - Entry path:
@@ -682,7 +689,7 @@ Primary implementation references:
 ### BrandHome
 
 - Screen name: `BrandHome`
-- File path: `apps/mobile/src/screens/BrandHomeScreen.js`
+- File path: `apps/client/src/screens/BrandHomeScreen.js`
 - User role: brand
 - Purpose: minimal brand status view showing connected shop, campaign status, and commission pool
 - Entry path:
@@ -704,7 +711,7 @@ Primary implementation references:
 ### Settings
 
 - Screen name: `Settings`
-- File path: `apps/mobile/src/screens/SettingsScreen.js`
+- File path: `apps/client/src/screens/SettingsScreen.js`
 - User role: supporter or creator
 - Purpose: switch active role, routing mode, tutorial, socials, and sign out
 - Entry path:
@@ -729,7 +736,7 @@ Primary implementation references:
 ### FallbackState
 
 - Screen name: `FallbackState`
-- File path: `apps/mobile/src/screens/FallbackStateScreen.js`
+- File path: `apps/client/src/screens/FallbackStateScreen.js`
 - User role: supporter
 - Purpose: collect unsupported domain requests
 - Entry path:
@@ -749,7 +756,7 @@ Primary implementation references:
 ### Feedback
 
 - Screen name: `Feedback`
-- File path: `apps/mobile/src/screens/FeedbackScreen.js`
+- File path: `apps/client/src/screens/FeedbackScreen.js`
 - User role: supporter
 - Purpose: success-style confirmation screen after routing
 - Entry path:
@@ -888,8 +895,8 @@ Primary implementation references:
 ### 1. Login / choose creator flow
 
 - Screen/file:
-  - `apps/mobile/src/screens/LoginScreen.js`
-  - `apps/mobile/src/screens/IntentSelectionScreen.js`
+  - `apps/client/src/screens/LoginScreen.js`
+  - `apps/client/src/screens/IntentSelectionScreen.js`
 - Data written:
   - auth session
   - `preferred_intent` through app-state persistence
@@ -903,7 +910,7 @@ Primary implementation references:
 ### 2. Set up creator profile
 
 - Screen/file:
-  - `apps/mobile/src/screens/CreatorOnboardingScreen.js`
+  - `apps/client/src/screens/CreatorOnboardingScreen.js`
 - Data written:
   - creator profile
   - niche/platform choices
@@ -918,8 +925,8 @@ Primary implementation references:
 ### 3. Add affiliate links
 
 - Screen/file:
-  - `apps/mobile/src/screens/AddAffiliateLinksScreen.js`
-  - `apps/mobile/src/screens/BrandProgramWebViewScreen.js`
+  - `apps/client/src/screens/AddAffiliateLinksScreen.js`
+  - `apps/client/src/screens/BrandProgramWebViewScreen.js`
 - Data written:
   - external affiliate links to `creator_affiliate_links`
   - Shopify store connections to backend `creator/brands`
@@ -934,8 +941,8 @@ Primary implementation references:
 ### 4. Add/connect brands
 
 - Screen/file:
-  - `apps/mobile/src/screens/ConnectBrandsScreen.js`
-  - `apps/mobile/src/screens/BrandProgramWebViewScreen.js`
+  - `apps/client/src/screens/ConnectBrandsScreen.js`
+  - `apps/client/src/screens/BrandProgramWebViewScreen.js`
 - Data written:
   - external affiliate links directly
   - Shopify creator-brand links via backend
@@ -949,7 +956,7 @@ Primary implementation references:
 ### 5. View creator dashboard
 
 - Screen/file:
-  - `apps/mobile/src/screens/CreatorDashboardScreen.js`
+  - `apps/client/src/screens/CreatorDashboardScreen.js`
 - Data written:
   - none
 - Whether backend creator endpoints are used:
@@ -964,17 +971,17 @@ Primary implementation references:
 ### Implemented UI
 
 - Brand has a dedicated mobile flow with 7 screens: `BrandOnboarding`, `BrandConnecting`, `BrandShopifySuccess`, `CampaignGate`, `CreateCampaign`, `CampaignSuccess`, `BrandHome`.
-  - Implemented in: `apps/mobile/src/screens/BrandOnboardingScreen.js`
-  - Implemented in: `apps/mobile/src/screens/BrandConnectingScreen.js`
-  - Implemented in: `apps/mobile/src/screens/BrandShopifySuccessScreen.js`
-  - Implemented in: `apps/mobile/src/screens/CampaignGateScreen.js`
-  - Implemented in: `apps/mobile/src/screens/CreateCampaignScreen.js`
-  - Implemented in: `apps/mobile/src/screens/CampaignSuccessScreen.js`
-  - Implemented in: `apps/mobile/src/screens/BrandHomeScreen.js`
+  - Implemented in: `apps/client/src/screens/BrandOnboardingScreen.js`
+  - Implemented in: `apps/client/src/screens/BrandConnectingScreen.js`
+  - Implemented in: `apps/client/src/screens/BrandShopifySuccessScreen.js`
+  - Implemented in: `apps/client/src/screens/CampaignGateScreen.js`
+  - Implemented in: `apps/client/src/screens/CreateCampaignScreen.js`
+  - Implemented in: `apps/client/src/screens/CampaignSuccessScreen.js`
+  - Implemented in: `apps/client/src/screens/BrandHomeScreen.js`
 
 - `IntentSelection` presents `Brand` as a real, independent role choice that navigates to the brand flow.
-  - Implemented in: `apps/mobile/src/screens/IntentSelectionScreen.js`
-  - Navigated by: `apps/mobile/src/navigation/AppNavigator.js`
+  - Implemented in: `apps/client/src/screens/IntentSelectionScreen.js`
+  - Navigated by: `apps/client/src/navigation/AppNavigator.js`
 
 ### Implemented backend
 
@@ -990,46 +997,46 @@ Primary implementation references:
 ### Brand journey
 
 1. **Select brand role** — `IntentSelection` -> Brand
-   - Screen/file: `apps/mobile/src/screens/IntentSelectionScreen.js`
+   - Screen/file: `apps/client/src/screens/IntentSelectionScreen.js`
    - Data written: `profiles.preferred_intent` = `"brand"`
    - Navigator routes to `BrandOnboarding` (no store) or `CampaignGate`/`BrandHome` (connected store)
 
 2. **Enter Shopify domain** — `BrandOnboarding`
-   - Screen/file: `apps/mobile/src/screens/BrandOnboardingScreen.js`
+   - Screen/file: `apps/client/src/screens/BrandOnboardingScreen.js`
    - Data read: `brandInstallStatus`, `brandShopDomain` from AppContext
    - Backend call: `GET /brand/shopify/install-status`
    - Exit: `BrandConnecting`
 
 3. **Connect Shopify** — `BrandConnecting`
-   - Screen/file: `apps/mobile/src/screens/BrandConnectingScreen.js`
+   - Screen/file: `apps/client/src/screens/BrandConnectingScreen.js`
    - Opens Shopify OAuth install URL via `Linking.openURL(buildBrandShopifyInstallUrl(...))`
    - Backend call: builds backend `/auth?shop=...` URL
    - User taps "I connected my store" to poll backend install status
    - Exit: `BrandShopifySuccess` when install confirmed
 
 4. **Confirm connection** — `BrandShopifySuccess`
-   - Screen/file: `apps/mobile/src/screens/BrandShopifySuccessScreen.js`
+   - Screen/file: `apps/client/src/screens/BrandShopifySuccessScreen.js`
    - Auto-syncs install status on mount via `refreshBrandInstallStatus`
    - Exit: `CreateCampaign` or `CampaignGate`
 
 5. **Campaign gate** — `CampaignGate`
-   - Screen/file: `apps/mobile/src/screens/CampaignGateScreen.js`
+   - Screen/file: `apps/client/src/screens/CampaignGateScreen.js`
    - Requires active campaign to access `BrandHome`; auto-redirects if campaign becomes active
    - Exit: `CreateCampaign`
 
 6. **Create campaign** — `CreateCampaign`
-   - Screen/file: `apps/mobile/src/screens/CreateCampaignScreen.js`
+   - Screen/file: `apps/client/src/screens/CreateCampaignScreen.js`
    - Backend call: `POST /brand/campaigns` via `createBrandCampaign`
    - Writes: `shopify_campaigns`
    - Exit: `CampaignSuccess`
 
 7. **Campaign success** — `CampaignSuccess`
-   - Screen/file: `apps/mobile/src/screens/CampaignSuccessScreen.js`
+   - Screen/file: `apps/client/src/screens/CampaignSuccessScreen.js`
    - Shows confirmation with share/invite-creators action
    - Exit: `BrandHome`
 
 8. **Brand home** — `BrandHome`
-   - Screen/file: `apps/mobile/src/screens/BrandHomeScreen.js`
+   - Screen/file: `apps/client/src/screens/BrandHomeScreen.js`
    - Minimal status view: connected shop domain, campaign status, commission pool
    - Auto-redirects to `CampaignGate` if no active campaign
    - Exit: `CreateCampaign`, `Settings`
@@ -1128,8 +1135,8 @@ Home price-history → backend /api/price-history/lookup (ProductHistory.in → 
 - Why it matters:
   - brand flow is no longer a false promise, but BrandHome is still a minimal status view lacking creator management, order analytics, and commission tracking
 - Files involved:
-  - `apps/mobile/src/screens/IntentSelectionScreen.js`
-  - `apps/mobile/src/screens/BrandHomeScreen.js`
+  - `apps/client/src/screens/IntentSelectionScreen.js`
+  - `apps/client/src/screens/BrandHomeScreen.js`
   - `services/shopify-app/src/routes/dashboard-routes.js`
 - Suggested fix direction:
   - expand BrandHome to surface backend reporting data and creator management
@@ -1143,8 +1150,8 @@ Home price-history → backend /api/price-history/lookup (ProductHistory.in → 
 - Why it matters:
   - creator may have backend Shopify connections that are not represented clearly in top-level dashboard summary
 - Files involved:
-  - `apps/mobile/src/screens/CreatorDashboardScreen.js`
-  - `apps/mobile/src/context/AppContext.js`
+  - `apps/client/src/screens/CreatorDashboardScreen.js`
+  - `apps/client/src/context/AppContext.js`
 - Suggested fix direction:
   - unify dashboard summary over both external links and backend Shopify creator-brand links
 
@@ -1158,8 +1165,8 @@ Home price-history → backend /api/price-history/lookup (ProductHistory.in → 
 - Why it matters:
   - the product model is mixed: "discover creators" and "connect brands" are separate, but users do not see the attribution-type distinction
 - Files involved:
-  - `apps/mobile/src/screens/CreatorDiscoveryScreen.js`
-  - `apps/mobile/src/screens/ConnectBrandsScreen.js`
+  - `apps/client/src/screens/CreatorDiscoveryScreen.js`
+  - `apps/client/src/screens/ConnectBrandsScreen.js`
   - `services/shopify-app/src/services/link-service.js`
 - Suggested fix direction:
   - add explicit program-type labelling in the UI
@@ -1174,8 +1181,8 @@ Home price-history → backend /api/price-history/lookup (ProductHistory.in → 
 - Why it matters:
   - Atribe-powered Shopify commerce exists in backend logic and brand campaigns exist in the mobile flow, but not as a native in-app supporter shopping surface
 - Files involved:
-  - `apps/mobile/src/data/brandPrograms.js`
-  - `apps/mobile/src/screens/BrandProgramWebViewScreen.js`
+  - `apps/client/src/data/brandPrograms.js`
+  - `apps/client/src/screens/BrandProgramWebViewScreen.js`
   - `services/shopify-app/src/services/link-service.js`
 - Suggested fix direction:
   - define whether brand pages are catalog pages, partner pages, or simple routing entry points
@@ -1189,8 +1196,8 @@ Home price-history → backend /api/price-history/lookup (ProductHistory.in → 
 - Why it matters:
   - it is not clear from current navigation whether those screens are part of the active runtime path or older UX remnants
 - Files involved:
-  - `apps/mobile/src/screens/FallbackStateScreen.js`
-  - `apps/mobile/src/screens/FeedbackScreen.js`
+  - `apps/client/src/screens/FallbackStateScreen.js`
+  - `apps/client/src/screens/FeedbackScreen.js`
   - `services/shopify-app/src/routes/redirect-routes.js`
 - Suggested fix direction:
   - confirm whether these screens still belong in the current routing journey
@@ -1205,7 +1212,7 @@ Home price-history → backend /api/price-history/lookup (ProductHistory.in → 
 - Why it matters:
   - brands can create campaigns but cannot see their impact; campaign management beyond creation is missing
 - Files involved:
-  - `apps/mobile/src/screens/BrandHomeScreen.js`
+  - `apps/client/src/screens/BrandHomeScreen.js`
   - `services/shopify-app/src/routes/dashboard-routes.js`
 - Suggested fix direction:
   - surface backend reporting data in BrandHome or a dedicated analytics screen; add campaign editing/pausing
@@ -1220,15 +1227,15 @@ Current code supports these product concepts:
 - selected into tribes
 - can have external affiliate links
 - can have backend Shopify creator-brand associations
-- Implemented in: `apps/mobile/src/screens/CreatorDiscoveryScreen.js`
-- Implemented in: `apps/mobile/src/context/AppContext.js`
+- Implemented in: `apps/client/src/screens/CreatorDiscoveryScreen.js`
+- Implemented in: `apps/client/src/context/AppContext.js`
 
 ### Brands
 
 - currently represented in creator UI as static `brandPrograms`
 - not represented as a supporter-facing discover surface
-- Implemented in: `apps/mobile/src/data/brandPrograms.js`
-- Used by: `apps/mobile/src/screens/ConnectBrandsScreen.js`
+- Implemented in: `apps/client/src/data/brandPrograms.js`
+- Used by: `apps/client/src/screens/ConnectBrandsScreen.js`
 
 ### Collections
 

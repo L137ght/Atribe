@@ -1,8 +1,8 @@
-import { createApp } from "./app.js";
-import { env } from "./config/env.js";
+import { createShopifyApp } from "./createShopifyApp.js";
+import { env } from "@atribe/config/shopify";
 
-const app = createApp();
+const app = createShopifyApp();
 
 app.listen(env.port, env.host, () => {
-  console.log(`Shopify app backend listening on http://${env.host}:${env.port}`);
+  console.log(`Shopify service listening on http://${env.host}:${env.port}`);
 });

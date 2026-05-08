@@ -18,7 +18,7 @@ Use it before relying on service READMEs or design/mockup files. The intended hi
 ```text
 atribe/
 ├── apps/
-│   └── mobile/            # Expo app
+│   └── client/            # Expo app for web, iOS, and Android
 ├── services/
 │   ├── api/               # Core backend
 │   ├── redirect/          # Link routing service
@@ -35,8 +35,8 @@ atribe/
 
 ## Commands
 
-Run the existing mobile app from the repo root:
+Run the existing client app from the repo root:
 
 ```bash
-npm run mobile:start
+npm run client:start
 ```

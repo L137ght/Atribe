@@ -1,0 +1,43 @@
+Category,Company,Commission,Payment Method,Threshold,Countries Supported,Affiliate Type,API Availability,Notes
+Web Builder,Shopify,$150 per referral,PayPal/Bank,~$25-50,Global,Link+Event,Yes,Partner API available
+Web Builder,Wix,$100 per sale,PayPal,~$50,Global,Link,Limited,Basic tracking only
+Web Builder,Squarespace,$100 per sale,PayPal,~$50,Global,Link,No,Network-based tracking
+Hosting,Bluehost,$65+ per signup,PayPal,$100,Global,Link+Event,No,Tracked via network
+Hosting,Hostinger,Up to 60%,PayPal/Bank,$100,Global,Link,Limited,Internal tracking
+Hosting,SiteGround,$50-$100+,PayPal,$50,Global,Link,No,Affiliate panel only
+Hosting,Cloudways,Up to $125/sale,PayPal,$250,Global,Link+Hybrid,Limited,Flexible payout model
+VPN,NordVPN,Up to 40%,PayPal,$10,Global,Link+Coupon,Limited,Popular hybrid model
+VPN,ExpressVPN,$36 per sale,PayPal,$100,Global,Link,No,No public API
+VPN,Surfshark,40% recurring,PayPal,$50,Global,Link+Coupon,Limited,Subscription-based
+VPN,CyberGhost,Up to 100% first sale,PayPal,$100,Global,Link,No,High initial commission
+Ecommerce,Amazon Associates,1-10%,Bank Transfer,₹1000+,Region-specific,Link,Yes,Product API available
+Ecommerce,Walmart,1-4%,Bank,$50,US,Link,No,Network dependent
+Ecommerce,Target,Up to 8%,Bank,$50,US,Link,No,US only
+Ecommerce,Etsy,4%,PayPal,$20,Global,Link,No,Via affiliate networks
+Ecommerce,eBay Partner Network,1-4%,PayPal,$10,Global,Link,Yes,Developer APIs available
+Design,Canva,15% recurring,PayPal,$10,Global,Link+Event,Limited,SaaS tracking
+Design,Adobe Creative Cloud,85% first month,PayPal/Bank,$50,Global,Link,No,Via network
+Marketing,ConvertKit,30% recurring,PayPal,$50,Global,Link+Event,Limited,SaaS subscription
+Marketing,HubSpot,Up to 30% recurring,PayPal,$10-50,Global,Link+Event,Yes,Full partner APIs
+Marketing,Semrush,Up to $200 per sale,PayPal,$50,Global,Link+Event,Yes,Affiliate + analytics APIs
+Freelance,Fiverr,$15-$150 CPA,PayPal,$100,Global,Event,Yes,CPA-based APIs
+Freelance,Upwork,Variable CPA,PayPal,$100,Global,Event,No,Limited tracking
+Finance,FreshBooks,$200 per paid user,PayPal,$50,Global,Event,No,Manual tracking
+Finance,QuickBooks,Variable,Bank,$50,US/Global,Event,No,Region dependent
+Finance,Wise,Variable per signup,Bank/PayPal,$50,Global,Event,Yes,Public APIs exist
+Finance,Robinhood,$20 per signup,Bank,$50,US,Event,No,Strict region lock
+Education,Coursera,10-45%,PayPal,$25,Global,Link,Yes,Affiliate APIs
+Education,Udemy,Up to 15%,Bank,$50,Global,Link,Yes,Public APIs
+Education,Skillshare,$7 per signup,PayPal,$10,Global,Event,No,Internal tracking
+Education,Teachable,30%,PayPal,$50,Global,Link+Event,Limited,SaaS model
+Education,MasterClass,25%,PayPal,$25,Global,Link,No,Network-based
+Lifestyle,HelloFresh,$10-$15 per sale,PayPal,$20,US/EU,Hybrid,No,Coupon heavy
+Lifestyle,Noom,$20 per sale,PayPal,$20,US,Hybrid,No,Mobile-heavy
+Lifestyle,Fabletics,$10 signup,PayPal,$50,US/EU,Hybrid,No,Subscription apparel
+Lifestyle,Sephora,Up to 10%,Bank,$50,Global,Hybrid,No,Coupon + link
+Travel,Booking.com,Variable per booking,Bank,$50,Global,Link,Yes,Affiliate APIs
+SaaS,ClickFunnels,Up to 40% recurring,PayPal,$100,Global,Link+Event,Limited,Recurring SaaS
+SaaS,Kajabi,30% recurring,PayPal,$50,Global,Link+Event,Limited,Creator platform
+SaaS,GetResponse,33% recurring,PayPal,$50,Global,Link+Event,Limited,Email SaaS
+SaaS,AWeber,30% recurring,PayPal,$30,Global,Link+Event,Limited,Email marketing
+SaaS,Leadpages,Up to 50%,PayPal,$50,Global,Link+Event,Limited,Landing pages

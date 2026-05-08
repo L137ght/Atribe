@@ -23,6 +23,7 @@ logs/
 # Build
 dist/
 build/
+.expo/
 
 # ngrok
 *.ngrok.log
@@ -30,4 +31,3 @@ build/
 # IDE
 .vscode/
 .idea/
-apps/mobile/

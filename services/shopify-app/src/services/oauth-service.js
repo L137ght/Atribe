@@ -1,4 +1,4 @@
-import { env } from "../config/env.js";
+import { env } from "../config/shopify-env.js";
 import { createNonce, safeCompare, toHexHmac } from "../utils/crypto.js";
 import { isValidShopDomain, normalizeShopDomain } from "../utils/shopify-validators.js";
 import { oauthStateStore } from "./oauth-state-store.js";

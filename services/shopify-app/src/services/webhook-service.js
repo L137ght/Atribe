@@ -1,5 +1,5 @@
 import { buildOfflineSession, shopify } from "../config/shopify.js";
-import { env } from "../config/env.js";
+import { shopifyEnv as env } from "../config/shopify-env.js";
 import { shopWebhookRegistrationRepository } from "../repositories/shop-webhook-registration-repository.js";
 import { logger } from "../utils/logger.js";
 

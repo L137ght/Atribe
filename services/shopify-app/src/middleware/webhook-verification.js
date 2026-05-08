@@ -1,4 +1,4 @@
-import { env } from "../config/env.js";
+import { shopifyEnv as env } from "../config/shopify-env.js";
 import { safeCompare, toBase64Hmac } from "../utils/crypto.js";
 import { getRawBodyString } from "../utils/http.js";
 

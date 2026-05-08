@@ -1,0 +1,67 @@
+{
+  "expo": {
+    "name": "Atribe",
+    "slug": "atribe",
+    "scheme": "atribe",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "dark",
+    "newArchEnabled": true,
+    "splash": {
+      "image": "./assets/splash-icon.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#17080d"
+    },
+    "ios": {
+      "bundleIdentifier": "com.atribe.io",
+      "supportsTablet": true,
+      "infoPlist": {
+        "CFBundleURLTypes": [
+          {
+            "CFBundleURLSchemes": [
+              "atribe"
+            ]
+          }
+        ]
+      }
+    },
+    "android": {
+      "package": "com.atribe.io",
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/adaptive-icon.png",
+        "backgroundColor": "#17080d"
+      },
+      "edgeToEdgeEnabled": true
+    },
+    "web": {
+      "favicon": "./assets/favicon.png"
+    },
+    "extra": {
+      "googleExpoClientId": "537306486597-9e0r8hjucqv5ihufggivcglcsksjtip6.apps.googleusercontent.com",
+      "googleIosClientId": "537306486597-onus0tjbaaa45vjtnhr47lsbr03dua2o.apps.googleusercontent.com",
+      "googleAndroidClientId": "537306486597-9e0r8hjucqv5ihufggivcglcsksjtip6.apps.googleusercontent.com",
+      "googleWebClientId": "537306486597-9e0r8hjucqv5ihufggivcglcsksjtip6.apps.googleusercontent.com"
+    },
+    "plugins": [
+      "expo-web-browser",
+      "expo-video",
+      [
+        "expo-share-intent",
+        {
+          "iosShareExtensionName": "Atribe",
+          "iosAppGroupIdentifier": "group.com.atribe.io",
+          "iosActivationRules": {
+            "NSExtensionActivationSupportsText": true,
+            "NSExtensionActivationSupportsWebURLWithMaxCount": 1,
+            "NSExtensionActivationSupportsWebPageWithMaxCount": 1
+          },
+          "androidIntentFilters": [
+            "text/plain",
+            "text/*"
+          ]
+        }
+      ]
+    ]
+  }
+}

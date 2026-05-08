@@ -1,0 +1,15 @@
+{
+  "name": "@atribe/config",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "main": "src/index.js",
+  "exports": {
+    ".": "./src/index.js",
+    "./shared": "./src/shared.js",
+    "./shopify": "./src/shopify.js"
+  },
+  "dependencies": {
+    "dotenv": "^16.4.5"
+  }
+}
