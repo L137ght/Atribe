@@ -22,3 +22,9 @@ export { userCreatorWeightRepository } from "../../../services/backend/shopify-a
 export { clickWeightSnapshotRepository } from "../../../services/backend/shopify-app/src/repositories/click-weight-snapshot-repository.js";
 export { shopScriptTagRepository } from "../../../services/backend/shopify-app/src/repositories/shop-script-tag-repository.js";
 export { shopWebhookRegistrationRepository } from "../../../services/backend/shopify-app/src/repositories/shop-webhook-registration-repository.js";
+export { shareLinkRepository } from "../../../services/backend/shopify-app/src/repositories/share-link-repository.js";
+export { shareClickRepository } from "../../../services/backend/shopify-app/src/repositories/share-click-repository.js";
+export { supportActionRepository } from "../../../services/backend/shopify-app/src/repositories/support-action-repository.js";
+export { supportScoreRepository } from "../../../services/backend/shopify-app/src/repositories/support-score-repository.js";
+export { creatorRewardRepository } from "../../../services/backend/shopify-app/src/repositories/creator-reward-repository.js";
+export { rewardClaimRepository } from "../../../services/backend/shopify-app/src/repositories/reward-claim-repository.js";

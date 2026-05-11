@@ -168,7 +168,7 @@ export const brandPrograms = [
         detail: "Save your Flipkart tracking link back in Atribe."
       },
       {
-        title: "Earn when your supporters shop",
+        title: "Earn when your shoppers shop",
         detail: "Atribe can route future Flipkart support through your link."
       }
     ],

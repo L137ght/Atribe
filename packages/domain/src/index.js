@@ -9,3 +9,9 @@ export { debugService } from "../../../services/backend/shopify-app/src/services
 
 // Price history
 export { getBestPriceHistoryForProductUrl } from "../../../services/backend/shopify-app/src/services/priceHistory/index.js";
+
+// Support points & rewards
+export { getPointsForAction } from "./support-points.js";
+export { canUnlockReward, getRewardStatus } from "./reward-access.js";
+export { classifyUrl } from "./url-classifier.js";
+export { generateShortCode } from "./short-code.js";

@@ -25,7 +25,7 @@ export default function FeedbackScreen({ navigation, route }) {
             You supported <Text style={styles.emphasis}>{creatorName}</Text>
           </Text>
           <BodyText style={styles.centerText}>
-            Your routed link now carries attribution for {domain}, following the creator weighting you configured in the new system.
+            Your link is ready and will support your chosen creators.
           </BodyText>
         </View>
 

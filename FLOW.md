@@ -41,8 +41,11 @@ Primary implementation references:
   - role selection (supporter, creator, brand)
   - supporter creator discovery and tribe selection
   - supporter link routing entry
+  - supporter share link creation for creator content (YouTube, Instagram, X/Twitter)
+  - supporter support score viewing
   - creator onboarding
   - creator affiliate-link management
+  - creator reward creation and management
   - creator brand-program browsing
   - partial Shopify creator-brand connection through backend endpoints
   - brand Shopify store connection flow
@@ -70,8 +73,8 @@ Primary implementation references:
 - Role: server-side attribution engine and Shopify commerce integration
 - Current maturity: operational backend split into three service modules composed by a compatibility layer
 - Service modules:
-  - `services/backend/api` — business APIs (dashboard, price history, debug)
-  - `services/backend/redirect` — link creation, supporter routing, click tracking
+  - `services/backend/api` — business APIs (dashboard, price history, debug, share links, support scores, creator rewards)
+  - `services/backend/redirect` — link creation, supporter routing, click tracking, share link redirect
   - `services/backend/shopify-app` — Shopify OAuth, webhooks, storefront scripts
   - `services/backend` — Phase 1 composition layer (no domain logic)
 - Main files/folders:
@@ -110,13 +113,16 @@ Primary implementation references:
   - external affiliate links
   - domain requests
   - routing events
+  - support actions and support scores (creator-specific supporter points)
+  - share links and share link clicks (supporter-generated content links)
+  - creator rewards and reward claims
   - Shopify-prefixed attribution tables when `DB_PROVIDER=supabase`
 
 ## 3. User Roles
 
 ### Supporter
 
-- Goal: discover creators, build a tribe, and route shopping links so attribution follows the supporter’s creator preferences
+- Goal: discover creators, build a tribe, route shopping links so attribution follows the supporter’s creator preferences, create share links for creator content, and earn support points
 - Current entry point:
   - Implemented in: `apps/client/src/screens/LandingScreen.js`
   - Implemented in: `apps/client/src/screens/LoginScreen.js`
@@ -125,7 +131,7 @@ Primary implementation references:
   - `Landing`
   - `Login`
   - `IntentSelection`
-  - `Home`
+  - `Home` (with Shop/Share tabs)
   - `CreatorDiscovery`
   - `CreatorSelection`
   - `ShareRoute`
@@ -135,28 +141,40 @@ Primary implementation references:
   - `WebView`
 - Current data written/read:
   - reads `profiles`, `creator_profiles`, `creator_affiliate_links`, `tribe_memberships`
+  - reads `support_scores`, `creator_rewards`, `reward_claims`, `share_links`
   - writes `tribe_memberships`
+  - writes `share_links` via `POST /api/share-links`
   - writes `routing_events`
   - routes through backend `/u/:userId/route`
+  - routes through backend `/s/:shortCode` (via external clicks on share links)
   - Implemented in: `apps/client/src/context/AppContext.js`
 - Current backend endpoints used:
   - `GET /u/:user_id/route?url=...`
-  - Implemented in: `services/backend/shopify-app/src/routes/redirect-routes.js`
+  - `POST /api/share-links`
+  - `GET /api/support/scores`
+  - `GET /api/creators/:creatorId/rewards`
+  - `POST /api/rewards/:rewardId/claim`
+  - `GET /s/:shortCode` (redirect endpoint, used by external visitors)
+  - Implemented in: `services/backend/redirect/src/routes/redirect-routes.js`
+  - Implemented in: `services/backend/redirect/src/routes/share-redirect-routes.js`
+  - Implemented in: `services/backend/api/src/routes/share-link-routes.js`
   - Used by: `apps/client/src/screens/HomeScreen.js`
   - Used by: `apps/client/src/screens/ShareRouteScreen.js`
+  - Used by: `apps/client/src/components/ShareSupportForm.js`
+  - Used by: `apps/client/src/components/SupportScoreCard.js`
 - Missing backend integration if any:
   - no authenticated ownership check from mobile token is passed on supporter `/u` calls today
   - `FallbackState` still describes unsupported-domain handling, but current primary flow routes through backend and may not hit that screen for Shopify cases
 
 ### Creator
 
-- Goal: create a creator identity, connect socials, add affiliate links, and connect brands/stores
+- Goal: create a creator identity, connect socials, add affiliate links, connect brands/stores, and create supporter rewards
 - Current entry point:
   - Implemented in: `apps/client/src/screens/LoginScreen.js`
   - Implemented in: `apps/client/src/screens/IntentSelectionScreen.js`
 - Current screens:
   - `CreatorOnboarding`
-  - `CreatorDashboard`
+  - `CreatorDashboard` (with Rewards tab for creating/managing supporter rewards)
   - `ConnectSocialAccounts`
   - `ConnectBrands`
   - `BrandProgramWebView`
@@ -166,14 +184,22 @@ Primary implementation references:
   - writes `creator_profiles`
   - writes `creator_social_connections`-style data through AppContext social methods
   - writes `creator_affiliate_links` directly for external affiliate URLs
+  - writes `creator_rewards` via `POST /api/creator/rewards`
+  - reads `creator_rewards` and `reward_claims` via `GET /api/creators/:creatorId/rewards`
   - uses backend `creator/brands` endpoints for Shopify store connections
   - Implemented in: `apps/client/src/context/AppContext.js`
 - Current backend endpoints used:
   - `GET /creator/brands?creator_id=...`
   - `POST /creator/brands`
   - `DELETE /creator/brands/:id`
+  - `POST /api/creator/rewards`
+  - `GET /api/creators/:creatorId/rewards`
   - Implemented in: `services/backend/shopify-app/src/routes/dashboard-routes.js`
+  - Implemented in: `services/backend/api/src/routes/creator-reward-routes.js`
   - Used by: `apps/client/src/context/AppContext.js`
+  - Used by: `apps/client/src/screens/CreatorDashboardScreen.js`
+  - Used by: `apps/client/src/components/CreateRewardForm.js`
+  - Used by: `apps/client/src/components/RewardCard.js`
 - Missing backend integration if any:
   - creator dashboard does not consume backend reporting endpoints such as `/creator/earnings`, `/creator/orders`, or `/creator/links`
   - external affiliate-link flow still writes directly to Supabase, not through backend
@@ -284,7 +310,7 @@ Primary implementation references:
 - Screen name: `Home`
 - File path: `apps/client/src/screens/HomeScreen.js`
 - User role: supporter
-- Purpose: paste a destination URL and route through backend attribution
+- Purpose: paste a destination URL and route through backend attribution; or create share links for creator content
 - Entry path:
   - `IntentSelection -> Home`
   - `Settings -> Home`
@@ -300,15 +326,20 @@ Primary implementation references:
 - Backend/Supabase calls:
   - constructs backend `/u/:userId/route` URL
   - writes `routing_events` via `recordRoutingEvent`
+  - calls backend `POST /api/share-links` when in Share tab mode
+  - calls backend `GET /api/support/scores` via `SupportScoreCard`
   - calls backend `GET /api/price-history/lookup?url=...` when Amazon or Flipkart link detected (debounced, 800ms)
   - Used by backend: `services/backend/shopify-app/src/routes/redirect-routes.js`
   - Used by backend: `services/backend/shopify-app/src/routes/price-history-routes.js`
+  - Used by backend: `services/backend/api/src/routes/share-link-routes.js`
 - Current UX issues:
   - the screen still previews tribe members and local weights, but backend is the final authority for eligible creator selection and Shopify snapshot construction
   - Amazon/Flipkart price history card appears below the shopping intel card; ProductHistory.in is tried first, PriceHistoryApp.com is fallback
 - Implementation notes:
   - no client-side affiliate rewrite remains in this screen
   - price history uses dual-provider backend orchestration with caching
+  - Shop/Share tab switcher at top of main card; Share mode shows ShareSupportForm component with creator picker
+  - SupportScoreCard in sidebar shows lifetime/monthly points per creator with next-reward progress
 
 ### CreatorDiscovery
 
@@ -417,7 +448,7 @@ Primary implementation references:
 - Screen name: `CreatorDashboard`
 - File path: `apps/client/src/screens/CreatorDashboardScreen.js`
 - User role: creator
-- Purpose: launch creator tools
+- Purpose: launch creator tools including reward creation and management
 - Entry path:
   - `CreatorOnboarding`
   - app start when signed-in creator already has profile
@@ -428,13 +459,18 @@ Primary implementation references:
   - `CreatorSelection`
 - Data source:
   - `currentCreator`
+  - reads `creator_rewards` via `GET /api/creators/:creatorId/rewards` (Rewards tab)
+  - reads `reward_claims` via `GET /api/creators/:creatorId/rewards` (Rewards tab)
 - Backend/Supabase calls:
-  - none directly in this screen
+  - calls `POST /api/creator/rewards` via `CreateRewardForm` (Rewards tab)
+  - calls `GET /api/creators/:creatorId/rewards` to populate rewards list (Rewards tab)
 - Current UX issues:
   - “Added brands” count is currently derived from `currentCreator.links` and does not clearly represent backend `creatorBrandLinks` Shopify associations
   - no creator earnings/orders reporting is surfaced here yet
 - Implementation notes:
-  - no creator earnings/orders reporting is surfaced here yet
+  - Rewards action tab shows `CreateRewardForm` component and lists existing rewards with `RewardCard` components
+  - Reward types: Early Access, Shared Community, Private AMA
+  - Delivery: external URL (Discord invite, Google Meet link, Notion page, etc.)
 
 ### ConnectBrands
 
@@ -890,6 +926,74 @@ Primary implementation references:
     - Shopify split attribution
     - house fallback
 
+### 8. Create share link for creator content
+
+- What user sees:
+  - `Home` screen Share tab: select a creator from tribe, paste a YouTube/Instagram/X URL, tap "Create support link"
+  - After creation: share URL, copy link, "+5 support points earned" badge
+- What code currently does:
+  - classifies URL platform via local detection, calls `POST /api/share-links` with creatorId and originalUrl
+  - backend validates creator_content URL, generates unique short code, persists `share_links` row, awards 5 points via `support_actions` + `support_scores`, returns full share URL
+- Whether it uses backend `/u/:userId/route`:
+  - no (separate endpoint: `POST /api/share-links`)
+- Whether it writes directly to Supabase:
+  - no; backend writes to `share_links`, `support_actions`, `support_scores`
+- Implementation in:
+  - `apps/client/src/components/ShareSupportForm.js`
+  - `services/backend/api/src/controllers/share-link-controller.js`
+  - `services/backend/api/src/routes/share-link-routes.js`
+- Current friction/UX issues:
+  - share URL uses `ATRIBE_REDIRECT_BASE_URL` or falls back to `ATRIBE_BASE_URL`
+
+### 9. External visitor clicks share link
+
+- What user sees:
+  - external visitor opens `https://go.atribe.io/s/:shortCode` and is redirected to the original creator content (YouTube, Instagram, X)
+- What code currently does:
+  - resolves `share_links.short_code`, creates `share_link_clicks` row with anti-abuse checks (self-click via auth, duplicate via fingerprint hash), awards 2 points to link's supporter if valid, increments click count, 302 redirects to `share_links.original_url`
+- Whether it uses backend `/u/:userId/route`:
+  - no (separate endpoint: `GET /s/:shortCode`)
+- Whether it writes directly to Supabase:
+  - no; backend writes to `share_link_clicks`, `support_actions`, `support_scores`
+- Implementation in:
+  - `services/backend/redirect/src/controllers/share-redirect-controller.js`
+  - `services/backend/redirect/src/routes/share-redirect-routes.js`
+- Current friction/UX issues:
+  - visitor privacy: only hashed IP, user-agent, and fingerprint stored; raw IPs not persisted
+
+### 10. View support scores
+
+- What user sees:
+  - `Home` screen sidebar: per-creator cards showing lifetime points, monthly points, next reward progress bar
+- What code currently does:
+  - calls `GET /api/support/scores`, enriches with creator names and next reward data from `creator_rewards`
+- Whether it uses backend `/u/:userId/route`:
+  - no (separate endpoint: `GET /api/support/scores`)
+- Whether it writes directly to Supabase:
+  - no; backend reads `support_scores`, `creator_rewards`, `shopify_creators`
+- Implementation in:
+  - `apps/client/src/components/SupportScoreCard.js`
+  - `services/backend/api/src/controllers/support-score-controller.js`
+  - `services/backend/api/src/routes/support-score-routes.js`
+- Current friction/UX issues:
+  - supporter must manually load scores; no auto-refresh
+
+### 11. Shopping link routing earns support points
+
+- What user sees:
+  - no explicit feedback in mobile UI; points are awarded server-side
+- What code currently does:
+  - after successful `GET /u/:user_id/route`, backend awards 20 support points for `shopping_link_routed` action, writes to `support_actions` and `support_scores`
+  - fire-and-forget; failure to award points does not break the redirect
+- Whether it uses backend `/u/:userId/route`:
+  - yes, hook inside `linkController.userRoute`
+- Whether it writes directly to Supabase:
+  - no; backend writes to `support_actions`, `support_scores`
+- Implementation in:
+  - `services/backend/redirect/src/controllers/link-controller.js`
+- Current friction/UX issues:
+  - no real-time feedback that points were earned; visible only via `GET /api/support/scores`
+
 ## 6. Creator Flow
 
 ### 1. Login / choose creator flow
@@ -958,13 +1062,31 @@ Primary implementation references:
 - Screen/file:
   - `apps/client/src/screens/CreatorDashboardScreen.js`
 - Data written:
-  - none
+  - none directly; `CreateRewardForm` in Rewards tab writes `creator_rewards` via backend
 - Whether backend creator endpoints are used:
-  - no
+  - yes for rewards: `GET /api/creators/:creatorId/rewards`, `POST /api/creator/rewards`
 - Whether direct Supabase writes happen:
   - no
 - Contradictions with `IMPLEMENTATION.md`:
-  - backend creator reporting endpoints exist, but this screen does not use them
+  - backend creator reporting endpoints (earnings, orders) exist but are not consumed by this screen
+  - rewards are now consumed via new support points API
+
+### 6. Create and manage supporter rewards
+
+- Screen/file:
+  - `apps/client/src/screens/CreatorDashboardScreen.js` (Rewards tab)
+  - `apps/client/src/components/CreateRewardForm.js`
+  - `apps/client/src/components/RewardCard.js`
+- Data written:
+  - `creator_rewards` via `POST /api/creator/rewards`
+- Data read:
+  - `creator_rewards` and `reward_claims` via `GET /api/creators/:creatorId/rewards`
+- Whether backend creator endpoints are used:
+  - yes
+- Whether direct Supabase writes happen:
+  - no
+- Contradictions with `IMPLEMENTATION.md`:
+  - rewards CRUD is fully backend-driven; no direct Supabase writes from mobile
 
 ## 7. Brand Flow
 
@@ -1102,6 +1224,8 @@ Primary implementation references:
 Landing / Login → Supabase auth + local navigation state → same → no major gap
 IntentSelection → local app-state role switch (supporter/creator/brand) → same → brand now has dedicated flow
 Home routing → backend /u + local routing_events → backend /u + richer supporter feedback → UI does not expose final routing outcome
+Home share → backend POST /api/share-links + support_scores → share link created, points awarded → share URL uses ATRIBE_REDIRECT_BASE_URL
+Home support scores → backend GET /api/support/scores + creator_rewards → supporter sees per-creator points and next-reward progress → manual load only
 ShareRoute → backend /u + local routing_events → same → outcome transparency gap
 CreatorDiscovery → direct Supabase tribe_memberships → same for selection storage → discover model still creator-centric
 CreatorSelection → direct Supabase tribe_memberships → same for selection storage → backend later normalizes eligible subset only
@@ -1112,7 +1236,11 @@ ConnectBrands external → direct Supabase via addAffiliateLink → same for now
 ConnectBrands Shopify → backend creator/brands via addAffiliateLink branch / webview flow → same → static catalog, not backend-driven
 BrandProgramWebView external → direct Supabase creator_affiliate_links → same for now → mixed model in one screen
 BrandProgramWebView Shopify → backend creator/brands → same → UI combines two different workflows
-CreatorDashboard → local creator state only → should eventually include backend reporting → backend data exists but is unused
+CreatorDashboard → local creator state + rewards API → should eventually include backend reporting → backend data exists but is unused
+Creator reward creation → backend POST /api/creator/rewards → creator_rewards row → creator-owned only
+Creator reward listing → backend GET /api/creators/:creatorId/rewards → enriched with supporter claim status → creator sees all, supporters see filtered
+Share redirect → backend GET /s/:shortCode → click tracked, points awarded, redirect to original URL → anti-abuse via fingerprint dedup
+Shopping points hook → backend /u/userRoute → 20pts awarded to supporter on successful routing → fire-and-forget, does not break redirect
 BrandOnboarding → backend GET /brand/shopify/install-status + local AsyncStorage → same → requires backend URL config
 BrandConnecting → backend /auth?shop=... + GET /brand/shopify/install-status poll → same → manual poll after OAuth
 BrandShopifySuccess → backend GET /brand/shopify/install-status sync → same → polling on mount

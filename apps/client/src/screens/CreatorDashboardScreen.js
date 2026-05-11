@@ -1,15 +1,18 @@
-import React, { useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { Text, View } from "react-native";
 import { useAppContext } from "../context";
 import {
   AppShell,
   BodyText,
   Card,
+  CreateRewardForm,
   PrimaryButton,
+  RewardCard,
   SecondaryButton,
   SectionHeader,
   StatTile
 } from "../components";
+import { fetchCreatorRewards, isAtribeBackendConfigured, supabase } from "../lib";
 import { theme } from "../theme";
 
 const ACTIONS = [
@@ -23,6 +26,14 @@ const ACTIONS = [
     detailLabel: "Generate smart links to your brands",
     detailBody: "Browse brand affiliations and move into link generation.",
     detailActionLabel: "Generate smart links"
+  },
+  {
+    id: "rewards",
+    label: "Rewards",
+    title: "Creator rewards",
+    body: "Create rewards for your shoppers to unlock with support points.",
+    primaryLabel: "Create a reward",
+    route: null,
   },
   {
     id: "socials",
@@ -52,19 +63,114 @@ const ACTIONS = [
 ];
 
 export default function CreatorDashboardScreen({ navigation }) {
-  const { currentCreator } = useAppContext();
+  const { currentCreator, session } = useAppContext();
   const [activeAction, setActiveAction] = useState("brands");
+  const [rewards, setRewards] = useState([]);
+  const [rewardsLoading, setRewardsLoading] = useState(false);
+  const [rewardsError, setRewardsError] = useState("");
   const addedBrandsCount = currentCreator?.links?.length || 0;
   const selectedAction = ACTIONS.find((action) => action.id === activeAction) || ACTIONS[0];
+
+  const loadRewards = useCallback(async () => {
+    if (!currentCreator?.id || !session?.id || session.mode === "demo") {
+      return;
+    }
+
+    if (!isAtribeBackendConfigured) {
+      return;
+    }
+
+    setRewardsLoading(true);
+    setRewardsError("");
+    try {
+      const { data } = await supabase.auth.getSession();
+      const accessToken = data.session?.access_token;
+      const payload = await fetchCreatorRewards({
+        creatorId: currentCreator.id,
+        accessToken,
+      });
+      setRewards(Array.isArray(payload) ? payload : []);
+    } catch (e) {
+      setRewardsError(e.message);
+    } finally {
+      setRewardsLoading(false);
+    }
+  }, [currentCreator?.id, session?.id, session?.mode]);
+
+  useEffect(() => {
+    if (activeAction === "rewards") {
+      loadRewards();
+    }
+  }, [activeAction, loadRewards]);
+
+  function renderActionContent() {
+    if (activeAction === "rewards") {
+      return (
+        <Card style={styles.primaryCard}>
+          <Text style={styles.primaryTitle}>Creator rewards</Text>
+          <BodyText>Create rewards and watch your shoppers level up.</BodyText>
+
+          <CreateRewardForm onCreated={loadRewards} />
+
+          {rewards.length > 0 ? (
+            <View style={styles.rewardsList}>
+              <Text style={styles.rewardsSectionTitle}>Your rewards</Text>
+              {rewards.map((reward) => (
+                <RewardCard key={reward.id} reward={reward} />
+              ))}
+            </View>
+          ) : rewardsLoading ? (
+            <BodyText>Loading rewards...</BodyText>
+          ) : null}
+
+          {rewardsError ? (
+            <BodyText style={{ color: theme.colors.errorText }}>{rewardsError}</BodyText>
+          ) : null}
+        </Card>
+      );
+    }
+
+    return (
+      <Card style={styles.primaryCard}>
+        <Text style={styles.primaryTitle}>{selectedAction.title}</Text>
+        <BodyText>{selectedAction.body}</BodyText>
+        {selectedAction.route ? (
+          <PrimaryButton
+            label={selectedAction.primaryLabel}
+            onPress={() =>
+              navigation.navigate(
+                selectedAction.route,
+                selectedAction.route === "ConnectSocialAccounts"
+                  ? { origin: "settings" }
+                  : undefined
+              )
+            }
+            variant="gradient"
+          />
+        ) : null}
+        {selectedAction.detailLabel ? (
+          <View style={styles.detailBlock}>
+            <Text style={styles.detailTitle}>{selectedAction.detailLabel}</Text>
+            <BodyText>{selectedAction.detailBody}</BodyText>
+            <PrimaryButton
+              label={selectedAction.detailActionLabel}
+              onPress={() => navigation.navigate("ConnectBrands")}
+            />
+          </View>
+        ) : null}
+        {selectedAction.footer ? (
+          <BodyText style={styles.emptyState}>{selectedAction.footer}</BodyText>
+        ) : null}
+      </Card>
+    );
+  }
 
   return (
     <AppShell
       navigation={navigation}
       activeRoute="CreatorDashboard"
-      title="Dashboard"
-      subtitle="Add links"
     >
-      <SectionHeader eyebrow="Add brands" title="Forge connections." />
+      <SectionHeader eyebrow="Creator dashboard" title="Forge connections." />
 
       <View style={styles.layout}>
         <View style={styles.mainColumn}>
@@ -82,35 +188,7 @@ export default function CreatorDashboardScreen({ navigation }) {
             </View>
           </Card>
 
-          <Card style={styles.primaryCard}>
-            <Text style={styles.primaryTitle}>{selectedAction.title}</Text>
-            <BodyText>{selectedAction.body}</BodyText>
-            <PrimaryButton
-              label={selectedAction.primaryLabel}
-              onPress={() =>
-                navigation.navigate(
-                  selectedAction.route,
-                  selectedAction.route === "ConnectSocialAccounts"
-                    ? { origin: "settings" }
-                    : undefined
-                )
-              }
-              variant="gradient"
-            />
-            {selectedAction.detailLabel ? (
-              <View style={styles.detailBlock}>
-                <Text style={styles.detailTitle}>{selectedAction.detailLabel}</Text>
-                <BodyText>{selectedAction.detailBody}</BodyText>
-                <PrimaryButton
-                  label={selectedAction.detailActionLabel}
-                  onPress={() => navigation.navigate("ConnectBrands")}
-                />
-              </View>
-            ) : null}
-            {selectedAction.footer ? (
-              <BodyText style={styles.emptyState}>{selectedAction.footer}</BodyText>
-            ) : null}
-          </Card>
+          {renderActionContent()}
         </View>
 
         <View style={styles.sideColumn}>
@@ -173,5 +251,14 @@ const styles = {
   },
   emptyState: {
     color: theme.colors.textMuted
-  }
+  },
+  rewardsList: {
+    gap: theme.spacing.md,
+  },
+  rewardsSectionTitle: {
+    color: theme.colors.textPrimary,
+    fontFamily: theme.fonts.serif,
+    fontSize: 22,
+    lineHeight: 28,
+  },
 };

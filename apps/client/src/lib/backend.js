@@ -46,23 +46,14 @@ const getLocalWebBackendUrl = () => {
     return explicitOverride;
   }
 
-  const localOrigin = normalizeBaseUrl(`http://${hostname}:${LOCAL_BACKEND_PORT}`);
   const bundledBackendUrl = getBundledBackendUrl();
-
-  if (!bundledBackendUrl) {
-    return localOrigin;
+  if (bundledBackendUrl) {
+    return "";
   }
 
-  try {
-    const bundledHostname = new URL(bundledBackendUrl).hostname.toLowerCase();
-    if (!LOCAL_WEB_HOSTS.has(bundledHostname)) {
-      return localOrigin;
-    }
-  } catch {
-    return localOrigin;
-  }
-
-  return "";
+  // Local web runs on a different origin than the API, so use the colocated
+  // backend only when no explicit backend URL has been configured.
+  return normalizeBaseUrl(`http://${hostname}:${LOCAL_BACKEND_PORT}`);
 };
 
 export const atribeBackendUrl = getLocalWebBackendUrl() || getBundledBackendUrl();
@@ -119,7 +110,7 @@ export function buildSupporterRouteUrl({ userId, destinationUrl }) {
   const normalizedDestinationUrl = String(destinationUrl || "").trim();
 
   if (!normalizedUserId) {
-    throw new Error("A signed-in supporter account is required before routing links.");
+    throw new Error("A signed-in shopper account is required before routing links.");
   }
 
   if (!normalizedDestinationUrl) {
@@ -199,4 +190,59 @@ function parseJsonResponse(text) {
   } catch {
     return {};
   }
+}
+
+export async function createShareLink({ creatorId, originalUrl, accessToken }) {
+  return backendJson("/api/share-links", {
+    method: "POST",
+    accessToken,
+    body: {
+      creatorId,
+      originalUrl,
+    },
+  });
+}
+
+export async function fetchSupportScores(accessToken) {
+  return backendJson("/api/support/scores", {
+    accessToken,
+  });
+}
+
+export async function fetchCreatorRewards({ creatorId, accessToken }) {
+  return backendJson(`/api/creators/${encodeURIComponent(creatorId)}/rewards`, {
+    accessToken,
+  });
+}
+
+export async function createCreatorReward({
+  title,
+  description,
+  rewardType,
+  requiredPoints,
+  deliveryType,
+  destinationUrl,
+  isActive,
+  accessToken,
+}) {
+  return backendJson("/api/creator/rewards", {
+    method: "POST",
+    accessToken,
+    body: {
+      title,
+      description,
+      rewardType,
+      requiredPoints,
+      deliveryType,
+      destinationUrl,
+      isActive,
+    },
+  });
+}
+
+export async function claimReward({ rewardId, accessToken }) {
+  return backendJson(`/api/rewards/${encodeURIComponent(rewardId)}/claim`, {
+    method: "POST",
+    accessToken,
+  });
 }

@@ -294,6 +294,11 @@ export default function CreatorOnboardingScreen({ navigation }) {
   }
 
   async function handleContinue() {
+    if (!creatorName.trim()) {
+      Alert.alert("Creator onboarding", "Enter a creator name.");
+      return;
+    }
+
     if (!selectedPlatforms.length) {
       Alert.alert("Creator onboarding", "Select at least one platform.");
       return;
@@ -455,7 +460,7 @@ export default function CreatorOnboardingScreen({ navigation }) {
         ) : null}
         {connectionError ? <Text style={styles.errorText}>{connectionError}</Text> : null}
         <PrimaryButton
-          disabled={!hasConnectedSelectedSocial || !hasMinimumNiches}
+          disabled={!creatorName.trim() || !selectedPlatforms.length || !hasMinimumNiches}
           label="Continue to dashboard"
           onPress={handleContinue}
         />

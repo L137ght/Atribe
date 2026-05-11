@@ -134,13 +134,11 @@ export default function SettingsScreen({ navigation }) {
     <AppShell
       navigation={navigation}
       activeRoute="Settings"
-      title="Settings"
-      subtitle={session?.email}
     >
       <SectionHeader
         eyebrow="Workspace"
         title="Preferences and access"
-        body="Settings now combines account controls with tribe management to keep navigation lighter."
+        body="Manage your account details and your creator tribe."
       />
 
       {tutorialActive && currentTutorialStep?.screen === "Settings" ? (
@@ -157,7 +155,7 @@ export default function SettingsScreen({ navigation }) {
         <Card style={styles.sectionCard}>
           <Text style={styles.cardTitle}>Current tribe</Text>
           <BodyText>
-            Manage the creators you route through here, then tune their weighting when weighted mode is active.
+            Choose which creators receive your support and adjust how your purchases are shared among them.
           </BodyText>
 
           {selectedCreators.length ? (
@@ -262,13 +260,13 @@ export default function SettingsScreen({ navigation }) {
         <Card style={styles.sectionCard}>
           <Text style={styles.cardTitle}>Active role</Text>
           <BodyText>
-            Supporters see routing and tribe tools. Creators manage profile and partnerships. Brands connect Shopify and launch creator campaigns.
+            Shoppers see routing and tribe tools. Creators manage profile and partnerships. Brands connect Shopify and launch creator campaigns.
           </BodyText>
 
           <View style={styles.roleStack}>
             <View style={[styles.roleCard, intent === "supporter" && styles.roleCardActive]}>
               <View style={styles.roleCopy}>
-                <Text style={styles.roleTitle}>Supporter</Text>
+                <Text style={styles.roleTitle}>Shopper</Text>
                 <BodyText>Route links and support your selected creators.</BodyText>
               </View>
               <SecondaryButton
@@ -390,7 +388,7 @@ export default function SettingsScreen({ navigation }) {
         <Card style={styles.sectionCard}>
           <Text style={styles.cardTitle}>Routing</Text>
           <BodyText>
-            Choose whether tribe routing uses custom weights or splits attribution evenly across selected creators.
+            Choose how to distribute your support among your selected creators.
           </BodyText>
 
           <View style={styles.modeStack}>
@@ -402,7 +400,7 @@ export default function SettingsScreen({ navigation }) {
             >
               <View style={styles.roleCopy}>
                 <Text style={styles.roleTitle}>Weighted</Text>
-                <BodyText>Keep manual percentages and show the weight sliders.</BodyText>
+                <BodyText>Set a specific support percentage for each creator.</BodyText>
               </View>
               <SecondaryButton
                 compact
@@ -418,7 +416,7 @@ export default function SettingsScreen({ navigation }) {
               <View style={styles.roleCopy}>
                 <Text style={styles.roleTitle}>Even split</Text>
                 <BodyText>
-                  Distribute attribution equally and hide manual weight controls.
+                  Support all selected creators equally.
                 </BodyText>
               </View>
               <PrimaryButton

@@ -6,7 +6,8 @@
   "main": "src/server.js",
   "scripts": {
     "dev": "node src/server.js",
-    "start": "node src/server.js"
+    "start": "node src/server.js",
+    "seed:support-feature-dev": "node src/scripts/seed-support-feature-dev.mjs"
   },
   "dependencies": {
     "@shopify/shopify-api": "^12.0.0",

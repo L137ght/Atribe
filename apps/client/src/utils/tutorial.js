@@ -4,7 +4,7 @@ export const TUTORIAL_STEPS = [
     screen: "Home",
     title: "Route links from your home workspace",
     body:
-      "Paste a destination URL here to generate a creator-attributed smart link. This is the main post-login workspace where supporters preview who benefits before opening a product.",
+      "Paste a destination URL here to generate a creator-attributed smart link. This is the main post-login workspace where shoppers preview who benefits before opening a product.",
     points: [
       "Use the destination URL field to start any routing event.",
       "Your selected tribe and supported creator count are summarized before you route.",
@@ -30,7 +30,7 @@ export const TUTORIAL_STEPS = [
     screen: "CreatorSelection",
     title: "Adjust attribution with weight sliders",
     body:
-      "Weight sliders let supporters suggest how much routing influence each creator should receive. Higher percentages make a creator more likely to be chosen over time.",
+      "Weight sliders let shoppers suggest how much routing influence each creator should receive. Higher percentages make a creator more likely to be chosen over time.",
     points: [
       "Search within your tribe from this page if you already know who you want to tune.",
       "Use the plus and minus controls to raise or lower each creator's share.",
@@ -45,7 +45,7 @@ export const TUTORIAL_STEPS = [
     body:
       "Settings is where users manage account details, switch roles, and choose whether attribution uses custom weights or an even split.",
     points: [
-      "Switch between supporter and creator roles here.",
+      "Switch between shopper and creator roles here.",
       "Change routing mode here when you want equal distribution instead of sliders.",
       "Replay this tutorial from settings any time."
     ],

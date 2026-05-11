@@ -82,7 +82,7 @@ export default function BrandOnboardingScreen({ navigation }) {
             <Card style={styles.noticeCard}>
               <Text style={styles.noticeTitle}>Backend configuration required</Text>
               <BodyText>
-                Set `EXPO_PUBLIC_ATRIBE_BACKEND_URL` before connecting Shopify from the mobile app.
+                Shopify connection is currently unavailable in this build.
               </BodyText>
             </Card>
           ) : null}

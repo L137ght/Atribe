@@ -193,7 +193,7 @@ export default function ConnectBrandsScreen({ navigation }) {
       <SectionHeader
         eyebrow="Partnerships"
         title="Connect brands"
-        body="Join brand programs to earn everytime your supporters purchase from that brand"
+        body="Join brand programs to earn everytime your shoppers purchase from that brand"
       />
 
       <Card style={styles.searchCard}>

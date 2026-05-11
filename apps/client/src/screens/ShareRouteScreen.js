@@ -166,7 +166,7 @@ export default function ShareRouteScreen({ navigation, route }) {
           <Kicker>Backend required</Kicker>
           <Text style={styles.cardTitle}>Use a signed-in account for routed links.</Text>
           <BodyText>
-            Demo sessions do not map to backend supporter identities, so backend routing is unavailable.
+            Shopping links cannot be generated while using a demo account.
           </BodyText>
         </Card>
       );
@@ -194,7 +194,7 @@ export default function ShareRouteScreen({ navigation, route }) {
           <Kicker>Configuration</Kicker>
           <Text style={styles.cardTitle}>Backend routing is not configured.</Text>
           <BodyText>
-            Set `EXPO_PUBLIC_ATRIBE_BACKEND_URL` before using supporter link routing from the mobile app.
+            Shopping links are currently unavailable in this build.
           </BodyText>
         </Card>
       );
@@ -273,7 +273,6 @@ export default function ShareRouteScreen({ navigation, route }) {
     <AppShell
       activeRoute={intent === "creator" ? "CreatorDashboard" : "Home"}
       navigation={navigation}
-      title="Route this link"
     >
       <SectionHeader
         eyebrow="Share sheet"

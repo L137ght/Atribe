@@ -276,8 +276,6 @@ export default function ConnectSocialAccountsScreen({ navigation, route }) {
       navigation={navigation}
       activeRoute="Settings"
       hideNavigation={origin === "onboarding"}
-      title={origin === "onboarding" ? undefined : "Connect socials"}
-      subtitle={origin === "onboarding" ? undefined : "Link your social profiles."}
     >
       <SectionHeader
         eyebrow={origin === "onboarding" ? "Creator flow" : "Creator identity"}

@@ -267,6 +267,107 @@ db.exec(`
 `);
 
 db.exec(`
+  CREATE TABLE IF NOT EXISTS support_actions (
+    id TEXT PRIMARY KEY,
+    supporter_id TEXT,
+    creator_id TEXT,
+    action_type TEXT NOT NULL,
+    points INTEGER NOT NULL DEFAULT 0,
+    source_type TEXT,
+    source_url TEXT,
+    destination_url TEXT,
+    share_link_id TEXT,
+    reward_id TEXT,
+    metadata TEXT NOT NULL DEFAULT '{}',
+    created_at TEXT NOT NULL
+  );
+`);
+
+db.exec(`
+  CREATE TABLE IF NOT EXISTS support_scores (
+    id TEXT PRIMARY KEY,
+    supporter_id TEXT NOT NULL,
+    creator_id TEXT NOT NULL,
+    lifetime_points INTEGER NOT NULL DEFAULT 0,
+    monthly_points INTEGER NOT NULL DEFAULT 0,
+    last_action_at TEXT,
+    created_at TEXT NOT NULL,
+    updated_at TEXT NOT NULL,
+    UNIQUE(supporter_id, creator_id)
+  );
+`);
+
+db.exec(`
+  CREATE TABLE IF NOT EXISTS share_links (
+    id TEXT PRIMARY KEY,
+    short_code TEXT NOT NULL UNIQUE,
+    supporter_id TEXT,
+    creator_id TEXT,
+    original_url TEXT NOT NULL,
+    normalized_url TEXT,
+    platform TEXT,
+    title TEXT,
+    content_type TEXT,
+    click_count INTEGER NOT NULL DEFAULT 0,
+    owner_ip_hash TEXT,
+    owner_user_agent_hash TEXT,
+    owner_fingerprint_hash TEXT,
+    created_at TEXT NOT NULL,
+    last_clicked_at TEXT
+  );
+`);
+
+ensureColumn("share_links", "owner_ip_hash", "TEXT");
+ensureColumn("share_links", "owner_user_agent_hash", "TEXT");
+ensureColumn("share_links", "owner_fingerprint_hash", "TEXT");
+
+db.exec(`
+  CREATE TABLE IF NOT EXISTS share_link_clicks (
+    id TEXT PRIMARY KEY,
+    share_link_id TEXT NOT NULL,
+    visitor_user_id TEXT,
+    visitor_fingerprint_hash TEXT,
+    ip_hash TEXT,
+    user_agent_hash TEXT,
+    awarded_points INTEGER NOT NULL DEFAULT 0,
+    was_self_click INTEGER NOT NULL DEFAULT 0,
+    was_duplicate INTEGER NOT NULL DEFAULT 0,
+    referrer TEXT,
+    created_at TEXT NOT NULL,
+    FOREIGN KEY(share_link_id) REFERENCES share_links(id)
+  );
+`);
+
+db.exec(`
+  CREATE TABLE IF NOT EXISTS creator_rewards (
+    id TEXT PRIMARY KEY,
+    creator_id TEXT NOT NULL,
+    title TEXT NOT NULL,
+    description TEXT,
+    reward_type TEXT NOT NULL,
+    required_points INTEGER NOT NULL DEFAULT 0,
+    delivery_type TEXT NOT NULL DEFAULT 'external_url',
+    destination_url TEXT,
+    is_active INTEGER NOT NULL DEFAULT 1,
+    starts_at TEXT,
+    ends_at TEXT,
+    created_at TEXT NOT NULL,
+    updated_at TEXT NOT NULL
+  );
+`);
+
+db.exec(`
+  CREATE TABLE IF NOT EXISTS reward_claims (
+    id TEXT PRIMARY KEY,
+    reward_id TEXT NOT NULL,
+    supporter_id TEXT NOT NULL,
+    creator_id TEXT NOT NULL,
+    claimed_at TEXT NOT NULL,
+    UNIQUE(reward_id, supporter_id)
+  );
+`);
+
+db.exec(`
   CREATE TABLE IF NOT EXISTS shopify_orders (
     order_id TEXT NOT NULL,
     shop_domain TEXT NOT NULL,

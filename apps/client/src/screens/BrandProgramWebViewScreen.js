@@ -306,7 +306,7 @@ export default function BrandProgramWebViewScreen({ navigation, route }) {
           </Text>
           {isShopifyConnection ? (
             <BodyText>
-              Shopify store associations are written through the backend. External affiliate URLs still save directly to your creator affiliate-link data.
+              Shopify stores are connected securely to your account. External affiliate links are saved directly to your profile.
             </BodyText>
           ) : null}
           {showLinkForm ? (
@@ -379,7 +379,7 @@ export default function BrandProgramWebViewScreen({ navigation, route }) {
                   <View style={{ flex: 1, gap: 4 }}>
                     <Text style={styles.linkDomain}>{link.shopDomain}</Text>
                     <BodyText numberOfLines={2}>
-                      Shopify backend connection · status {link.status}
+                      Shopify connection · {link.status}
                     </BodyText>
                   </View>
                 </View>

@@ -48,7 +48,7 @@ export default function LoginScreen({ navigation }) {
   const demoAccounts = [
     {
       email: "supporter@atribe.app",
-      label: "Use supporter demo",
+      label: "Use shopper demo",
       password: "AtribeDemo123!"
     },
     {

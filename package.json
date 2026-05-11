@@ -20,6 +20,7 @@
     "redirect:start": "npm --workspace @atribe/redirect run start",
     "redirect:dev": "npm --workspace @atribe/redirect run dev",
     "shopify:start": "npm --workspace @atribe/shopify-app run start",
-    "shopify:dev": "npm --workspace @atribe/shopify-app run dev"
+    "shopify:dev": "npm --workspace @atribe/shopify-app run dev",
+    "test:support-feature": "node --test packages/domain/test/*.test.js services/backend/api/test/*.test.js services/backend/redirect/test/*.test.js services/backend/shopify-app/test/*.test.js"
   }
 }

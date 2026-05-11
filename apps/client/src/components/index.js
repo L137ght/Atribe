@@ -4,3 +4,8 @@ export { default as PriceHistoryCard } from "./PriceHistoryCard";
 export { default as ShoppingIntelCard } from "./ShoppingIntelCard";
 export { default as ShareIntentBootstrap } from "./ShareIntentBootstrap";
 export { default as TutorialCallout } from "./TutorialCallout";
+export { default as ShareSupportForm } from "./ShareSupportForm";
+export { SupportScoreCard } from "./SupportScoreCard";
+export { RewardCard } from "./RewardCard";
+export { CreateRewardForm } from "./CreateRewardForm";
+export { SupporterRewardsPanel } from "./SupporterRewardsPanel";

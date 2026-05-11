@@ -28,7 +28,7 @@ export default function BrandHomeScreen({ navigation }) {
       <SectionHeader
         eyebrow="Brand home"
         title="Your creator-powered sales channel is live"
-        body="This is the minimal brand status view. Use it to confirm your store is connected and your first campaign is active."
+        body="Confirm your store is connected and your first campaign is active."
       />
 
       <View style={styles.statsRow}>

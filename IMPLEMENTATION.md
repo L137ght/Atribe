@@ -72,9 +72,15 @@ Documentation-only rule:
 - `api.atribe.io/api/price-history/lookup` → `services/backend/api`
 - `api.atribe.io/creator/*` → `services/backend/api`
 - `api.atribe.io/brand/*` → `services/backend/api`
+- `api.atribe.io/api/share-links` → `services/backend/api`
+- `api.atribe.io/api/support/scores` → `services/backend/api`
+- `api.atribe.io/api/creators/:creatorId/rewards` → `services/backend/api`
+- `api.atribe.io/api/creator/rewards` → `services/backend/api`
+- `api.atribe.io/api/rewards/:rewardId/claim` → `services/backend/api`
 - `api.atribe.io/links/create` → `services/backend/redirect`
 - `api.atribe.io/u/:user_id/route` → `services/backend/redirect`
 - `api.atribe.io/r/:creator_id/:link_id` → `services/backend/redirect`
+- `api.atribe.io/s/:shortCode` → `services/backend/redirect`
 - `api.atribe.io/auth/*` → `services/backend/shopify-app`
 - `api.atribe.io/webhooks/*` → `services/backend/shopify-app`
 - `api.atribe.io/storefront/*` → `services/backend/shopify-app`
@@ -116,10 +122,14 @@ services/backend/src/createApp.js
   ├── createApiApp()       ← services/backend/api/src/createApp.js
   │     ├── dashboardRouter (creator/brand endpoints)
   │     ├── debugRouter (dev-only)
-  │     └── priceHistoryRouter
+  │     ├── priceHistoryRouter
+  │     ├── shareLinkRouter (POST /api/share-links)
+  │     ├── supportScoreRouter (GET /api/support/scores)
+  │     └── creatorRewardRouter (rewards CRUD + claim)
   ├── createRedirectApp()  ← services/backend/redirect/src/createApp.js
   │     ├── linkRouter (POST /links/create)
-  │     └── redirectRouter (GET /u/:user_id/route, GET /r/:creator_id/:link_id)
+  │     ├── redirectRouter (GET /u/:user_id/route, GET /r/:creator_id/:link_id)
+  │     └── shareRedirectRouter (GET /s/:shortCode)
   └── createShopifyApp()   ← services/backend/shopify-app/src/createShopifyApp.js
         ├── authRouter (GET /auth, GET /auth/callback)
         ├── storefrontRouter (GET /storefront/atribe.js)
@@ -141,6 +151,8 @@ The implemented backend mounts from `services/backend/src/createApp.js`. It serv
 - Shopify app install/auth
 - legacy creator redirect routing
 - supporter `/u/:user_id/route` routing
+- share link redirect (`/s/:shortCode`)
+- share link creation, support scores, and creator rewards API
 - creator and brand reporting endpoints
 - Shopify webhook ingestion
 - storefront attribution script
@@ -246,6 +258,15 @@ Implemented in: `services/backend/shopify-app/src/repositories/order-attribution
   - Writes: `shopify_links`, `shopify_creator_coupon_mappings`
   - Not currently used by mobile UI: `apps/client/src/screens/*`
 
+- `GET /s/:shortCode`
+  - Share redirect path for supporter-generated content links.
+  - Resolves short code, records click with anti-abuse checks (self-click and duplicate fingerprint detection), awards support points to the link's supporter, increments click count, redirects to original content URL.
+  - Implemented in: `services/backend/redirect/src/routes/share-redirect-routes.js`
+  - Implemented in: `services/backend/redirect/src/controllers/share-redirect-controller.js`
+  - Reads: `share_links`, `share_link_clicks`
+  - Writes: `share_link_clicks`, `support_actions`, `support_scores`
+  - Used by: external visitors clicking supporter share links
+
 ### Storefront attribution surface
 
 - `GET /storefront/atribe.js`
@@ -306,6 +327,49 @@ Implemented in: `services/backend/shopify-app/src/repositories/order-attribution
   - Implemented in: `services/backend/shopify-app/src/services/priceHistory/providers.js` (shared fetch)
   - Used by: `apps/client/src/lib/priceHistory.js`
   - Used by: `apps/client/src/screens/HomeScreen.js` (via `PriceHistoryCard`)
+
+### Support points & rewards API
+
+- `POST /api/share-links`
+  - Creates a supporter-generated share link for YouTube, Instagram, or X/Twitter content.
+  - Classifies URL via `classifyUrl()`, validates creator_content platform match, generates unique short code, persists to `share_links`, awards 5 support points.
+  - Requires authenticated supporter.
+  - Implemented in: `services/backend/api/src/routes/share-link-routes.js`
+  - Implemented in: `services/backend/api/src/controllers/share-link-controller.js`
+  - Writes: `share_links`, `support_actions`, `support_scores`
+  - Used by: `apps/client/src/components/ShareSupportForm.js`
+
+- `GET /api/support/scores`
+  - Returns all support scores for the authenticated supporter, enriched with creator name and next reward progress.
+  - Implemented in: `services/backend/api/src/routes/support-score-routes.js`
+  - Implemented in: `services/backend/api/src/controllers/support-score-controller.js`
+  - Reads: `support_scores`, `creator_rewards`, `shopify_creators`
+  - Used by: `apps/client/src/components/SupportScoreCard.js`
+
+- `GET /api/creators/:creatorId/rewards`
+  - Returns active rewards for a creator with supporter-specific unlock/claim status.
+  - Destination URLs only exposed when unlocked and claimed, or when requester is the creator.
+  - Implemented in: `services/backend/api/src/routes/creator-reward-routes.js`
+  - Implemented in: `services/backend/api/src/controllers/creator-reward-controller.js`
+  - Reads: `creator_rewards`, `support_scores`, `reward_claims`
+  - Used by: `apps/client/src/screens/CreatorDashboardScreen.js`
+
+- `POST /api/creator/rewards`
+  - Creator creates a reward (early_access, shared_community, or private_ama).
+  - Requires authenticated creator, creator-owned only.
+  - Implemented in: `services/backend/api/src/routes/creator-reward-routes.js`
+  - Implemented in: `services/backend/api/src/controllers/creator-reward-controller.js`
+  - Writes: `creator_rewards`
+  - Used by: `apps/client/src/components/CreateRewardForm.js`
+
+- `POST /api/rewards/:rewardId/claim`
+  - Supporter claims an unlocked reward.
+  - Validates eligibility, creates claim record, awards 0 points, returns destination URL.
+  - Returns `not_enough_points` error with remaining points if ineligible.
+  - Implemented in: `services/backend/api/src/routes/creator-reward-routes.js`
+  - Implemented in: `services/backend/api/src/controllers/creator-reward-controller.js`
+  - Writes: `reward_claims`, `support_actions`
+  - Used by: `apps/client/src/components/RewardCard.js`
 
 ### Creator-facing endpoints
 
@@ -482,6 +546,46 @@ Not currently used by production UI: `apps/client/src/screens/*`
   - Backend-owned creator↔shop association table.
   - Implemented in: `services/backend/shopify-app/src/repositories/creator-brand-link-repository.js`
 
+- `support_actions`
+  - Records every meaningful supporter action (share link creation, share link click, shopping link routed, reward claimed).
+  - Implemented in: `services/backend/shopify-app/src/repositories/support-action-repository.js`
+  - Written by: share-link API, share redirect, shopping routing hook
+  - Migration: `supabase/migrations/20260509120000_add_support_points_rewards_and_share_links.sql`
+
+- `support_scores`
+  - Fast read model for creator-specific supporter lifetime and monthly points.
+  - Upserted on every support action.
+  - Implemented in: `services/backend/shopify-app/src/repositories/support-score-repository.js`
+  - Written by: share-link API, share redirect, shopping routing hook
+  - Migration: `supabase/migrations/20260509120000_add_support_points_rewards_and_share_links.sql`
+
+- `share_links`
+  - Tracks supporter-generated links to creator content (YouTube, Instagram, X/Twitter).
+  - Stores short code, original/normalized URL, platform, content type, click count.
+  - Implemented in: `services/backend/shopify-app/src/repositories/share-link-repository.js`
+  - Written by: `POST /api/share-links`
+  - Migration: `supabase/migrations/20260509120000_add_support_points_rewards_and_share_links.sql`
+
+- `share_link_clicks`
+  - Anti-abuse and analytics table for share link visits.
+  - Tracks visitor fingerprint, IP hash, user-agent hash, self-click and duplicate detection.
+  - Implemented in: `services/backend/shopify-app/src/repositories/share-click-repository.js`
+  - Written by: `GET /s/:shortCode`
+  - Migration: `supabase/migrations/20260509120000_add_support_points_rewards_and_share_links.sql`
+
+- `creator_rewards`
+  - Creator-defined rewards (early_access, shared_community, private_ama) with required points and destination URLs.
+  - Implemented in: `services/backend/shopify-app/src/repositories/creator-reward-repository.js`
+  - Written by: `POST /api/creator/rewards`
+  - Migration: `supabase/migrations/20260509120000_add_support_points_rewards_and_share_links.sql`
+
+- `reward_claims`
+  - Tracks which supporters have claimed which rewards.
+  - Unique constraint on (reward_id, supporter_id).
+  - Implemented in: `services/backend/shopify-app/src/repositories/reward-claim-repository.js`
+  - Written by: `POST /api/rewards/:rewardId/claim`
+  - Migration: `supabase/migrations/20260509120000_add_support_points_rewards_and_share_links.sql`
+
 - `shopify_links`
   - Legacy creator-owned tracking links.
   - Implemented in: `services/backend/shopify-app/src/repositories/link-repository.js`
@@ -548,6 +652,24 @@ Not currently used by production UI: `apps/client/src/screens/*`
   - `shopify_order_commissions`
   - implemented in: `services/backend/shopify-app/src/services/order-attribution-service.js`
   - implemented in: `services/backend/shopify-app/src/services/commission-service.js`
+
+- Support points truth today:
+  - `support_actions` — immutable audit log of every action
+  - `support_scores` — fast read model, creator-specific lifetime + monthly points
+  - implemented in: `services/backend/shopify-app/src/repositories/support-action-repository.js`
+  - implemented in: `services/backend/shopify-app/src/repositories/support-score-repository.js`
+
+- Share link truth today:
+  - `share_links` — supporter-generated content share links with short codes
+  - `share_link_clicks` — anti-abuse click tracking with fingerprint deduplication
+  - implemented in: `services/backend/shopify-app/src/repositories/share-link-repository.js`
+  - implemented in: `services/backend/shopify-app/src/repositories/share-click-repository.js`
+
+- Creator rewards truth today:
+  - `creator_rewards` — reward definitions (type, points required, destination URL)
+  - `reward_claims` — supporter claim records
+  - implemented in: `services/backend/shopify-app/src/repositories/creator-reward-repository.js`
+  - implemented in: `services/backend/shopify-app/src/repositories/reward-claim-repository.js`
 
 ## User Flow Mapping
 
@@ -800,6 +922,30 @@ Not currently used by production UI: `apps/client/src/screens/*`
   - Implemented in: `apps/client/src/lib/priceHistory.js`
   - Implemented in: `apps/client/src/components/PriceHistoryCard.js`
   - Used by: `apps/client/src/screens/HomeScreen.js`
+
+- Supporter share links for creator content (YouTube, Instagram, X/Twitter).
+  - Backend: URL classification (`packages/domain/src/url-classifier.js`), short code generation (`packages/domain/src/short-code.js`), share link creation API, share redirect with anti-abuse.
+  - Implemented in: `services/backend/api/src/controllers/share-link-controller.js`
+  - Implemented in: `services/backend/redirect/src/controllers/share-redirect-controller.js`
+  - Mobile: ShareSupportForm component with platform detection, creator picker, and success state.
+  - Implemented in: `apps/client/src/components/ShareSupportForm.js`
+  - Used by: `apps/client/src/screens/HomeScreen.js` (Share tab)
+
+- Support points system with creator-specific scoring.
+  - Backend: point rules (`packages/domain/src/support-points.js`), 20pts shopping route, 5pts share created, 2pts share clicked, 0pts reward claimed.
+  - Shopping routing hook in `GET /u/:user_id/route` awards points on successful routing.
+  - Implemented in: `services/backend/redirect/src/controllers/link-controller.js`
+  - Mobile: SupportScoreCard with lifetime/monthly points display and next reward progress bar.
+  - Implemented in: `apps/client/src/components/SupportScoreCard.js`
+
+- Creator rewards (Early Access, Shared Community, Private AMA) with point-based unlocking.
+  - Backend: reward creation API (creator-owned), reward listing with supporter-specific status, claim API with eligibility check.
+  - Implemented in: `services/backend/api/src/controllers/creator-reward-controller.js`
+  - Domain logic: `packages/domain/src/reward-access.js` (`canUnlockReward`, `getRewardStatus`)
+  - Mobile: CreateRewardForm on CreatorDashboard, RewardCard with claim button, destination URL revealed only after unlocking.
+  - Implemented in: `apps/client/src/components/CreateRewardForm.js`
+  - Implemented in: `apps/client/src/components/RewardCard.js`
+  - Used by: `apps/client/src/screens/CreatorDashboardScreen.js` (Rewards tab)
 
 ### Implemented but not currently wired into UI
 

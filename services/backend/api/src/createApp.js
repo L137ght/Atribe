@@ -15,6 +15,9 @@ import { corsMiddleware } from "../../shopify-app/src/middleware/cors.js";
 import { dashboardRouter } from "./routes/dashboard-routes.js";
 import { debugRouter } from "./routes/debug-routes.js";
 import { priceHistoryRouter } from "./routes/price-history-routes.js";
+import { shareLinkRouter } from "./routes/share-link-routes.js";
+import { supportScoreRouter } from "./routes/support-score-routes.js";
+import { creatorRewardRouter } from "./routes/creator-reward-routes.js";
 
 export function createApiApp() {
   const app = express();
@@ -29,6 +32,10 @@ export function createApiApp() {
   }
   app.use("/price-history", priceHistoryRouter);
   app.use("/api/price-history", priceHistoryRouter);
+
+  app.use("/api/share-links", shareLinkRouter);
+  app.use("/api/support", supportScoreRouter);
+  app.use("/api", creatorRewardRouter);
 
   return app;
 }

@@ -1,5 +1,6 @@
-import React from "react";
+import React, { useEffect, useRef } from "react";
 import {
+  Animated,
   Platform,
   Pressable,
   SafeAreaView,
@@ -156,8 +157,174 @@ function LandingGhostButton({ label, onPress }) {
   );
 }
 
+function AnimatedNotificationPill({ text, delay, style }) {
+  const translateY = useRef(new Animated.Value(20)).current;
+  const opacity = useRef(new Animated.Value(0)).current;
+
+  useEffect(() => {
+    const animation = Animated.loop(
+      Animated.sequence([
+        Animated.delay(delay),
+        Animated.parallel([
+          Animated.timing(translateY, {
+            toValue: 0,
+            duration: 800,
+            useNativeDriver: true,
+          }),
+          Animated.timing(opacity, {
+            toValue: 1,
+            duration: 800,
+            useNativeDriver: true,
+          }),
+        ]),
+        Animated.delay(3000),
+        Animated.parallel([
+          Animated.timing(translateY, {
+            toValue: -20,
+            duration: 800,
+            useNativeDriver: true,
+          }),
+          Animated.timing(opacity, {
+            toValue: 0,
+            duration: 800,
+            useNativeDriver: true,
+          }),
+        ]),
+        Animated.timing(translateY, {
+          toValue: 20,
+          duration: 0,
+          useNativeDriver: true,
+        }),
+      ])
+    );
+    animation.start();
+    return () => animation.stop();
+  }, [delay, opacity, translateY]);
+
+  return (
+    <Animated.View style={[styles.notificationPill, style, { opacity, transform: [{ translateY }] }]}>
+      <Text style={styles.notificationText}>{text}</Text>
+    </Animated.View>
+  );
+}
+
+const CARD_DATA = [
+  {
+    label: "For Shoppers",
+    title: "Shop & Support for Free",
+    bullets: [
+      "Choose the creators you love to support.",
+      "Shop at partner brands without paying extra.",
+      "Earn points for early access, private AMAs, and merch.",
+    ]
+  },
+  {
+    label: "Smart Shopping Tools",
+    title: "Shop with Confidence",
+    bullets: [
+      "View detailed product price history before you buy.",
+      "Automatically detect misleading offers and fake sales.",
+      "Purchase safely from highly reputable, vetted brands.",
+    ]
+  },
+  {
+    label: "For Creators",
+    title: "Monetize & Build Community",
+    bullets: [
+      "Connect your audience directly to the brands you love.",
+      "Build a lasting, engaged community around your content.",
+      "Manage all your brand sponsorships in one central dashboard.",
+    ]
+  },
+  {
+    label: "For Brands",
+    title: "Supercharge Your Affiliate Sales",
+    bullets: [
+      "Launch custom affiliate programs with your chosen creators.",
+      "Integrate seamlessly with Shopify in just one click.",
+      "Reach trusted creator voices and highly engaged audiences.",
+    ]
+  }
+];
+
+function StaticFeatureCard({ label, title, bullets }) {
+  return (
+    <View style={[styles.hoverCardContainer, styles.hoverCardGlow, { minHeight: 220, marginBottom: theme.spacing.lg }]}>
+      <View style={[styles.hoverCardContent, { flex: 1, justifyContent: 'center' }]}>
+        <Text style={styles.hoverCardLabel}>{label}</Text>
+        <Text style={[styles.hoverCardTitle, { marginBottom: 12 }]}>{title}</Text>
+        <View style={styles.hoverCardBullets}>
+          {bullets.map((bullet, i) => (
+            <View key={i} style={styles.hoverCardBulletRow}>
+              <Text style={styles.hoverCardBulletIcon}>✓</Text>
+              <BodyText style={styles.hoverCardBulletText}>{bullet}</BodyText>
+            </View>
+          ))}
+        </View>
+      </View>
+    </View>
+  );
+}
+
+function AutoFlippingCarousel({ items }) {
+  const [activeIndex, setActiveIndex] = React.useState(0);
+  const flipAnim = useRef(new Animated.Value(0)).current;
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      Animated.timing(flipAnim, {
+        toValue: 1,
+        duration: 400,
+        useNativeDriver: true,
+      }).start(() => {
+        setActiveIndex((prev) => (prev + 1) % items.length);
+        flipAnim.setValue(-1);
+        Animated.timing(flipAnim, {
+          toValue: 0,
+          duration: 400,
+          useNativeDriver: true,
+        }).start();
+      });
+    }, 4500);
+
+    return () => clearInterval(interval);
+  }, [items.length, flipAnim]);
+
+  const rotateX = flipAnim.interpolate({
+    inputRange: [-1, 0, 1],
+    outputRange: ['-90deg', '0deg', '90deg']
+  });
+
+  const activeItem = items[activeIndex];
+
+  return (
+    <View style={styles.carouselContainer}>
+      <Animated.View style={[
+        styles.hoverCardContainer, 
+        styles.hoverCardGlow, 
+        styles.carouselCard,
+        { transform: [{ rotateX }] }
+      ]}>
+        <View style={[styles.hoverCardContent, { flex: 1, justifyContent: 'center' }]}>
+          <Text style={styles.hoverCardLabel}>{activeItem.label}</Text>
+          <Text style={[styles.hoverCardTitle, { marginBottom: 12 }]}>{activeItem.title}</Text>
+          <View style={styles.hoverCardBullets}>
+            {activeItem.bullets.map((bullet, i) => (
+              <View key={i} style={styles.hoverCardBulletRow}>
+                <Text style={styles.hoverCardBulletIcon}>✓</Text>
+                <BodyText style={styles.hoverCardBulletText}>{bullet}</BodyText>
+              </View>
+            ))}
+          </View>
+        </View>
+      </Animated.View>
+    </View>
+  );
+}
+
 export default function LandingScreen({ navigation }) {
   const { currentCreator, intent, session } = useAppContext();
+  const scrollY = useRef(new Animated.Value(0)).current;
   const { width, height } = useWindowDimensions();
   const isCompact = width < 720;
   const isNarrow = width < 430;
@@ -254,13 +421,27 @@ export default function LandingScreen({ navigation }) {
             style={StyleSheet.absoluteFillObject}
           />
 
-          <ScrollView
+          <Animated.View pointerEvents="none" style={[
+            styles.floatingPillContainer, 
+            { opacity: scrollY.interpolate({ inputRange: [0, 150], outputRange: [1, 0], extrapolate: 'clamp' }) }
+          ]}>
+            <AnimatedNotificationPill text="🎉 Unlocked: Private AMA" delay={0} style={{ alignSelf: 'flex-end' }} />
+            <AnimatedNotificationPill text="🛍️ Saved 15% at Gymshark" delay={1500} style={{ alignSelf: 'flex-start', marginTop: 16 }} />
+            <AnimatedNotificationPill text="💖 +50 Support Points" delay={3000} style={{ alignSelf: 'center', marginTop: 16 }} />
+          </Animated.View>
+
+          <Animated.ScrollView
             contentContainerStyle={[
               styles.scrollContent,
               isWide && styles.scrollContentWide,
               isCompact && styles.scrollContentCompact
             ]}
             showsVerticalScrollIndicator={false}
+            onScroll={Animated.event(
+              [{ nativeEvent: { contentOffset: { y: scrollY } } }],
+              { useNativeDriver: false }
+            )}
+            scrollEventThrottle={16}
           >
             <View
               style={[
@@ -294,13 +475,13 @@ export default function LandingScreen({ navigation }) {
                   >
                     {isCompact ? (
                       <>
+                        Shop{"\n"}
+                        Brands.{"\n"}
                         Support{"\n"}
-                        Your Favorite{"\n"}
-                        Creators{"\n"}
-                        When You Shop
+                        Creators.
                       </>
                     ) : (
-                      "Support your favorite creators when you shop."
+                      "Shop Your Favorite Brands. Support Your Favorite Creators."
                     )}
                   </Text>
                 <BodyText
@@ -314,9 +495,7 @@ export default function LandingScreen({ navigation }) {
                     }
                   ]}
                 >
-                  Pick the creators you love.
-                  {"\n"}
-                  We make sure they benefit when you buy online.
+                  Atribe is a new way to support creators while gaining exclusive rewards and access to their most engaged community.
                 </BodyText>
                 <GradientTextLine
                   style={[
@@ -343,115 +522,37 @@ export default function LandingScreen({ navigation }) {
               </View>
 
               {isWide ? (
-                <View style={[styles.infoCard, styles.infoCardWide]}>
-                  <Text style={styles.infoLabel}>What it does</Text>
-                  <View style={styles.infoList}>
-                    <View style={styles.infoRow}>
-                      <Text style={styles.infoNumber}>1.</Text>
-                      <View style={styles.infoCopy}>
-                        <Text style={styles.infoTitle}>Choose your creators</Text>
-                        <BodyText style={styles.infoText}>
-                          Pick the people you want to support.
-                        </BodyText>
-                      </View>
+                <View style={styles.heroRightContentWide}>
+                  <AutoFlippingCarousel items={CARD_DATA} />
+                  <View style={styles.trustBanner}>
+                    <View style={styles.trustBadge}>
+                      <Text style={styles.trustBadgeText}>✨ Supports 100+ creators</Text>
                     </View>
-                    <View style={styles.infoRow}>
-                      <Text style={styles.infoNumber}>2.</Text>
-                      <View style={styles.infoCopy}>
-                        <Text style={styles.infoTitle}>Shop like you normally do</Text>
-                        <BodyText style={styles.infoText}>
-                          We automatically support them when you buy.
-                        </BodyText>
-                      </View>
-                    </View>
-                    <View style={styles.infoRow}>
-                      <Text style={styles.infoNumber}>3.</Text>
-                      <View style={styles.infoCopy}>
-                        <Text style={styles.infoTitle}>Get the best deals</Text>
-                        <BodyText style={styles.infoText}>
-                          Users get rewarded by getting the best deals.
-                        </BodyText>
-                      </View>
+                    <View style={styles.trustBadge}>
+                      <Text style={styles.trustBadgeText}>🤝 Backed by trusted Brands</Text>
                     </View>
                   </View>
                 </View>
               ) : null}
-
             </View>
 
-            {!isWide && !isCompact ? (
-              <>
-                <View style={styles.infoCard}>
-                  <Text style={styles.infoLabel}>What it does</Text>
-                  <View style={styles.infoList}>
-                    <View style={styles.infoRow}>
-                      <Text style={styles.infoNumber}>1.</Text>
-                      <View style={styles.infoCopy}>
-                        <Text style={styles.infoTitle}>Choose your creators</Text>
-                        <BodyText style={styles.infoText}>
-                          Pick the people you want to support.
-                        </BodyText>
-                      </View>
-                    </View>
-                    <View style={styles.infoRow}>
-                      <Text style={styles.infoNumber}>2.</Text>
-                      <View style={styles.infoCopy}>
-                        <Text style={styles.infoTitle}>Shop like you normally do</Text>
-                        <BodyText style={styles.infoText}>
-                          We automatically support them when you buy.
-                        </BodyText>
-                      </View>
-                    </View>
-                    <View style={styles.infoRow}>
-                      <Text style={styles.infoNumber}>3.</Text>
-                      <View style={styles.infoCopy}>
-                        <Text style={styles.infoTitle}>Get the best deals</Text>
-                        <BodyText style={styles.infoText}>
-                          Users get rewarded by getting the best deals.
-                        </BodyText>
-                      </View>
-                    </View>
+            {!isWide ? (
+              <View style={styles.mobileStackContent}>
+                <View style={styles.trustBanner}>
+                  <View style={styles.trustBadge}>
+                    <Text style={styles.trustBadgeText}>✨ Supports 100+ creators</Text>
+                  </View>
+                  <View style={styles.trustBadge}>
+                    <Text style={styles.trustBadgeText}>🤝 Backed by trusted Brands</Text>
                   </View>
                 </View>
-              </>
-            ) : null}
-
-            {isCompact ? (
-              <View style={[styles.infoCard, styles.infoCardCompact]}>
-                <Text style={[styles.infoLabel, styles.infoLabelCompact]}>What it does</Text>
-                <View style={[styles.infoList, styles.infoListCompact]}>
-                  <View style={styles.infoRow}>
-                    <Text style={[styles.infoNumber, styles.infoNumberCompact]}>1.</Text>
-                    <View style={styles.infoCopy}>
-                      <Text style={[styles.infoTitle, styles.infoTitleCompact]}>Choose your creators</Text>
-                      <BodyText style={[styles.infoText, styles.infoTextCompact]}>
-                        Pick the people you want to support.
-                      </BodyText>
-                    </View>
-                  </View>
-                  <View style={styles.infoRow}>
-                    <Text style={[styles.infoNumber, styles.infoNumberCompact]}>2.</Text>
-                    <View style={styles.infoCopy}>
-                      <Text style={[styles.infoTitle, styles.infoTitleCompact]}>Shop like you normally do</Text>
-                      <BodyText style={[styles.infoText, styles.infoTextCompact]}>
-                        We automatically support them when you buy.
-                      </BodyText>
-                    </View>
-                  </View>
-                  <View style={styles.infoRow}>
-                    <Text style={[styles.infoNumber, styles.infoNumberCompact]}>3.</Text>
-                    <View style={styles.infoCopy}>
-                      <Text style={[styles.infoTitle, styles.infoTitleCompact]}>Get the best deals</Text>
-                      <BodyText style={[styles.infoText, styles.infoTextCompact]}>
-                        Users get rewarded by getting the best deals.
-                      </BodyText>
-                    </View>
-                  </View>
-                </View>
+                {CARD_DATA.map((card, i) => (
+                  <StaticFeatureCard key={i} {...card} />
+                ))}
               </View>
             ) : null}
 
-          </ScrollView>
+          </Animated.ScrollView>
 
         </View>
       </View>
@@ -552,7 +653,8 @@ const styles = StyleSheet.create({
   },
   scrollContentCompact: {
     paddingTop: theme.spacing.md,
-    paddingBottom: theme.spacing.md
+    paddingBottom: theme.spacing.md,
+    paddingHorizontal: theme.spacing.lg
   },
   heroSection: {
     flex: 1,
@@ -683,89 +785,134 @@ const styles = StyleSheet.create({
     paddingTop: theme.spacing.lg,
     alignItems: "flex-start"
   },
-  infoCard: {
+  floatingPillContainer: {
+    position: 'absolute',
+    top: 80,
+    left: 20,
+    right: 20,
+    zIndex: 10,
+    flexDirection: 'column',
+  },
+  notificationPill: {
+    paddingHorizontal: 16,
+    paddingVertical: 10,
+    backgroundColor: 'rgba(29,17,22,0.8)',
+    borderRadius: 20,
+    borderWidth: 1,
+    borderColor: 'rgba(242,221,228,0.2)',
+    flexDirection: 'row',
+    alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+    elevation: 5,
+  },
+  notificationText: {
+    color: '#fff',
+    fontSize: 14,
+    fontWeight: '600',
+    fontFamily: theme.fonts.sans,
+  },
+  trustBanner: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: theme.spacing.md,
+    paddingHorizontal: theme.spacing.xl,
+    marginTop: theme.spacing.xl,
+    marginBottom: theme.spacing.sm,
+    alignSelf: 'center',
+    backgroundColor: 'rgba(255,255,255,0.04)',
+    borderRadius: 100,
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.08)',
+    flexWrap: 'wrap',
+    gap: theme.spacing.xl,
+  },
+  trustBadge: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  trustBadgeText: {
+    color: theme.colors.textSecondary,
+    fontSize: 15,
+    fontWeight: '600',
+    fontFamily: theme.fonts.sans,
+    letterSpacing: 0.5,
+  },
+  heroRightContentWide: {
+    flex: 1,
+    maxWidth: 620,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  carouselContainer: {
     width: "100%",
-    maxWidth: 760,
-    marginTop: theme.spacing.xxl,
-    padding: theme.spacing.xl,
+    minHeight: 300,
+    perspective: 1000,
+    marginTop: theme.spacing.lg,
+    marginBottom: theme.spacing.lg,
+  },
+  carouselCard: {
+    ...StyleSheet.absoluteFillObject,
+    backfaceVisibility: 'hidden',
+  },
+  mobileStackContent: {
+    width: "100%",
+    marginTop: theme.spacing.xl,
+  },
+  hoverCardContainer: {
+    flex: 1,
     borderRadius: 24,
     borderWidth: 1,
     borderColor: "rgba(242,221,228,0.12)",
-    backgroundColor: "rgba(29,17,22,0.8)",
-    gap: theme.spacing.lg
+    backgroundColor: "rgba(29,17,22,0.6)",
+    overflow: 'hidden',
   },
-  infoCardWide: {
-    width: 380,
-    maxWidth: 380,
-    marginTop: 0,
-    minHeight: 560,
-    alignSelf: "center",
-    justifyContent: "center"
+  hoverCardGlow: {
+    backgroundColor: "rgba(143,1,100,0.15)",
+    borderWidth: 1,
+    borderColor: "rgba(255,175,214,0.35)",
+    borderRadius: 24,
   },
-  infoCardCompact: {
-    alignSelf: "center",
-    flexShrink: 0,
-    marginTop: Math.round(theme.spacing.xxl * 1.44),
-    padding: theme.spacing.lg,
-    maxWidth: 560
-  },
-  infoLabel: {
-    color: theme.colors.textMuted,
-    fontFamily: theme.fonts.sans,
-    fontSize: 11,
-    fontWeight: "700",
-    letterSpacing: 1.8,
-    textTransform: "uppercase"
-  },
-  infoList: {
-    gap: theme.spacing.lg
-  },
-  infoListCompact: {
-    gap: theme.spacing.md
-  },
-  infoLabelCompact: {
-    fontSize: 16,
-    lineHeight: 22,
-    letterSpacing: 1.8
-  },
-  infoRow: {
-    flexDirection: "row",
+  hoverCardContent: {
+    padding: theme.spacing.xl,
     gap: theme.spacing.md,
-    alignItems: "flex-start"
   },
-  infoNumber: {
-    width: 28,
+  hoverCardLabel: {
     color: theme.colors.accentSoft,
     fontFamily: theme.fonts.sans,
-    fontSize: 12,
-    fontWeight: "700",
-    letterSpacing: 1.4,
-    marginTop: 4
-  },
-  infoNumberCompact: {
     fontSize: 14,
-    lineHeight: 20
+    fontWeight: "700",
+    letterSpacing: 1.5,
+    textTransform: "uppercase",
   },
-  infoCopy: {
-    flex: 1,
-    gap: 6
-  },
-  infoTitle: {
+  hoverCardTitle: {
     color: theme.colors.textPrimary,
     fontFamily: theme.fonts.sans,
-    fontSize: 18,
-    lineHeight: 24,
-    fontWeight: "600"
-  },
-  infoTitleCompact: {
     fontSize: 24,
-    lineHeight: 30
+    fontWeight: "700",
+    marginBottom: theme.spacing.sm,
   },
-  infoText: {
-    color: theme.colors.textSecondary
+  hoverCardBullets: {
+    gap: theme.spacing.md,
   },
-  infoTextCompact: {
-    fontSize: 20,
-    lineHeight: 28
+  hoverCardBulletRow: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    gap: theme.spacing.sm,
+  },
+  hoverCardBulletIcon: {
+    color: theme.colors.accentSoft,
+    fontSize: 16,
+    fontWeight: '900',
+    marginTop: 2,
+  },
+  hoverCardBulletText: {
+    flex: 1,
+    color: theme.colors.textSecondary,
+    fontSize: 15,
+    lineHeight: 22,
   }
 });

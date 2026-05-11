@@ -1,5 +1,8 @@
 import { createApiApp } from "./createApp.js";
 import { sharedEnv } from "../../shopify-app/src/config/shared-env.js";
+import { verifySupportFeatureStorage } from "../../shopify-app/src/db/support-feature-storage-check.js";
+
+await verifySupportFeatureStorage();
 
 const app = createApiApp();
 

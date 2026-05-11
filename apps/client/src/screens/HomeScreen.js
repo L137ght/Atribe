@@ -28,7 +28,10 @@ import {
   PrimaryButton,
   SecondaryButton,
   SectionHeader,
-  ShoppingIntelCard
+  ShareSupportForm,
+  ShoppingIntelCard,
+  SupportScoreCard,
+  SupporterRewardsPanel
 } from "../components";
 import { theme } from "../theme";
 import { getDomainFromUrl, TUTORIAL_STEPS } from "../utils";
@@ -59,6 +62,9 @@ export default function HomeScreen({ navigation }) {
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [validationError, setValidationError] = useState("");
   const [tutorialPage, setTutorialPage] = useState(0);
+  const [homeMode, setHomeMode] = useState("shop");
+  const [selectedShareCreatorId, setSelectedShareCreatorId] = useState(null);
+  const [supportDataRefreshKey, setSupportDataRefreshKey] = useState(0);
   const tutorialScrollRef = useRef(null);
   const tutorialModalWidth = Math.min(width - 24, 780);
   const tutorialSlideWidth = tutorialModalWidth - theme.spacing.xl * 2;
@@ -149,7 +155,18 @@ export default function HomeScreen({ navigation }) {
   const heroTitle =
     intent === "creator"
       ? "Shop through your creator links."
+      : homeMode === "share"
+      ? "Share creator content"
       : "Check before you buy. Support your creators.";
+
+  const heroSubtitle = homeMode === "share"
+    ? "Paste a YouTube, Instagram, or X link from a creator you support. We'll create a share link so your support counts."
+    : undefined;
+
+  const tabActions = [
+    { id: "shop", label: "Shop" },
+    { id: "share", label: "Share" },
+  ];
 
   useEffect(() => {
     let cancelled = false;
@@ -278,6 +295,7 @@ export default function HomeScreen({ navigation }) {
   return (
     <AppShell navigation={navigation} activeRoute="Home">
       <SectionHeader eyebrow="Shopping support" title={heroTitle} />
+      {heroSubtitle ? <BodyText style={styles.heroSubtitle}>{heroSubtitle}</BodyText> : null}
 
       <Modal
         animationType="slide"
@@ -369,76 +387,119 @@ export default function HomeScreen({ navigation }) {
 
       <View style={styles.layout}>
         <Card style={styles.mainCard}>
-          <InputField
-            label="Paste a shopping link"
-            autoCapitalize="none"
-            autoCorrect={false}
-            keyboardType="url"
-            placeholder="https://amazon.com/product-id"
-            value={destinationUrl}
-            onChangeText={setDestinationUrl}
-          />
-
-          {detectedDomain ? (
-            <View style={styles.domainTag}>
-              <Text style={styles.domainTagText}>
-                Detected: {detectedDomain}
-              </Text>
-            </View>
-          ) : null}
-
-          {validationError ? (
-            <BodyText style={styles.validationError}>{validationError}</BodyText>
-          ) : null}
-
-          {destinationUrl.trim() && !validationError ? (
-            <>
-              <ShoppingIntelCard
-                analysis={analysis}
-                fallbackMessage={
-                  isAnalyzing
-                    ? "Checking this product before you shop."
-                    : analysisError
-                }
-                onPrimaryPress={handleGenerateRoute}
-                onSecondaryPress={() => {
-                  setDestinationUrl("");
-                  setAnalysis(null);
-                  setAnalysisError("");
-                  setValidationError("");
-                  setPriceHistoryState({ status: "idle", data: null, error: null });
-                }}
-                disabled={isAnalyzing}
+          <View style={styles.tabRow}>
+            {tabActions.map((tab) => (
+              <SecondaryButton
+                key={tab.id}
+                compact
+                label={tab.label}
+                selected={homeMode === tab.id}
+                onPress={() => setHomeMode(tab.id)}
               />
-              {supportsPriceHistory ? (
-                <PriceHistoryCard
-                  data={priceHistoryState.data}
-                  state={priceHistoryState.status}
-                  onViewFullPage={(url) => {
-                    if (Platform.OS === "web") {
-                      window.open(url, "_blank");
-                    } else {
-                      Linking.openURL(url);
+            ))}
+          </View>
+
+          {homeMode === "shop" ? (
+            <>
+              <InputField
+                label="Paste a shopping link"
+                autoCapitalize="none"
+                autoCorrect={false}
+                keyboardType="url"
+                placeholder="https://amazon.com/product-id"
+                value={destinationUrl}
+                onChangeText={setDestinationUrl}
+              />
+
+              {detectedDomain ? (
+                <View style={styles.domainTag}>
+                  <Text style={styles.domainTagText}>
+                    Detected: {detectedDomain}
+                  </Text>
+                </View>
+              ) : null}
+
+              {validationError ? (
+                <BodyText style={styles.validationError}>{validationError}</BodyText>
+              ) : null}
+
+              {destinationUrl.trim() && !validationError ? (
+                <>
+                  <ShoppingIntelCard
+                    analysis={analysis}
+                    fallbackMessage={
+                      isAnalyzing
+                        ? "Checking this product before you shop."
+                        : analysisError
                     }
-                  }}
+                    onPrimaryPress={handleGenerateRoute}
+                    onSecondaryPress={() => {
+                      setDestinationUrl("");
+                      setAnalysis(null);
+                      setAnalysisError("");
+                      setValidationError("");
+                      setPriceHistoryState({ status: "idle", data: null, error: null });
+                    }}
+                    disabled={isAnalyzing}
+                  />
+                  {supportsPriceHistory ? (
+                    <PriceHistoryCard
+                      data={priceHistoryState.data}
+                      state={priceHistoryState.status}
+                      onViewFullPage={(url) => {
+                        if (Platform.OS === "web") {
+                          window.open(url, "_blank");
+                        } else {
+                          Linking.openURL(url);
+                        }
+                      }}
+                    />
+                  ) : null}
+                </>
+              ) : null}
+
+              {!destinationUrl.trim() ? (
+                <PrimaryButton
+                  label="Support and continue"
+                  onPress={handleGenerateRoute}
                 />
               ) : null}
+
+              {!isAtribeBackendConfigured ? (
+                <BodyText>
+                  Shopping features are currently unavailable in this build.
+                </BodyText>
+              ) : null}
             </>
-          ) : null}
+          ) : (
+            <>
+              {tribeCreators.length > 0 ? (
+                <View style={styles.creatorPicker}>
+                  <Text style={styles.creatorPickerLabel}>Supporting creator</Text>
+                  <View style={styles.creatorPickerRow}>
+                    {tribeCreators.map((creator) => (
+                      <SecondaryButton
+                        key={creator.id}
+                        compact
+                        label={creator.name}
+                        selected={selectedShareCreatorId === creator.id}
+                        onPress={() => setSelectedShareCreatorId(creator.id)}
+                      />
+                    ))}
+                  </View>
+                </View>
+              ) : (
+                <BodyText style={{ color: theme.colors.textMuted }}>
+                  Add creators to your tribe before creating share links.
+                </BodyText>
+              )}
 
-          {!destinationUrl.trim() ? (
-            <PrimaryButton
-              label="Complete your purchase"
-              onPress={handleGenerateRoute}
-            />
-          ) : null}
-
-          {!isAtribeBackendConfigured ? (
-            <BodyText>
-              Backend routing is not configured in this mobile app build. Set
-              `EXPO_PUBLIC_ATRIBE_BACKEND_URL` to enable supporter shopping.
-            </BodyText>
-          ) : null}
+              <ShareSupportForm
+                selectedCreatorId={selectedShareCreatorId}
+                onCreated={() => setSupportDataRefreshKey((current) => current + 1)}
+              />
+            </>
+          )}
 
           <Card style={styles.routingSummaryCard}>
             <Text style={styles.summaryKicker}>Your support setup</Text>
@@ -491,6 +552,15 @@ export default function HomeScreen({ navigation }) {
             )}
           </View>
         </Card>
+
+        <View style={styles.sideColumn}>
+          <SupportScoreCard refreshKey={supportDataRefreshKey} />
+          <SupporterRewardsPanel
+            creators={tribeCreators}
+            refreshKey={supportDataRefreshKey}
+            onClaimed={() => setSupportDataRefreshKey((current) => current + 1)}
+          />
+        </View>
       </View>
     </AppShell>
   );
@@ -505,6 +575,39 @@ const styles = {
   mainCard: {
     flex: 1,
     minWidth: 320
+  },
+  sideColumn: {
+    width: 280,
+    minWidth: 260,
+    gap: theme.spacing.md,
+  },
+  tabRow: {
+    flexDirection: "row",
+    gap: theme.spacing.sm,
+    paddingBottom: theme.spacing.sm,
+    marginBottom: theme.spacing.sm,
+    borderBottomWidth: 1,
+    borderBottomColor: theme.colors.borderSubtle,
+  },
+  heroSubtitle: {
+    marginTop: -theme.spacing.sm,
+    marginBottom: theme.spacing.md,
+  },
+  creatorPicker: {
+    gap: theme.spacing.sm,
+  },
+  creatorPickerLabel: {
+    color: theme.colors.textMuted,
+    fontFamily: theme.fonts.sans,
+    fontSize: 11,
+    letterSpacing: 1.4,
+    textTransform: "uppercase",
+    fontWeight: "700",
+  },
+  creatorPickerRow: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    gap: theme.spacing.xs,
   },
   domainTag: {
     alignSelf: "flex-start",

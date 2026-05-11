@@ -39,6 +39,9 @@ export const sharedEnv = {
   host: process.env.HOST || "localhost",
   logLevel: process.env.LOG_LEVEL || "debug",
   atribeBaseUrl: normalizeBaseUrl(process.env.ATRIBE_BASE_URL || ""),
+  atribeRedirectBaseUrl: normalizeBaseUrl(
+    process.env.ATRIBE_REDIRECT_BASE_URL || process.env.ATRIBE_BASE_URL || ""
+  ),
   sqliteDbPath: process.env.SQLITE_DB_PATH || "./shopify-app.db",
   supabaseUrl: normalizeOptionalUrl(process.env.SUPABASE_URL),
   supabaseServiceRoleKey: process.env.SUPABASE_SERVICE_ROLE_KEY || "",

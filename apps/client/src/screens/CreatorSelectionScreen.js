@@ -63,16 +63,14 @@ export default function CreatorSelectionScreen({ navigation }) {
     <AppShell
       navigation={navigation}
       activeRoute="CreatorSelection"
-      title="Select creators"
-      subtitle="Multi-select and assign weights."
     >
       <SectionHeader
         eyebrow="Weighted routing"
         title="Build your creator mix"
         body={
           distributionMode === "even"
-            ? "Search your network and add creators to your tribe. Attribution is currently split evenly, so manual weight controls are hidden."
-            : "Search your network, add creators to your tribe, then tune how much influence each one receives in the routing preview."
+            ? "Search your network and add creators to your tribe. Support is currently split equally among your selected creators."
+            : "Search your network, add creators to your tribe, and choose how much support each one receives."
         }
       />
 

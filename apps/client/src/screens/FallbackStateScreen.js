@@ -50,7 +50,7 @@ export default function FallbackStateScreen({ navigation, route }) {
         <Card style={styles.secondaryCard}>
           <Text style={styles.cardTitle}>Explore Atribe</Text>
           <BodyText>
-            Browse verified creators who are already shaping the network, then return once your tribe covers the domain you want to route.
+            Browse creators you can support, then return once you've added them to your tribe.
           </BodyText>
           <SecondaryButton
             label="Browse creators"

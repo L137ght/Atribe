@@ -44,8 +44,6 @@ export default function AddAffiliateLinksScreen({ navigation }) {
     <AppShell
       navigation={navigation}
       activeRoute="AddAffiliateLinks"
-      title="Links"
-      subtitle="Register affiliate-enabled domains."
     >
       <SectionHeader
         eyebrow="Monetization"
@@ -71,7 +69,7 @@ export default function AddAffiliateLinksScreen({ navigation }) {
               <Text style={styles.detectedValue}>{detectedDomain}</Text>
               {detectedDomain.endsWith(".myshopify.com") ? (
                 <BodyText>
-                  Shopify store domains are connected through the backend creator-brand API.
+                  Shopify stores are connected automatically.
                 </BodyText>
               ) : null}
             </View>
@@ -144,7 +142,7 @@ export default function AddAffiliateLinksScreen({ navigation }) {
           </>
         ) : (
           <BodyText>
-            Your creator dashboard needs at least one domain before the new flow can route links through your profile.
+            Add at least one domain to start earning from your links.
           </BodyText>
         )}
       </Card>

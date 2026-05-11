@@ -134,6 +134,90 @@ export const creatorRepository = {
     return statement.get(creatorId) || null;
   },
 
+  async findByUserId(userId) {
+    if (!userId) {
+      return null;
+    }
+
+    if (env.dbProvider === "supabase") {
+      const supabase = getSupabase();
+
+      try {
+        const { data, error } = await supabase
+          .from("creator_profiles")
+          .select(`
+            id,
+            user_id,
+            display_name,
+            created_at,
+            creator_affiliate_links (
+              id,
+              domain,
+              affiliate_url,
+              is_active
+            )
+          `)
+          .eq("user_id", userId)
+          .order("created_at", { ascending: true })
+          .limit(1)
+          .maybeSingle();
+
+        if (error) {
+          throw error;
+        }
+
+        if (data) {
+          return mapSupabaseCreator(data);
+        }
+      } catch {}
+
+      try {
+        const { data, error } = await supabase
+          .from("shopify_creators")
+          .select(`
+            id,
+            user_id,
+            name,
+            external_tags_json,
+            created_at,
+            shopify_creator_affiliate_links (
+              id,
+              domain,
+              affiliate_url,
+              is_active
+            )
+          `)
+          .eq("user_id", userId)
+          .order("created_at", { ascending: true })
+          .limit(1)
+          .maybeSingle();
+
+        if (error) {
+          throw error;
+        }
+
+        if (data) {
+          return mapSupabaseCreator({
+            ...data,
+            creator_affiliate_links: data.shopify_creator_affiliate_links || []
+          });
+        }
+      } catch {
+        return null;
+      }
+
+      return null;
+    }
+
+    const statement = db.prepare(`
+      SELECT id, name, external_tags_json AS externalTagsJson, created_at AS createdAt
+      FROM creators
+      WHERE id = ?
+    `);
+
+    return statement.get(userId) || null;
+  },
+
   async upsert({ id, name = null, externalTagsJson = null }) {
     if (env.dbProvider === "supabase") {
       const supabase = getSupabase();
