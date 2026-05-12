@@ -3,6 +3,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 const STORAGE_KEYS = {
   appState: "creator-router.app-state",
   creators: "creator-router.creators",
+  locale: "creator-router.locale",
   preferences: "creator-router.preferences",
   socialAccounts: "creator-router.social-accounts",
   session: "creator-router.session"
@@ -70,6 +71,14 @@ export function loadPreferences() {
 
 export function savePreferences(preferences) {
   return writeJson(STORAGE_KEYS.preferences, preferences);
+}
+
+export function loadLocaleSelection() {
+  return readJson(STORAGE_KEYS.locale, null);
+}
+
+export function saveLocaleSelection(localeSelection) {
+  return writeJson(STORAGE_KEYS.locale, localeSelection);
 }
 
 export function loadSocialAccounts() {

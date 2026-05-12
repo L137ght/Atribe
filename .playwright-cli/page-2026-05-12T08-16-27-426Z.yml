@@ -1,0 +1,39 @@
+- generic [ref=e256]:
+  - generic [ref=e257]:
+    - generic [ref=e260] [cursor=pointer]: Atribe
+    - generic [ref=e261]:
+      - generic [ref=e263] [cursor=pointer]: Discover
+      - generic [ref=e265] [cursor=pointer]: Dashboard
+      - generic [ref=e267] [cursor=pointer]: Settings
+    - generic [ref=e269]: A
+  - generic [ref=e271]:
+    - generic [ref=e273]:
+      - generic [ref=e274]: Creator dashboard
+      - generic [ref=e275]: Forge connections.
+    - generic [ref=e276]:
+      - generic [ref=e277]:
+        - generic [ref=e278]:
+          - generic [ref=e279]:
+            - generic [ref=e280]: Share to Story
+            - generic [ref=e281]: Invite your audience to support you through Atribe.
+          - button "Create Story Card" [ref=e282] [cursor=pointer]:
+            - generic [ref=e285]: Create Story Card
+        - generic [ref=e287]:
+          - generic [ref=e289] [cursor=pointer]: Connect brands
+          - generic [ref=e291] [cursor=pointer]: Rewards
+          - generic [ref=e293] [cursor=pointer]: Connect socials
+          - generic [ref=e295] [cursor=pointer]: Add domain
+          - generic [ref=e297] [cursor=pointer]: Add creators
+        - generic [ref=e298]:
+          - generic [ref=e299]: Connect brands
+          - generic [ref=e300]: Choose the brands you want to work with.
+          - button "Add brands" [ref=e301] [cursor=pointer]:
+            - generic [ref=e304]: Add brands
+          - generic [ref=e305]:
+            - generic [ref=e306]: Generate smart links to your brands
+            - generic [ref=e307]: Browse brand affiliations and move into link generation.
+            - generic [ref=e309] [cursor=pointer]: Generate smart links
+      - generic [ref=e311]:
+        - generic [ref=e312]: Added
+        - generic [ref=e313]: "0"
+        - generic [ref=e314]: Brands

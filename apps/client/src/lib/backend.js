@@ -215,6 +215,20 @@ export async function fetchCreatorRewards({ creatorId, accessToken }) {
   });
 }
 
+export async function fetchCreatorBio(identifier) {
+  return backendJson(`/api/creator-bio/${encodeURIComponent(identifier)}`);
+}
+
+export async function syncCreatorBioContent({ creatorId, accessToken }) {
+  return backendJson("/creator/bio/sync", {
+    method: "POST",
+    accessToken,
+    body: {
+      creator_id: creatorId,
+    },
+  });
+}
+
 export async function createCreatorReward({
   title,
   description,

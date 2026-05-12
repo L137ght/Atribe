@@ -2,6 +2,7 @@ export * from "./components";
 export * from "./context";
 export * from "./data";
 export * from "./lib";
+export * from "./locale";
 export * from "./navigation";
 export * from "./screens";
 export * from "./theme";

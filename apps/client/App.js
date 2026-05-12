@@ -5,6 +5,7 @@ import {
   NavigationContainer,
   useNavigationContainerRef
 } from "@react-navigation/native";
+import { NavigationIndependentTree } from "@react-navigation/core";
 import * as Linking from "expo-linking";
 import { ShareIntentProvider } from "expo-share-intent";
 import { SafeAreaProvider } from "react-native-safe-area-context";
@@ -26,10 +27,13 @@ const linking = {
   config: {
     screens: {
       Landing: "",
+      LocalePicker: "locale",
       Login: "login",
       IntentSelection: "role",
       Home: "home",
       CreatorDashboard: "creator/dashboard",
+      CreatorBioPage: "creator/link-in-bio",
+      CreatorBioPublic: "c/:creatorId",
       CreatorOnboarding: "creator/onboarding",
       CreatorDiscovery: "discover",
       CreatorSelection: "tribe",
@@ -68,18 +72,20 @@ function AppShell() {
   }
 
   return (
-    <NavigationContainer
-      linking={linking}
-      onReady={() => setNavigationReady(true)}
-      ref={navigationRef}
-    >
-      <StatusBar style="light" />
-      <ShareIntentBootstrap
-        navigationReady={navigationReady}
-        navigationRef={navigationRef}
-      />
-      <AppNavigator />
-    </NavigationContainer>
+    <NavigationIndependentTree>
+      <NavigationContainer
+        linking={linking}
+        onReady={() => setNavigationReady(true)}
+        ref={navigationRef}
+      >
+        <StatusBar style="light" />
+        <ShareIntentBootstrap
+          navigationReady={navigationReady}
+          navigationRef={navigationRef}
+        />
+        <AppNavigator />
+      </NavigationContainer>
+    </NavigationIndependentTree>
   );
 }
 

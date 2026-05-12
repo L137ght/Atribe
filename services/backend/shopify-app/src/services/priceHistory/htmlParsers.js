@@ -96,6 +96,22 @@ export function extractScriptData(html) {
   }
 }
 
+export function extractNextData(html) {
+  try {
+    const match = String(html || "").match(
+      /<script[^>]*id=["']__NEXT_DATA__["'][^>]*type=["']application\/json["'][^>]*>([\s\S]*?)<\/script>/i
+    );
+
+    if (!match?.[1]) {
+      return null;
+    }
+
+    return JSON.parse(match[1]);
+  } catch {
+    return null;
+  }
+}
+
 /**
  * Parse a price value from text, handling ₹, $, €, £ and comma formatting.
  * @param {string} text

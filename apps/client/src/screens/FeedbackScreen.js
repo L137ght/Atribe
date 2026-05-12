@@ -32,16 +32,16 @@ export default function FeedbackScreen({ navigation, route }) {
         <View style={styles.cardGrid}>
           <Card style={styles.card}>
             <Text style={styles.label}>Impact</Text>
-            <Text style={styles.cardHeadline}>The routed link is active and ready to open or share.</Text>
+            <Text style={styles.cardHeadline}>The magic link is active and ready to open or share.</Text>
           </Card>
           <Card style={styles.card}>
             <Text style={styles.label}>Next</Text>
-            <Text style={styles.cardHeadline}>Return to the routing workspace or keep curating your tribe.</Text>
+            <Text style={styles.cardHeadline}>Return to the links workspace or keep curating your tribe.</Text>
           </Card>
         </View>
 
         <View style={styles.actionRow}>
-          <PrimaryButton label="Return to route" onPress={() => navigation.navigate("Home")} />
+          <PrimaryButton label="Return to your links" onPress={() => navigation.navigate("Home")} />
           <SecondaryButton
             label="Explore others"
             onPress={() => navigation.navigate("CreatorDiscovery")}

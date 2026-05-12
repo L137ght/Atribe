@@ -1,15 +1,28 @@
-import React, { createContext, useContext, useEffect, useMemo, useRef, useState } from "react";
+import React, { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
+import { Platform } from "react-native";
 import { sampleCreators } from "../data";
+import {
+  DEFAULT_THEME_ID,
+  getBrowserLanguagePreferences,
+  getSupportedCountries,
+  getSupportedLanguages,
+  getThemeLocaleConfig,
+  getTranslations,
+  resolveThemeLocale,
+  translate
+} from "../locale";
 import { extractTag, getDomainFromUrl } from "../utils";
 import {
   clearSessionStorage,
   loadAppState,
   loadCreators,
+  loadLocaleSelection,
   loadPreferences,
   loadSession,
   loadSocialAccounts,
   saveAppState,
   saveCreators,
+  saveLocaleSelection,
   savePreferences,
   saveSession,
   saveSocialAccounts
@@ -28,6 +41,7 @@ const AppContext = createContext(null);
 const DEMO_SUPPORTER_ID = "demo-supporter-user";
 const DEMO_CREATOR_ID = "demo-creator-user";
 const DEMO_CREATOR_PROFILE_ID = "demo-creator-profile";
+const DEFAULT_THEME_CONFIG = getThemeLocaleConfig(DEFAULT_THEME_ID);
 
 const DEMO_SESSIONS = {
   supporter: {
@@ -240,6 +254,49 @@ function isSchemaCacheTableError(error) {
   return error?.code === "PGRST205" || error?.code === "42P01";
 }
 
+function normalizeLocaleSelection(candidateLocale) {
+  if (!candidateLocale?.countryCode) {
+    return null;
+  }
+
+  const resolvedLocale = resolveThemeLocale({
+    themeConfig: DEFAULT_THEME_CONFIG,
+    persistedSelection: {
+      countryCode: candidateLocale.countryCode,
+      languageTag: candidateLocale.languageTag,
+      source: candidateLocale.source || "persisted"
+    }
+  });
+
+  return {
+    countryCode: resolvedLocale.countryCode,
+    languageTag: resolvedLocale.languageTag,
+    source: candidateLocale.source || resolvedLocale.source,
+    themeId: candidateLocale.themeId || DEFAULT_THEME_ID
+  };
+}
+
+function getProfileLocaleSelection(profile) {
+  if (!profile?.country_code || !profile?.language_tag) {
+    return null;
+  }
+
+  return normalizeLocaleSelection({
+    countryCode: profile.country_code,
+    languageTag: profile.language_tag,
+    source: "profile",
+    themeId: profile.theme_id || DEFAULT_THEME_ID
+  });
+}
+
+function isSameLocale(leftLocale, rightLocale) {
+  return (
+    leftLocale?.countryCode === rightLocale?.countryCode &&
+    leftLocale?.languageTag === rightLocale?.languageTag &&
+    (leftLocale?.themeId || DEFAULT_THEME_ID) === (rightLocale?.themeId || DEFAULT_THEME_ID)
+  );
+}
+
 async function ensureProfile(user, intent) {
   if (!user) {
     return null;
@@ -378,9 +435,21 @@ export function AppProvider({ children }) {
   const [tutorialActive, setTutorialActive] = useState(false);
   const [tutorialCompleted, setTutorialCompleted] = useState(false);
   const [tutorialStepId, setTutorialStepId] = useState("home");
+  const [locale, setLocaleState] = useState(null);
   const [isReady, setIsReady] = useState(false);
   const [isConfigured] = useState(isSupabaseConfigured);
   const authModeRef = useRef(authMode);
+  const localeRef = useRef(locale);
+  const localeThemeConfig = DEFAULT_THEME_CONFIG;
+  const availableLocaleCountries = useMemo(
+    () => getSupportedCountries(DEFAULT_THEME_ID),
+    []
+  );
+  const localeSelectionRequired = Platform.OS !== "web" && !locale;
+  const translations = useMemo(
+    () => getTranslations(DEFAULT_THEME_ID, locale?.languageTag || localeThemeConfig.defaultLanguageTag),
+    [locale?.languageTag, localeThemeConfig.defaultLanguageTag]
+  );
 
   const currentCreator = useMemo(
     () => creators.find((creator) => creator.id === creatorProfileId) || null,
@@ -391,6 +460,10 @@ export function AppProvider({ children }) {
   useEffect(() => {
     authModeRef.current = authMode;
   }, [authMode]);
+
+  useEffect(() => {
+    localeRef.current = locale;
+  }, [locale]);
 
   async function persistAppState(overrides = {}) {
     await saveAppState({
@@ -420,6 +493,59 @@ export function AppProvider({ children }) {
       saveSocialAccounts(nextSocialAccounts)
     ]);
   }
+
+  async function persistResolvedLocale(nextLocale, syncProfile = false) {
+    const normalizedLocale = normalizeLocaleSelection(nextLocale);
+
+    if (!normalizedLocale) {
+      return null;
+    }
+
+    setLocaleState(normalizedLocale);
+    await saveLocaleSelection(normalizedLocale);
+
+    if (
+      syncProfile &&
+      !isDemoSession &&
+      isConfigured &&
+      session?.id
+    ) {
+      const { error } = await supabase
+        .from("profiles")
+        .update({
+          country_code: normalizedLocale.countryCode,
+          language_tag: normalizedLocale.languageTag,
+          theme_id: normalizedLocale.themeId
+        })
+        .eq("id", session.id);
+
+      if (error) {
+        throw error;
+      }
+    }
+
+    return normalizedLocale;
+  }
+
+  async function setLocaleSelection(selection) {
+    return persistResolvedLocale(
+      {
+        ...selection,
+        source: "explicit",
+        themeId: DEFAULT_THEME_ID
+      },
+      true
+    );
+  }
+
+  function getAvailableLocaleLanguages(countryCode) {
+    return getSupportedLanguages(DEFAULT_THEME_ID, countryCode);
+  }
+
+  const t = useCallback(
+    (keyPath, fallbackValue = keyPath) => translate(translations, keyPath, fallbackValue),
+    [translations]
+  );
 
   async function hydrateDemoState(nextSession, persistedAppState) {
     setCreatorBrandLinks([]);
@@ -609,6 +735,7 @@ export function AppProvider({ children }) {
     const activeIntent = shouldForceIntentSelection
       ? null
       : preferredIntent || appState.profile?.preferred_intent || profile?.preferred_intent || null;
+    const profileLocale = getProfileLocaleSelection(profile || appState.profile);
     const nextSessionState = mapSession(nextSession, profile || appState.profile);
     const ownCreator = appState.creators.find((creator) => creator.userId === nextSession.user.id);
 
@@ -676,6 +803,27 @@ export function AppProvider({ children }) {
     setTutorialCompleted(Boolean(persistedAppState.tutorialCompleted));
     setTutorialStepId(persistedAppState.tutorialStepId || "home");
 
+    const currentLocale = localeRef.current;
+    const shouldAdoptProfileLocale =
+      profileLocale &&
+      (!currentLocale || currentLocale.source !== "explicit");
+
+    if (shouldAdoptProfileLocale) {
+      await persistResolvedLocale({
+        ...profileLocale,
+        source: "profile"
+      });
+    } else if (currentLocale && (!profileLocale || currentLocale.source === "explicit")) {
+      await supabase
+        .from("profiles")
+        .update({
+          country_code: currentLocale.countryCode,
+          language_tag: currentLocale.languageTag,
+          theme_id: currentLocale.themeId || DEFAULT_THEME_ID
+        })
+        .eq("id", nextSession.user.id);
+    }
+
     if (persistedAppState.forceIntentSelection) {
       await saveAppState({
         ...persistedAppState,
@@ -693,9 +841,27 @@ export function AppProvider({ children }) {
       try {
         const persistedAppState = await loadAppState();
         const persistedSession = await loadSession();
+        const persistedLocale = normalizeLocaleSelection(await loadLocaleSelection());
+        const browserResolvedLocale =
+          Platform.OS === "web"
+            ? normalizeLocaleSelection(
+                resolveThemeLocale({
+                  themeConfig: localeThemeConfig,
+                  browserLanguages: getBrowserLanguagePreferences()
+                })
+              )
+            : null;
+        const initialLocale = persistedLocale || browserResolvedLocale;
 
         if (!isMounted) {
           return;
+        }
+
+        if (initialLocale) {
+          setLocaleState(initialLocale);
+          if (!persistedLocale) {
+            await saveLocaleSelection(initialLocale);
+          }
         }
 
         setDistributionModeState(persistedAppState.distributionMode || "weighted");
@@ -1321,13 +1487,20 @@ export function AppProvider({ children }) {
         platform,
         username: username.trim(),
         external_account_id: `${platform}:${username.trim().toLowerCase()}`,
+        provider_account_id: `${platform}:${username.trim().toLowerCase()}`,
+        provider_username: username.trim(),
+        provider_display_name: username.trim(),
+        provider_avatar_url: "",
         status: "connected",
         granted_permissions: permissions || [],
+        granted_scopes: permissions || [],
         profile_data: {
           username: username.trim(),
           connectedVia: oauthProvider ? "oauth-provider" : "oauth-modal",
           oauthProvider: oauthProvider || null
         },
+        token_expires_at: null,
+        last_synced_at: null,
         last_connected_at: new Date().toISOString(),
         created_at: new Date().toISOString(),
         creator_social_audience_snapshots: [
@@ -1371,13 +1544,20 @@ export function AppProvider({ children }) {
       platform,
       username: username.trim(),
       external_account_id: `${platform}:${username.trim().toLowerCase()}`,
+      provider_account_id: `${platform}:${username.trim().toLowerCase()}`,
+      provider_username: username.trim(),
+      provider_display_name: username.trim(),
+      provider_avatar_url: "",
       status: "connected",
       granted_permissions: permissions || [],
+      granted_scopes: permissions || [],
       profile_data: {
         username: username.trim(),
         connectedVia: oauthProvider ? "oauth-provider" : "oauth-modal",
         oauthProvider: oauthProvider || null
       },
+      token_expires_at: null,
+      last_synced_at: null,
       last_connected_at: new Date().toISOString()
     };
 
@@ -1840,10 +2020,14 @@ export function AppProvider({ children }) {
       currentCreator,
       currentTutorialStep,
       distributionMode,
+      availableLocaleCountries,
+      getAvailableLocaleLanguages,
       getPreference,
       intent,
       isConfigured,
       isReady,
+      locale,
+      localeSelectionRequired,
       preferences,
       recordRoutingEvent,
       removeAffiliateLink,
@@ -1859,7 +2043,9 @@ export function AppProvider({ children }) {
       signInWithGoogleOAuth,
       signInWithPassword,
       signOut,
+      setLocaleSelection,
       submitDomainRequest,
+      t,
       tutorialActive,
       tutorialCompleted,
       tutorialStepId,
@@ -1880,13 +2066,17 @@ export function AppProvider({ children }) {
       creatorProfileId,
       currentCreator,
       distributionMode,
+      availableLocaleCountries,
       isDemoSession,
       intent,
       isConfigured,
       isReady,
+      locale,
+      localeSelectionRequired,
       preferences,
       requestedDomains,
       session,
+      t,
       tutorialActive,
       tutorialCompleted,
       tutorialStepId,

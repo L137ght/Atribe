@@ -61,24 +61,24 @@
     </style>
   </head>
   <body>
-    <h1>Atribe Extension Settings</h1>
-    <p>
+    <h1 id="title">Atribe Extension Settings</h1>
+    <p id="body">
       Configure the backend base URL and the supporter user id. The extension will route supported product URLs through
       the Atribe backend instead of applying a hardcoded affiliate tag.
     </p>
 
     <form id="settings-form">
-      <label>
+      <label id="backend-label">
         Atribe backend URL
         <input id="backend-url" name="backend-url" placeholder="https://your-backend.example.com" />
       </label>
 
-      <label>
+      <label id="user-label">
         Supporter user id
         <input id="user-id" name="user-id" placeholder="uuid" />
       </label>
 
-      <button type="submit">Save settings</button>
+      <button id="save-button" type="submit">Save settings</button>
       <div id="status" aria-live="polite"></div>
     </form>
 

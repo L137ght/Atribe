@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { Alert, Text, View } from "react-native";
 import { useAppContext } from "../context";
 import {
@@ -27,19 +27,26 @@ export default function SettingsScreen({ navigation }) {
     currentCreator,
     currentTutorialStep,
     distributionMode,
+    availableLocaleCountries,
+    getAvailableLocaleLanguages,
     getPreference,
     intent,
+    locale,
     removeFromTribe,
     session,
     skipTutorial,
     startTutorial,
     setDistributionMode,
     setIntent,
+    setLocaleSelection,
     signOut,
+    t,
     tutorialActive,
     updatePreference
   } = useAppContext();
   const [query, setQuery] = useState("");
+  const [selectedCountryCode, setSelectedCountryCode] = useState(locale?.countryCode || "US");
+  const [selectedLanguageTag, setSelectedLanguageTag] = useState(locale?.languageTag || "");
 
   const selectedCreators = useMemo(
     () => creators.filter((creator) => getPreference(creator.id)?.selected),
@@ -66,30 +73,32 @@ export default function SettingsScreen({ navigation }) {
   }, [creators, getPreference, query]);
 
   const visibleCreatorSuggestions = visibleCreators.slice(0, 4);
+  const localeLanguageOptions = useMemo(
+    () => getAvailableLocaleLanguages(selectedCountryCode),
+    [getAvailableLocaleLanguages, selectedCountryCode]
+  );
   const activeConnectionsCount =
     (currentCreator?.links?.length || 0) +
     (creatorBrandLinks?.filter((link) => link.status !== "archived").length || 0);
 
+  useEffect(() => {
+    if (!locale) {
+      return;
+    }
+
+    setSelectedCountryCode(locale.countryCode);
+    setSelectedLanguageTag(locale.languageTag);
+  }, [locale]);
+
+  useEffect(() => {
+    if (!localeLanguageOptions.some((language) => language.tag === selectedLanguageTag)) {
+      setSelectedLanguageTag(localeLanguageOptions[0]?.tag || "");
+    }
+  }, [localeLanguageOptions, selectedLanguageTag]);
+
   async function handleIntentChange(nextIntent) {
     try {
       await setIntent(nextIntent);
-
-      if (nextIntent === "creator" && !currentCreator) {
-        navigation.navigate("CreatorOnboarding");
-        return;
-      }
-
-      if (nextIntent === "brand") {
-        if (!brandShopDomain || brandInstallStatus?.install_status !== "installed") {
-          navigation.navigate("BrandOnboarding");
-          return;
-        }
-
-        navigation.navigate(brandHasActiveCampaign ? "BrandHome" : "CampaignGate");
-        return;
-      }
-
-      navigation.navigate("Home");
     } catch (error) {
       Alert.alert("Settings", error.message);
     }
@@ -115,9 +124,24 @@ export default function SettingsScreen({ navigation }) {
     await advanceTutorial();
   }
 
+  async function handleLocaleSave() {
+    try {
+      await setLocaleSelection({
+        countryCode: selectedCountryCode,
+        languageTag: selectedLanguageTag
+      });
+      Alert.alert(
+        t("settings.localeSaved", "Language updated"),
+        t("settings.localeSavedBody", "Your country and language preference have been updated.")
+      );
+    } catch (error) {
+      Alert.alert("Settings", error.message);
+    }
+  }
+
   async function handleReplayTutorial() {
+    await setIntent("supporter");
     await startTutorial("home");
-    navigation.navigate("Home");
   }
 
   async function adjustWeight(creatorId, delta) {
@@ -136,9 +160,9 @@ export default function SettingsScreen({ navigation }) {
       activeRoute="Settings"
     >
       <SectionHeader
-        eyebrow="Workspace"
-        title="Preferences and access"
-        body="Manage your account details and your creator tribe."
+        eyebrow={t("settings.workspaceEyebrow", "Workspace")}
+        title={t("settings.workspaceTitle", "Preferences and access")}
+        body={t("settings.workspaceBody", "Manage your account details and your creator tribe.")}
       />
 
       {tutorialActive && currentTutorialStep?.screen === "Settings" ? (
@@ -152,6 +176,51 @@ export default function SettingsScreen({ navigation }) {
       ) : null}
 
       <View style={styles.sectionStack}>
+        <Card style={styles.sectionCard}>
+          <Text style={styles.cardTitle}>{t("settings.localeTitle", "Language and region")}</Text>
+          <BodyText>
+            {t(
+              "settings.localeBody",
+              "Choose the country and language Atribe should use on this device. Browser clients default to your browser language until you change it."
+            )}
+          </BodyText>
+
+          <Text style={styles.inlineLabel}>{t("localePicker.countryLabel", "Country")}</Text>
+          <View style={styles.suggestionGrid}>
+            {availableLocaleCountries.map((country) => (
+              <SecondaryButton
+                key={country.code}
+                label={country.label}
+                onPress={() => setSelectedCountryCode(country.code)}
+                selected={country.code === selectedCountryCode}
+              />
+            ))}
+          </View>
+
+          <Text style={styles.inlineLabel}>{t("localePicker.languageLabel", "Language")}</Text>
+          <View style={styles.suggestionGrid}>
+            {localeLanguageOptions.map((language) => (
+              <SecondaryButton
+                key={language.tag}
+                label={language.label}
+                onPress={() => setSelectedLanguageTag(language.tag)}
+                selected={language.tag === selectedLanguageTag}
+              />
+            ))}
+          </View>
+
+          <BodyText>
+            {t("settings.localeCurrent", "Current locale")}: {locale?.countryCode || selectedCountryCode} ·{" "}
+            {locale?.languageTag || selectedLanguageTag}
+          </BodyText>
+
+          <PrimaryButton
+            label={t("settings.localeChange", "Change language")}
+            onPress={handleLocaleSave}
+            variant="gradient"
+          />
+        </Card>
+
         <Card style={styles.sectionCard}>
           <Text style={styles.cardTitle}>Current tribe</Text>
           <BodyText>
@@ -267,7 +336,7 @@ export default function SettingsScreen({ navigation }) {
             <View style={[styles.roleCard, intent === "supporter" && styles.roleCardActive]}>
               <View style={styles.roleCopy}>
                 <Text style={styles.roleTitle}>Shopper</Text>
-                <BodyText>Route links and support your selected creators.</BodyText>
+                <BodyText>Create magic links and support your selected creators.</BodyText>
               </View>
               <SecondaryButton
                 compact
@@ -454,6 +523,14 @@ const styles = {
     fontFamily: theme.fonts.serif,
     fontSize: 30,
     lineHeight: 36
+  },
+  inlineLabel: {
+    color: theme.colors.textMuted,
+    fontFamily: theme.fonts.sans,
+    fontSize: 11,
+    letterSpacing: 1.4,
+    textTransform: "uppercase",
+    fontWeight: "700"
   },
   roleStack: {
     gap: theme.spacing.md

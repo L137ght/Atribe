@@ -1,0 +1,35 @@
+- generic [ref=e63]:
+  - generic [ref=e64]:
+    - generic [ref=e67] [cursor=pointer]: Atribe
+    - generic [ref=e68]:
+      - generic [ref=e70] [cursor=pointer]: Links
+      - generic [ref=e72] [cursor=pointer]: Discover
+      - generic [ref=e74] [cursor=pointer]: Settings
+    - generic [ref=e76]: A
+  - generic [ref=e79]:
+    - generic [ref=e81]:
+      - generic [ref=e82]: Back the creators you love.
+      - generic [ref=e83]: Shop Better Deals. No extra cost.
+    - generic [ref=e84]:
+      - generic [ref=e85]: Welcome
+      - generic [ref=e86]: Sign in to continue
+      - button "Continue with Google" [ref=e87] [cursor=pointer]:
+        - generic [ref=e90]: Continue with Google
+      - generic [ref=e93]: or use email
+      - generic [ref=e95]:
+        - generic [ref=e96]: Email address
+        - textbox "supporter@atribe.app" [ref=e97]
+      - generic [ref=e98]:
+        - generic [ref=e99]: Password
+        - textbox "AtribeDemo123!" [ref=e100]
+      - button "Sign in with email" [ref=e101] [cursor=pointer]:
+        - generic [ref=e104]: Sign in with email
+      - generic [ref=e105]:
+        - generic [ref=e106]:
+          - generic [ref=e107]: supporter@atribe.app
+          - button "Use shopper demo" [ref=e108] [cursor=pointer]:
+            - generic [ref=e111]: Use shopper demo
+        - generic [ref=e112]:
+          - generic [ref=e113]: creator@atribe.app
+          - button "Use creator demo" [ref=e114] [cursor=pointer]:
+            - generic [ref=e117]: Use creator demo

@@ -13,15 +13,19 @@ import {
   ConnectBrandsScreen,
   ConnectSocialAccountsScreen,
   CreateCampaignScreen,
+  CreatorBioPageScreen,
+  CreatorBioPublicScreen,
   CreatorDashboardScreen,
   CreatorDiscoveryScreen,
   CreatorOnboardingScreen,
   CreatorSelectionScreen,
+  CreatorShareStoryScreen,
   FeedbackScreen,
   FallbackStateScreen,
   HomeScreen,
   IntentSelectionScreen,
   LandingScreen,
+  LocalePickerScreen,
   LoginScreen,
   SettingsScreen,
   ShareRouteScreen,
@@ -39,6 +43,7 @@ export default function AppNavigator() {
     creatorOnboardingPending,
     currentCreator,
     intent,
+    localeSelectionRequired,
     session
   } = useAppContext();
   const navigatorStateKey = `${session?.id || "guest"}:${intent || "none"}`;
@@ -65,16 +70,20 @@ export default function AppNavigator() {
         }
       }}
     >
-      {!session ? (
+      {localeSelectionRequired ? (
+        <Stack.Screen component={LocalePickerScreen} name="LocalePicker" />
+      ) : !session ? (
         <>
           <Stack.Screen component={LandingScreen} name="Landing" />
           <Stack.Screen component={LoginScreen} name="Login" />
+          <Stack.Screen component={CreatorBioPublicScreen} name="CreatorBioPublic" />
           <Stack.Screen component={ShareRouteScreen} name="ShareRoute" />
         </>
       ) : !intent ? (
         <>
           <Stack.Screen component={IntentSelectionScreen} name="IntentSelection" />
           <Stack.Screen component={ShareRouteScreen} name="ShareRoute" />
+          <Stack.Screen component={CreatorBioPublicScreen} name="CreatorBioPublic" />
         </>
       ) : (
         <>
@@ -105,8 +114,10 @@ export default function AppNavigator() {
               )}
               <Stack.Screen component={ConnectBrandsScreen} name="ConnectBrands" />
               <Stack.Screen component={ConnectSocialAccountsScreen} name="ConnectSocialAccounts" />
+              <Stack.Screen component={CreatorBioPageScreen} name="CreatorBioPage" />
               <Stack.Screen component={BrandProgramWebViewScreen} name="BrandProgramWebView" />
               <Stack.Screen component={AddAffiliateLinksScreen} name="AddAffiliateLinks" />
+              <Stack.Screen component={CreatorShareStoryScreen} name="CreatorShareStory" />
             </>
           ) : intent === "brand" ? (
             <>
@@ -125,8 +136,10 @@ export default function AppNavigator() {
               ) : null}
             </>
           ) : null}
+          <Stack.Screen component={LocalePickerScreen} name="LocalePicker" />
           <Stack.Screen component={FallbackStateScreen} name="FallbackState" />
           <Stack.Screen component={FeedbackScreen} name="Feedback" />
+          <Stack.Screen component={CreatorBioPublicScreen} name="CreatorBioPublic" />
           <Stack.Screen component={ShareRouteScreen} name="ShareRoute" />
           <Stack.Screen component={WebViewScreen} name="WebViewScreen" />
         </>

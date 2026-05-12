@@ -51,7 +51,7 @@ export default function BrandHomeScreen({ navigation }) {
               ? `${Number(brandInstallStatus.default_commission_rate) * 100}%`
               : "Default"
           }
-          detail="Campaign pool is split across eligible creators from the routed snapshot."
+          detail="Campaign pool is split across eligible creators from the magic link."
         />
       </View>
 

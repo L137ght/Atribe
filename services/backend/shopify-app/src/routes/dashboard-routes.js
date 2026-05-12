@@ -1,5 +1,6 @@
 import { Router } from "express";
 
+import { creatorBioController } from "../controllers/creator-bio-controller.js";
 import { dashboardController } from "../controllers/dashboard-controller.js";
 import {
   attachAuthContext,
@@ -16,6 +17,7 @@ dashboardRouter.get("/creator/links", requireAuthenticatedUser, requireCreatorOw
 dashboardRouter.get("/creator/earnings", requireAuthenticatedUser, requireCreatorOwnership, dashboardController.creatorEarnings);
 dashboardRouter.get("/creator/orders", requireAuthenticatedUser, requireCreatorOwnership, dashboardController.creatorOrders);
 dashboardRouter.get("/creator/brands", requireAuthenticatedUser, requireCreatorOwnership, dashboardController.creatorBrands);
+dashboardRouter.post("/creator/bio/sync", requireAuthenticatedUser, requireCreatorOwnership, creatorBioController.sync);
 dashboardRouter.post("/creator/brands", requireAuthenticatedUser, requireCreatorOwnership, dashboardController.creatorBrandCreate);
 dashboardRouter.patch("/creator/brands/:id", requireAuthenticatedUser, requireCreatorBrandLinkOwnership, dashboardController.creatorBrandUpdate);
 dashboardRouter.delete("/creator/brands/:id", requireAuthenticatedUser, requireCreatorBrandLinkOwnership, dashboardController.creatorBrandArchive);

@@ -3,6 +3,14 @@
   Enable this from Theme settings -> App embeds.
 {% endcomment %}
 
+<script>
+  window.atribeThemeContext = {
+    themeId: "nocturne-editorial",
+    countryCode: "{{ localization.country.iso_code | default: '' }}",
+    languageTag: "{{ request.locale.iso_code | replace: '_', '-' | default: '' }}"
+  };
+</script>
+
 {% schema %}
 {
   "name": "Atribe Attribution",
@@ -11,4 +19,3 @@
   "settings": []
 }
 {% endschema %}
-

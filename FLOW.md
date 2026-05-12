@@ -175,6 +175,7 @@ Primary implementation references:
 - Current screens:
   - `CreatorOnboarding`
   - `CreatorDashboard` (with Rewards tab for creating/managing supporter rewards)
+  - `CreatorShareStory`
   - `ConnectSocialAccounts`
   - `ConnectBrands`
   - `BrandProgramWebView`
@@ -457,6 +458,7 @@ Primary implementation references:
   - `ConnectSocialAccounts`
   - `AddAffiliateLinks`
   - `CreatorSelection`
+  - `CreatorShareStory`
 - Data source:
   - `currentCreator`
   - reads `creator_rewards` via `GET /api/creators/:creatorId/rewards` (Rewards tab)
@@ -468,9 +470,33 @@ Primary implementation references:
   - “Added brands” count is currently derived from `currentCreator.links` and does not clearly represent backend `creatorBrandLinks` Shopify associations
   - no creator earnings/orders reporting is surfaced here yet
 - Implementation notes:
+  - Prominent `Share to Story` CTA opens `CreatorShareStory` to generate a branded story card.
   - Rewards action tab shows `CreateRewardForm` component and lists existing rewards with `RewardCard` components
   - Reward types: Early Access, Shared Community, Private AMA
   - Delivery: external URL (Discord invite, Google Meet link, Notion page, etc.)
+
+### CreatorShareStory
+
+- Screen name: `CreatorShareStory`
+- File path: `apps/client/src/screens/CreatorShareStoryScreen.js`
+- User role: creator
+- Purpose: preview and export a branded 9:16 Atribe story card that promotes the creator profile
+- Entry path:
+  - `CreatorDashboard` via `Share to Story` CTA
+- Exit/next actions:
+  - native share sheet with captured PNG story card
+  - copy profile URL
+  - `CreatorDashboard`
+- Data source:
+  - `currentCreator`
+  - `creatorSocialAccounts` for handle display when available
+  - `session.photoUrl` as avatar fallback
+- Backend/Supabase calls:
+  - none
+- Implementation notes:
+  - story card rendering is isolated in `apps/client/src/components/CreatorStoryCard.js`
+  - profile URL construction is isolated in `apps/client/src/utils/buildCreatorProfileUrl.js`
+  - image export uses `react-native-view-shot`; native sharing uses `expo-sharing`; link copying uses `expo-clipboard`
 
 ### ConnectBrands
 
@@ -1070,6 +1096,26 @@ Primary implementation references:
 - Contradictions with `IMPLEMENTATION.md`:
   - backend creator reporting endpoints (earnings, orders) exist but are not consumed by this screen
   - rewards are now consumed via new support points API
+
+### 5a. Share creator story card
+
+- Screen/file:
+  - `apps/client/src/screens/CreatorShareStoryScreen.js`
+  - `apps/client/src/components/CreatorStoryCard.js`
+- Data written:
+  - none
+- Data read:
+  - `currentCreator`
+  - `creatorSocialAccounts`
+  - `session.photoUrl`
+- Whether backend creator endpoints are used:
+  - no
+- Whether direct Supabase writes happen:
+  - no
+- Export/share behavior:
+  - captures only the story card preview as PNG
+  - opens native share sheet when `expo-sharing` is available
+  - copies the creator profile URL through `expo-clipboard`
 
 ### 6. Create and manage supporter rewards
 

@@ -323,7 +323,7 @@ function AutoFlippingCarousel({ items }) {
 }
 
 export default function LandingScreen({ navigation }) {
-  const { currentCreator, intent, session } = useAppContext();
+  const { currentCreator, intent, session, t } = useAppContext();
   const scrollY = useRef(new Animated.Value(0)).current;
   const { width, height } = useWindowDimensions();
   const isCompact = width < 720;
@@ -380,14 +380,20 @@ export default function LandingScreen({ navigation }) {
             <View style={styles.mobileHeaderActions}>
               <GradientButton
                 compact
-                label="Get Started"
+                label={t("landing.getStarted", "Get Started")}
                 onPress={() => navigation.navigate("Login")}
               />
-              <LandingGhostButton label="Log in" onPress={() => navigation.navigate("Login")} />
+              <LandingGhostButton
+                label={t("landing.login", "Log in")}
+                onPress={() => navigation.navigate("Login")}
+              />
             </View>
           ) : null}
           {!isCompact ? (
-            <LandingGhostButton label="Log in" onPress={() => navigation.navigate("Login")} />
+            <LandingGhostButton
+              label={t("landing.login", "Log in")}
+              onPress={() => navigation.navigate("Login")}
+            />
           ) : null}
         </View>
 
@@ -474,14 +480,12 @@ export default function LandingScreen({ navigation }) {
                     ]}
                   >
                     {isCompact ? (
-                      <>
-                        Shop{"\n"}
-                        Brands.{"\n"}
-                        Support{"\n"}
-                        Creators.
-                      </>
+                      t("landing.heroTitleCompact", "Shop\nBrands.\nSupport\nCreators.")
                     ) : (
-                      "Shop Your Favorite Brands. Support Your Favorite Creators."
+                      t(
+                        "landing.heroTitle",
+                        "Shop Your Favorite Brands. Support Your Favorite Creators."
+                      )
                     )}
                   </Text>
                 <BodyText
@@ -495,7 +499,10 @@ export default function LandingScreen({ navigation }) {
                     }
                   ]}
                 >
-                  Atribe is a new way to support creators while gaining exclusive rewards and access to their most engaged community.
+                  {t(
+                    "landing.heroBody",
+                    "Atribe is a new way to support creators while gaining exclusive rewards and access to their most engaged community."
+                  )}
                 </BodyText>
                 <GradientTextLine
                   style={[
@@ -507,14 +514,18 @@ export default function LandingScreen({ navigation }) {
                       lineHeight: Math.round(mobileEmphasisSize * 1.2)
                     }
                   ]}
-                  text={isCompact ? "Better Deals. No Extra Cost" : "Better Deals. No added Costs"}
+                  text={
+                    isCompact
+                      ? t("landing.heroEmphasisCompact", "Better Deals. No Extra Cost")
+                      : t("landing.heroEmphasis", "Better Deals. No added Costs")
+                  }
                 />
               </View>
 
                 {!isCompact ? (
                   <View style={[styles.actions, isWide && styles.actionsWide]}>
                     <GradientButton
-                      label="Get Started"
+                      label={t("landing.getStarted", "Get Started")}
                       onPress={() => navigation.navigate("Login")}
                     />
                   </View>

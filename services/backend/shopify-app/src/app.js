@@ -1,6 +1,7 @@
 import express from "express";
 
 import { authRouter } from "./routes/auth-routes.js";
+import { creatorBioRouter } from "./routes/creator-bio-routes.js";
 import { dashboardRouter } from "./routes/dashboard-routes.js";
 import { debugRouter } from "./routes/debug-routes.js";
 import { linkRouter } from "./routes/link-routes.js";
@@ -73,6 +74,7 @@ export const createApp = () => {
   app.use("/links", linkRouter);
   app.use("/price-history", priceHistoryRouter);
   app.use("/api/price-history", priceHistoryRouter);
+  app.use("/api/creator-bio", creatorBioRouter);
   app.use("/storefront", storefrontRouter);
   app.use("/", redirectRouter);
 

@@ -13,6 +13,7 @@ import {
 import { useAppContext } from "../context";
 import {
   analyzeShoppingLink,
+  buildPriceSignalFromPriceHistory,
   buildSupporterRouteUrl,
   fetchPriceHistory,
   isAtribeBackendConfigured,
@@ -263,6 +264,21 @@ export default function HomeScreen({ navigation }) {
           data: result.data || null,
           error: null
         });
+
+        if (result.status === "success" && result.data) {
+          const backendPriceSignal = buildPriceSignalFromPriceHistory(result.data);
+          if (backendPriceSignal) {
+            setAnalysis((currentAnalysis) =>
+              currentAnalysis
+                ? {
+                    ...currentAnalysis,
+                    productTitle: currentAnalysis.productTitle || result.data.productTitle || "",
+                    priceSignal: backendPriceSignal
+                  }
+                : currentAnalysis
+            );
+          }
+        }
       } catch (error) {
         if (cancelled || error.name === "AbortError") return;
 
@@ -460,7 +476,7 @@ export default function HomeScreen({ navigation }) {
 
               {!destinationUrl.trim() ? (
                 <PrimaryButton
-                  label="Support and continue"
+                  label="Create a magic link"
                   onPress={handleGenerateRoute}
                 />
               ) : null}

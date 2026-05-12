@@ -1,1 +1,9 @@
-{}
+{
+  "atribe": {
+    "locale": {
+      "country": "Country",
+      "language": "Language",
+      "theme": "Theme"
+    }
+  }
+}

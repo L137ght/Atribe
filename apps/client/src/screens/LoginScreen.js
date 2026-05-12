@@ -1,5 +1,6 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { ActivityIndicator, Alert, Platform, Text, View, useWindowDimensions } from "react-native";
+import { makeRedirectUri } from "expo-auth-session";
 import * as WebBrowser from "expo-web-browser";
 import * as Google from "expo-auth-session/providers/google";
 import { useAppContext } from "../context";
@@ -34,26 +35,37 @@ export default function LoginScreen({ navigation }) {
     signInAsDemo,
     signInWithGoogle,
     signInWithGoogleOAuth,
-    signInWithPassword
+    signInWithPassword,
+    t
   } = useAppContext();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const { width } = useWindowDimensions();
   const isCompact = width < 980;
-  const googleConfig = useMemo(() => getGoogleAuthConfig(), []);
+  const googleConfig = useMemo(() => {
+    const config = getGoogleAuthConfig();
+
+    if (Platform.OS !== "web") {
+      config.redirectUri = makeRedirectUri({
+        native: "com.atribe.io:/oauthredirect"
+      });
+    }
+
+    return config;
+  }, []);
   const isGoogleConfigured = isGoogleAuthConfigured(googleConfig);
   const [request, response, promptAsync] = Google.useIdTokenAuthRequest(googleConfig);
 
   const demoAccounts = [
     {
       email: "supporter@atribe.app",
-      label: "Use shopper demo",
+      label: t("login.shopperDemo", "Use shopper demo"),
       password: "AtribeDemo123!"
     },
     {
       email: "creator@atribe.app",
-      label: "Use creator demo",
+      label: t("login.creatorDemo", "Use creator demo"),
       password: "AtribeDemo123!"
     }
   ];
@@ -65,14 +77,18 @@ export default function LoginScreen({ navigation }) {
       }
 
       if (response.type === "dismiss" || response.type === "cancel") {
-        showMessage("Google Login", "Google sign-in was canceled.");
+        showMessage(
+          t("login.alerts.googleTitle", "Google Login"),
+          t("login.alerts.googleCanceled", "Google sign-in was canceled.")
+        );
         return;
       }
 
       if (response.type === "error") {
         showMessage(
-          "Google Login",
-          response.error?.message || "Google sign-in failed. Check OAuth client settings."
+          t("login.alerts.googleTitle", "Google Login"),
+          response.error?.message ||
+            t("login.alerts.googleFailed", "Google sign-in failed. Check OAuth client settings.")
         );
         return;
       }
@@ -85,7 +101,10 @@ export default function LoginScreen({ navigation }) {
       const accessToken = response.params?.access_token || response.authentication?.accessToken;
 
       if (!idToken) {
-        showMessage("Google Login", "Google did not return an ID token.");
+        showMessage(
+          t("login.alerts.googleTitle", "Google Login"),
+          t("login.alerts.googleNoIdToken", "Google did not return an ID token.")
+        );
         return;
       }
 
@@ -99,28 +118,34 @@ export default function LoginScreen({ navigation }) {
         });
         navigation.replace("IntentSelection");
       } catch (error) {
-        showMessage("Google Login", error.message);
+        showMessage(t("login.alerts.googleTitle", "Google Login"), error.message);
       } finally {
         setIsSubmitting(false);
       }
     }
 
     handleAuthResponse();
-  }, [request?.nonce, response, signInWithGoogle]);
+  }, [request?.nonce, response, signInWithGoogle, t]);
 
   async function handleLogin() {
     if (!isSupabaseConfigured) {
       showMessage(
-        "Supabase setup",
-        "Add your Supabase URL and publishable key to .env.local before signing in."
+        t("login.alerts.supabaseTitle", "Supabase setup"),
+        t(
+          "login.alerts.supabaseBody",
+          "Add your Supabase URL and publishable key to .env.local before signing in."
+        )
       );
       return;
     }
 
     if (!isGoogleConfigured) {
       showMessage(
-        "Google Login",
-        "Add your Google OAuth client IDs in app.json under expo.extra before signing in."
+        t("login.alerts.googleTitle", "Google Login"),
+        t(
+          "login.alerts.googleConfigBody",
+          "Add your Google OAuth client IDs in app.json under expo.extra before signing in."
+        )
       );
       return;
     }
@@ -134,13 +159,19 @@ export default function LoginScreen({ navigation }) {
       }
 
       if (!request) {
-        showMessage("Google Login", "Google sign-in is still loading. Please try again.");
+        showMessage(
+          t("login.alerts.googleTitle", "Google Login"),
+          t("login.alerts.googleLoading", "Google sign-in is still loading. Please try again.")
+        );
         return;
       }
 
       await promptAsync();
     } catch (error) {
-      showMessage("Google Login", error?.message || "Unable to start Google login.");
+      showMessage(
+        t("login.alerts.googleTitle", "Google Login"),
+        error?.message || t("login.alerts.googleUnable", "Unable to start Google login.")
+      );
     }
   }
 
@@ -163,14 +194,20 @@ export default function LoginScreen({ navigation }) {
 
     if (!isSupabaseConfigured) {
       showMessage(
-        "Supabase setup",
-        "Add your Supabase URL and publishable key to .env.local before signing in."
+        t("login.alerts.supabaseTitle", "Supabase setup"),
+        t(
+          "login.alerts.supabaseBody",
+          "Add your Supabase URL and publishable key to .env.local before signing in."
+        )
       );
       return;
     }
 
     if (!nextEmail.trim() || !nextPassword) {
-      showMessage("Email login", "Enter an email and password.");
+      showMessage(
+        t("login.alerts.emailTitle", "Email login"),
+        t("login.alerts.emailMissing", "Enter an email and password.")
+      );
       return;
     }
 
@@ -183,7 +220,7 @@ export default function LoginScreen({ navigation }) {
       });
       navigation.replace("IntentSelection");
     } catch (error) {
-      showMessage("Email login", error.message);
+      showMessage(t("login.alerts.emailTitle", "Email login"), error.message);
     } finally {
       setIsSubmitting(false);
     }
@@ -194,22 +231,22 @@ export default function LoginScreen({ navigation }) {
       <View style={[styles.layout, isCompact && styles.layoutCompact]}>
         <View style={styles.copyPane}>
           <EditorialHero
-            title="Back the creators you love."
-            body="Shop Better Deals. No extra cost."
+            title={t("login.heroTitle", "Back the creators you love.")}
+            body={t("login.heroBody", "Shop Better Deals. No extra cost.")}
           />
         </View>
 
         <Card style={[styles.card, isCompact && styles.cardCompact]}>
-          <Text style={styles.cardTitle}>Welcome</Text>
-          <BodyText>Sign in to continue</BodyText>
+          <Text style={styles.cardTitle}>{t("login.welcome", "Welcome")}</Text>
+          <BodyText>{t("login.continue", "Sign in to continue")}</BodyText>
 
           <PrimaryButton
             label={
               isSubmitting
-                ? "Signing in..."
+                ? t("login.signingIn", "Signing in...")
                 : !request
-                  ? "Preparing Google..."
-                  : "Continue with Google"
+                  ? t("login.preparingGoogle", "Preparing Google...")
+                  : t("login.continueWithGoogle", "Continue with Google")
             }
             onPress={handleLogin}
             variant="gradient"
@@ -218,7 +255,7 @@ export default function LoginScreen({ navigation }) {
 
           <View style={styles.dividerRow}>
             <View style={styles.dividerLine} />
-            <Text style={styles.dividerText}>or use email</Text>
+            <Text style={styles.dividerText}>{t("login.orUseEmail", "or use email")}</Text>
             <View style={styles.dividerLine} />
           </View>
 
@@ -226,7 +263,7 @@ export default function LoginScreen({ navigation }) {
             autoCapitalize="none"
             autoCorrect={false}
             keyboardType="email-address"
-            label="Email address"
+            label={t("login.emailAddress", "Email address")}
             placeholder="supporter@atribe.app"
             value={email}
             onChangeText={setEmail}
@@ -235,7 +272,7 @@ export default function LoginScreen({ navigation }) {
           <InputField
             autoCapitalize="none"
             autoCorrect={false}
-            label="Password"
+            label={t("login.password", "Password")}
             placeholder="AtribeDemo123!"
             secureTextEntry
             value={password}
@@ -243,7 +280,11 @@ export default function LoginScreen({ navigation }) {
           />
 
           <PrimaryButton
-            label={isSubmitting ? "Signing in..." : "Sign in with email"}
+            label={
+              isSubmitting
+                ? t("login.signingIn", "Signing in...")
+                : t("login.signInWithEmail", "Sign in with email")
+            }
             onPress={() => handlePasswordLogin()}
             variant="gradient"
           />

@@ -235,7 +235,7 @@ export default function ShareRouteScreen({ navigation, route }) {
           </View>
 
           <View style={styles.actionsRow}>
-            <PrimaryButton compact label="Open routed link" onPress={handleOpenRoutedLink} />
+            <PrimaryButton compact label="Open magic link" onPress={handleOpenRoutedLink} />
             <SecondaryButton compact label="Copy link" onPress={handleCopyLink} />
           </View>
         </Card>
@@ -276,8 +276,8 @@ export default function ShareRouteScreen({ navigation, route }) {
     >
       <SectionHeader
         eyebrow="Share sheet"
-        title="Route this link"
-        body="Check the buy signals first, then continue with creator support."
+        title="Create Magic Link"
+        body="See if it's a good deal before generating your magic link."
       />
 
       {isLoading ? (

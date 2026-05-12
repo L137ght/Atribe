@@ -44,6 +44,14 @@ const ACTIONS = [
     route: "ConnectSocialAccounts"
   },
   {
+    id: "bio",
+    label: "Link in Bio",
+    title: "Link in Bio",
+    body: "Create a living profile page that updates with your latest content.",
+    primaryLabel: "Set Up My Page",
+    route: "CreatorBioPage"
+  },
+  {
     id: "domain",
     label: "Add domain",
     title: "Add domain",
@@ -174,6 +182,18 @@ export default function CreatorDashboardScreen({ navigation }) {
 
       <View style={styles.layout}>
         <View style={styles.mainColumn}>
+          <Card style={styles.shareStoryCard}>
+            <View style={styles.shareStoryCopy}>
+              <Text style={styles.shareStoryTitle}>Share to Story</Text>
+              <BodyText>Invite your audience to support you through Atribe.</BodyText>
+            </View>
+            <PrimaryButton
+              label="Create Story Card"
+              onPress={() => navigation.navigate("CreatorShareStory")}
+              variant="gradient"
+            />
+          </Card>
+
           <Card style={styles.actionPickerCard}>
             <View style={styles.actionPickerRow}>
               {ACTIONS.map((action) => (
@@ -220,6 +240,26 @@ const styles = {
   },
   actionPickerCard: {
     padding: theme.spacing.md
+  },
+  shareStoryCard: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    alignItems: "center",
+    justifyContent: "space-between",
+    gap: theme.spacing.md,
+    backgroundColor: theme.colors.surfaceElevated,
+    borderColor: theme.colors.accentBorder
+  },
+  shareStoryCopy: {
+    flex: 1,
+    minWidth: 240,
+    gap: 6
+  },
+  shareStoryTitle: {
+    color: theme.colors.textPrimary,
+    fontFamily: theme.fonts.serif,
+    fontSize: 30,
+    lineHeight: 36
   },
   actionPickerRow: {
     flexDirection: "row",

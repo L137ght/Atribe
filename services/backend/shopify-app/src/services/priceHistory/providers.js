@@ -10,7 +10,7 @@ const PROVIDER_TOTAL_TIMEOUT_MS = 12000;
 const MAX_RETRIES = 1;
 
 const DEFAULT_HEADERS = {
-  "User-Agent": "Mozilla/5.0 AtribePriceHistoryBot/1.0",
+  "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0 Safari/537.36 AtribePriceHistoryBot/1.0",
   "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
   "Accept-Language": "en-IN,en;q=0.9"
 };
@@ -62,6 +62,27 @@ export async function fetchHtml(url, { signal, timeoutMs = FETCH_TIMEOUT_MS } = 
   }
 
   throw lastError;
+}
+
+export async function resolveRedirectUrl(url, { signal, timeoutMs = FETCH_TIMEOUT_MS } = {}) {
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
+
+  if (signal) {
+    signal.addEventListener("abort", () => controller.abort(), { once: true });
+  }
+
+  try {
+    const response = await fetch(url, {
+      signal: controller.signal,
+      headers: DEFAULT_HEADERS,
+      redirect: "follow"
+    });
+
+    return response.url || url;
+  } finally {
+    clearTimeout(timeoutId);
+  }
 }
 
 /**

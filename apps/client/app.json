@@ -38,10 +38,10 @@
       "favicon": "./assets/favicon.png"
     },
     "extra": {
-      "googleExpoClientId": "537306486597-9e0r8hjucqv5ihufggivcglcsksjtip6.apps.googleusercontent.com",
+      "googleExpoClientId": "537306486597-cp6dbemgo72ttgutooddgk8fmb9ibbf1.apps.googleusercontent.com",
       "googleIosClientId": "537306486597-onus0tjbaaa45vjtnhr47lsbr03dua2o.apps.googleusercontent.com",
       "googleAndroidClientId": "537306486597-9e0r8hjucqv5ihufggivcglcsksjtip6.apps.googleusercontent.com",
-      "googleWebClientId": "537306486597-9e0r8hjucqv5ihufggivcglcsksjtip6.apps.googleusercontent.com"
+      "googleWebClientId": "537306486597-cp6dbemgo72ttgutooddgk8fmb9ibbf1.apps.googleusercontent.com"
     },
     "plugins": [
       "expo-web-browser",

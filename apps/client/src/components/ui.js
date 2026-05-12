@@ -1,6 +1,7 @@
 import React from "react";
 import {
   AccessibilityInfo,
+  Image,
   Platform,
   Pressable,
   SafeAreaView,
@@ -30,6 +31,48 @@ const MID_PINK = "#f287c0";
 const ROSE_MAGENTA = "#de5ca6";
 const BRIGHT_BERRY = "#c93e90";
 const DARK_RASPBERRY = "#8f0164";
+
+const NICHE_PLACEHOLDERS = {
+  "Howto & Style": require("../../assets/placeholders/avatar_cooking.png"),
+  "Music": require("../../assets/placeholders/avatar_music.png"),
+  "Gaming": require("../../assets/placeholders/avatar_gaming.png"),
+  "Autos & Vehicles": require("../../assets/placeholders/avatar_autos.png"),
+  "Film & Animation": require("../../assets/placeholders/avatar_film.png"),
+  "Pets & Animals": require("../../assets/placeholders/avatar_pets.png"),
+  "Sports": require("../../assets/placeholders/avatar_sports.png"),
+  "Travel & Events": require("../../assets/placeholders/avatar_travel.png"),
+  "Education": require("../../assets/placeholders/avatar_education.png"),
+  "Science & Technology": require("../../assets/placeholders/avatar_science.png"),
+  "Sustainability": require("../../assets/placeholders/avatar_sustainability.png"),
+  "Visual storytelling": require("../../assets/placeholders/avatar_photography.png"),
+  "Lifestyle / tech": require("../../assets/placeholders/avatar_tech.png"),
+  "Editorial style": require("../../assets/placeholders/avatar_photography.png"),
+  "Architecture": require("../../assets/placeholders/avatar_photography.png")
+};
+
+export function CreatorAvatar({ creator, size = 34, style }) {
+  if (!creator) return null;
+
+  const source = creator.profilePic 
+    ? { uri: creator.profilePic } 
+    : (NICHE_PLACEHOLDERS[creator.niche] || null);
+
+  if (source) {
+    return (
+      <Image 
+        source={source} 
+        style={[{ width: size, height: size, borderRadius: size / 2, borderWidth: 1, borderColor: theme.colors.borderSubtle }, style]} 
+      />
+    );
+  }
+
+  const initial = creator.name ? creator.name.charAt(0).toUpperCase() : "A";
+  return (
+    <View style={[{ width: size, height: size, borderRadius: size / 2, alignItems: "center", justifyContent: "center", borderWidth: 1, borderColor: theme.colors.borderSubtle, backgroundColor: theme.colors.surfaceElevated }, style]}>
+      <Text style={{ color: theme.colors.textPrimary, fontFamily: theme.fonts.sans, fontWeight: "700" }}>{initial}</Text>
+    </View>
+  );
+}
 
 function useReducedMotionPreference() {
   const [reducedMotionEnabled, setReducedMotionEnabled] = React.useState(false);
@@ -136,26 +179,26 @@ export function AppShell({
   subtitle,
   hideNavigation = false
 }) {
-  const { currentCreator, intent } = useAppContext();
+  const { currentCreator, intent, t } = useAppContext();
   const { width } = useWindowDimensions();
   const isCompact = width < 900;
   const navItems =
     intent === "creator"
       ? [
-          { route: "CreatorDiscovery", label: "Discover" },
-          { route: "CreatorDashboard", label: "Dashboard" },
-          { route: "Settings", label: "Settings" }
+          { route: "CreatorDiscovery", label: t("navigation.discover", "Discover") },
+          { route: "CreatorDashboard", label: t("navigation.dashboard", "Dashboard") },
+          { route: "Settings", label: t("navigation.settings", "Settings") }
         ]
       : intent === "brand"
       ? [
-          { route: "BrandHome", label: "Brand" },
-          { route: "CreateCampaign", label: "Campaign" },
-          { route: "Settings", label: "Settings" }
+          { route: "BrandHome", label: t("navigation.brand", "Brand") },
+          { route: "CreateCampaign", label: t("navigation.campaign", "Campaign") },
+          { route: "Settings", label: t("navigation.settings", "Settings") }
         ]
       : [
-          { route: "Home", label: "Route" },
-          { route: "CreatorDiscovery", label: "Discover" },
-          { route: "Settings", label: "Settings" }
+          { route: "Home", label: t("navigation.links", "Links") },
+          { route: "CreatorDiscovery", label: t("navigation.discover", "Discover") },
+          { route: "Settings", label: t("navigation.settings", "Settings") }
         ];
 
   return (
@@ -181,9 +224,13 @@ export function AppShell({
           ) : (
             <View />
           )}
-          <View style={styles.avatar}>
-            <Text style={styles.avatarText}>A</Text>
-          </View>
+          {currentCreator ? (
+            <CreatorAvatar creator={currentCreator} />
+          ) : (
+            <View style={styles.avatar}>
+              <Text style={styles.avatarText}>A</Text>
+            </View>
+          )}
         </View>
 
         <ScrollView

@@ -1,0 +1,41 @@
+- generic [ref=e319]:
+  - generic [ref=e320]:
+    - generic [ref=e323] [cursor=pointer]: Atribe
+    - generic [ref=e324]:
+      - generic [ref=e326] [cursor=pointer]: Discover
+      - generic [ref=e328] [cursor=pointer]: Dashboard
+      - generic [ref=e330] [cursor=pointer]: Settings
+    - generic [ref=e332]: A
+  - generic [ref=e334]:
+    - generic [ref=e335]:
+      - generic [ref=e336]:
+        - generic [ref=e337]: Share to story
+        - generic [ref=e338]: Share your Atribe story
+        - generic [ref=e339]: Post this card to invite your audience to support your work at no extra cost.
+      - generic [ref=e342] [cursor=pointer]: Back
+    - generic [ref=e343]:
+      - generic [ref=e346]:
+        - generic [ref=e347]: ✦
+        - generic [ref=e348]: ✦
+        - generic [ref=e349]: ✦
+        - generic [ref=e350]:
+          - generic [ref=e351]: atribe
+          - generic [ref=e352]: ✦
+        - generic [ref=e353]:
+          - generic [ref=e356]: AS
+          - generic [ref=e357]: Atribe Studio
+        - generic [ref=e358]:
+          - generic [ref=e359]: Want to support what I make?
+          - generic [ref=e360]: Join Atribe and Support me at no extra cost
+        - generic [ref=e361]:
+          - generic [ref=e362]: ↗
+          - generic [ref=e363]: Tap my link sticker
+        - generic [ref=e366]: Powered by Atribe
+      - generic [ref=e367]:
+        - generic [ref=e368]: Ready to post
+        - generic [ref=e369]: Share exports only the story card. Add the copied profile URL as your Instagram link sticker before posting.
+        - generic [ref=e371]: https://atribe.io/creators/demo-creator-profile
+        - button "Share Story Card" [ref=e372] [cursor=pointer]:
+          - generic [ref=e375]: Share Story Card
+        - generic [ref=e377] [cursor=pointer]: Copy Profile Link
+        - generic [ref=e378]: Web preview support depends on the browser. Copy Profile Link remains available.

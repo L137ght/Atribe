@@ -1,11 +1,27 @@
 (() => {
   const STORAGE_KEY = "atribe_attribution";
+  const LOCALE_STORAGE_KEY = "atribe_locale";
   const ATTRIBE_REF_KEY = "atribe_ref";
   const ATTRIBE_CLICK_KEY = "atribe_click";
   const ATTRIBE_USER_KEY = "atribe_user";
   const ATTRIBE_SNAPSHOT_KEY = "atribe_snapshot";
   const ATTRIBE_CREATOR_KEY = "atribe_creator";
   const ATTRIBE_TIMESTAMP_KEY = "atribe_timestamp";
+  const ATTRIBE_COUNTRY_KEY = "atribe_country";
+  const ATTRIBE_LANG_KEY = "atribe_lang";
+  const ATTRIBE_THEME_KEY = "atribe_theme";
+  const THEME_CONFIG = {
+    themeId: "nocturne-editorial",
+    defaultCountryCode: "US",
+    defaultLanguageTag: "en-US",
+    countries: [
+      { code: "US", defaultLanguageTag: "en-US", supportedLanguageTags: ["en-US", "es-US"] },
+      { code: "IN", defaultLanguageTag: "en-IN", supportedLanguageTags: ["en-IN", "hi-IN"] },
+      { code: "CA", defaultLanguageTag: "en-CA", supportedLanguageTags: ["en-CA", "fr-CA"] },
+      { code: "CH", defaultLanguageTag: "de-CH", supportedLanguageTags: ["de-CH", "fr-CH", "it-CH"] },
+      { code: "FR", defaultLanguageTag: "fr-FR", supportedLanguageTags: ["fr-FR", "en-FR"] }
+    ]
+  };
 
   const safeRun = (fn) => {
     try {
@@ -13,6 +29,81 @@
     } catch (_error) {
       // Attribution must never break the storefront experience.
     }
+  };
+
+  const normalizeLanguageTag = (languageTag) => {
+    const trimmedValue = String(languageTag || "").trim().replace(/_/g, "-");
+
+    if (!trimmedValue) {
+      return "";
+    }
+
+    const parts = trimmedValue.split("-").filter(Boolean);
+    const [language, region] = parts;
+
+    if (!region) {
+      return language.toLowerCase();
+    }
+
+    return `${language.toLowerCase()}-${region.toUpperCase()}`;
+  };
+
+  const getCountryConfig = (countryCode) =>
+    THEME_CONFIG.countries.find((country) => country.code === String(countryCode || "").toUpperCase()) || null;
+
+  const findLanguageMatch = (countryConfig, languageTag) => {
+    const normalizedLanguageTag = normalizeLanguageTag(languageTag);
+
+    if (!countryConfig || !normalizedLanguageTag) {
+      return null;
+    }
+
+    return (
+      countryConfig.supportedLanguageTags.find((supportedLanguageTag) => {
+        const normalizedSupportedLanguageTag = normalizeLanguageTag(supportedLanguageTag);
+
+        return (
+          normalizedSupportedLanguageTag === normalizedLanguageTag ||
+          normalizedSupportedLanguageTag.split("-")[0] === normalizedLanguageTag.split("-")[0]
+        );
+      }) || null
+    );
+  };
+
+  const inferCountryFromLanguage = (languageTag) => {
+    const normalizedLanguageTag = normalizeLanguageTag(languageTag);
+    return normalizedLanguageTag.includes("-") ? normalizedLanguageTag.split("-")[1] : "";
+  };
+
+  const resolveLocale = () => {
+    const storefrontContext = window.atribeThemeContext || {};
+    const browserLanguages = (window.navigator?.languages || [window.navigator?.language])
+      .map(normalizeLanguageTag)
+      .filter(Boolean);
+    const storefrontCountryConfig =
+      getCountryConfig(storefrontContext.countryCode) ||
+      getCountryConfig(inferCountryFromLanguage(browserLanguages[0])) ||
+      getCountryConfig(inferCountryFromLanguage(storefrontContext.languageTag)) ||
+      getCountryConfig(THEME_CONFIG.defaultCountryCode);
+    const matchedLanguage =
+      browserLanguages
+        .map((languageTag) => findLanguageMatch(storefrontCountryConfig, languageTag))
+        .find(Boolean) ||
+      findLanguageMatch(storefrontCountryConfig, storefrontContext.languageTag) ||
+      storefrontCountryConfig.defaultLanguageTag;
+    const locale = {
+      countryCode: storefrontCountryConfig.code,
+      languageTag: matchedLanguage,
+      themeId: THEME_CONFIG.themeId,
+      source: browserLanguages.length ? "browser" : "default"
+    };
+
+    window.localStorage.setItem(LOCALE_STORAGE_KEY, JSON.stringify(locale));
+    window.localStorage.setItem(ATTRIBE_COUNTRY_KEY, locale.countryCode || "");
+    window.localStorage.setItem(ATTRIBE_LANG_KEY, locale.languageTag || "");
+    window.localStorage.setItem(ATTRIBE_THEME_KEY, locale.themeId || "");
+
+    return locale;
   };
 
   const readStoredAttribution = () => {
@@ -105,6 +196,7 @@
   };
 
   const syncCartAttributes = async (attribution) => {
+    const locale = resolveLocale();
     const cartResponse = await fetch("/cart.js", {
       credentials: "same-origin",
       headers: {
@@ -122,7 +214,10 @@
       atribe_user: attribution.atribe_user || "",
       atribe_snapshot: attribution.atribe_snapshot || "",
       atribe_creator: attribution.atribe_creator || "",
-      atribe_ts: attribution.timestamp
+      atribe_ts: attribution.timestamp,
+      atribe_country: locale.countryCode,
+      atribe_lang: locale.languageTag,
+      atribe_theme: locale.themeId
     };
 
     const isAlreadySynced =
@@ -131,7 +226,10 @@
       (currentAttributes.atribe_user || "") === nextAttributes.atribe_user &&
       (currentAttributes.atribe_snapshot || "") === nextAttributes.atribe_snapshot &&
       (currentAttributes.atribe_creator || "") === nextAttributes.atribe_creator &&
-      currentAttributes.atribe_ts === nextAttributes.atribe_ts;
+      currentAttributes.atribe_ts === nextAttributes.atribe_ts &&
+      (currentAttributes.atribe_country || "") === nextAttributes.atribe_country &&
+      (currentAttributes.atribe_lang || "") === nextAttributes.atribe_lang &&
+      (currentAttributes.atribe_theme || "") === nextAttributes.atribe_theme;
 
     if (isAlreadySynced) return;
 
@@ -159,6 +257,7 @@
   };
 
   safeRun(() => {
+    resolveLocale();
     const attribution = resolveAttribution();
     if (!attribution) return;
 

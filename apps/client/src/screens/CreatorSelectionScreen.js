@@ -5,6 +5,7 @@ import {
   AppShell,
   BodyText,
   Card,
+  CreatorAvatar,
   InputField,
   PrimaryButton,
   SecondaryButton,
@@ -102,13 +103,16 @@ export default function CreatorSelectionScreen({ navigation }) {
 
           return (
             <Card key={creator.id} style={styles.creatorCard}>
-              <View style={{ gap: 6 }}>
-                <Text style={styles.creatorName}>{creator.name}</Text>
-                <Text style={styles.creatorMeta}>
-                  {creator.platform} · {creator.niche}
-                </Text>
-                <BodyText>{creator.bio}</BodyText>
+              <View style={{ flexDirection: "row", gap: theme.spacing.sm, alignItems: "center", marginBottom: 8 }}>
+                <CreatorAvatar creator={creator} size={48} />
+                <View style={{ gap: 4 }}>
+                  <Text style={styles.creatorName}>{creator.name}</Text>
+                  <Text style={styles.creatorMeta}>
+                    {creator.platform} · {creator.niche}
+                  </Text>
+                </View>
               </View>
+              <BodyText>{creator.bio}</BodyText>
 
               {isSelected ? (
                 <>

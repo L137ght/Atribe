@@ -6,7 +6,7 @@
  * @module productInfo
  */
 
-const SUPPORTED_MARKETPLACES = ["amazon.in", "amazon.com", "flipkart.com"];
+const SUPPORTED_MARKETPLACES = ["amazon.in", "amazon.com", "amzn.in", "flipkart.com"];
 
 const STOP_WORDS = new Set([
   "for", "with", "and", "the", "new", "latest", "original",
@@ -68,7 +68,7 @@ export function extractProductInfoFromUrl(inputUrl) {
 
   base.isValid = true;
 
-  if (marketplace.startsWith("amazon")) {
+  if (marketplace.startsWith("amazon") || marketplace === "amzn.in") {
     base.marketplace = "amazon";
     const dpIndex = parsed.pathname.split("/").filter(Boolean).findIndex(
       (p) => p.toLowerCase() === "dp"
@@ -122,7 +122,11 @@ function buildCacheKey(info) {
     .toLowerCase()
     .replace(/[^a-z0-9\s]/g, "")
     .trim();
-  return `price-history:${info.marketplace}:${normalizedTitle}`;
+  if (normalizedTitle) {
+    return `price-history:${info.marketplace}:${normalizedTitle}`;
+  }
+
+  return `price-history:${info.marketplace}:${info.originalUrl}`;
 }
 
 /**

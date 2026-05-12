@@ -34,7 +34,7 @@ Documentation-only rule:
   - Implemented in: `apps/client/App.js`
   - Implemented in: `apps/client/src/navigation/AppNavigator.js`
   - Implemented in: `apps/client/src/context/AppContext.js`
-  - Active screens: `LandingScreen`, `LoginScreen`, `IntentSelectionScreen`, `HomeScreen`, `CreatorDiscoveryScreen`, `CreatorSelectionScreen`, `ShareRouteScreen`, `SettingsScreen`, `FallbackStateScreen`, `FeedbackScreen`, `CreatorOnboardingScreen`, `CreatorDashboardScreen`, `ConnectBrandsScreen`, `ConnectSocialAccountsScreen`, `BrandProgramWebViewScreen`, `AddAffiliateLinksScreen`, `WebViewScreen`, `BrandOnboardingScreen`, `BrandConnectingScreen`, `BrandShopifySuccessScreen`, `CampaignGateScreen`, `CreateCampaignScreen`, `CampaignSuccessScreen`, `BrandHomeScreen`
+  - Active screens: `LandingScreen`, `LoginScreen`, `IntentSelectionScreen`, `HomeScreen`, `CreatorDiscoveryScreen`, `CreatorSelectionScreen`, `ShareRouteScreen`, `SettingsScreen`, `FallbackStateScreen`, `FeedbackScreen`, `CreatorOnboardingScreen`, `CreatorDashboardScreen`, `CreatorShareStoryScreen`, `ConnectBrandsScreen`, `ConnectSocialAccountsScreen`, `BrandProgramWebViewScreen`, `AddAffiliateLinksScreen`, `WebViewScreen`, `BrandOnboardingScreen`, `BrandConnectingScreen`, `BrandShopifySuccessScreen`, `CampaignGateScreen`, `CreateCampaignScreen`, `CampaignSuccessScreen`, `BrandHomeScreen`
 
 - `services/backend/shopify-app` — Shopify integration layer (OAuth, webhooks, storefront scripts). Requires `SHOPIFY_API_KEY` etc.
   - Entry point: `services/backend/shopify-app/src/createShopifyApp.js`
@@ -718,13 +718,19 @@ Not currently used by production UI: `apps/client/src/screens/*`
    - Implemented in: `apps/client/src/screens/CreatorOnboardingScreen.js`
    - Implemented in: `apps/client/src/screens/CreatorDashboardScreen.js`
 
-2. Creator can browse brand programs.
+2. Creator dashboard includes a `Share to Story` growth CTA that opens a story-native profile promotion flow.
+   - Implemented in: `apps/client/src/screens/CreatorDashboardScreen.js`
+   - Implemented in: `apps/client/src/screens/CreatorShareStoryScreen.js`
+   - Implemented in: `apps/client/src/components/CreatorStoryCard.js`
+   - Implemented in: `apps/client/src/utils/buildCreatorProfileUrl.js`
+
+3. Creator can browse brand programs.
    - Implemented in: `apps/client/src/screens/ConnectBrandsScreen.js`
 
-3. Creator can open a brand program webview and either save an external affiliate URL or create a Shopify store association through backend creator-brand endpoints.
+4. Creator can open a brand program webview and either save an external affiliate URL or create a Shopify store association through backend creator-brand endpoints.
    - Implemented in: `apps/client/src/screens/BrandProgramWebViewScreen.js`
 
-4. Creator can add/remove external affiliate links directly, while Shopify store connections go through backend creator-brand endpoints.
+5. Creator can add/remove external affiliate links directly, while Shopify store connections go through backend creator-brand endpoints.
    - Implemented in: `apps/client/src/screens/AddAffiliateLinksScreen.js`
    - Implemented in: `apps/client/src/context/AppContext.js`
 

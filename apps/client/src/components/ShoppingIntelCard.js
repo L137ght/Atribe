@@ -61,7 +61,7 @@ export default function ShoppingIntelCard({
   fallbackMessage,
   onPrimaryPress,
   onSecondaryPress,
-  primaryLabel = "Shop with creator support",
+  primaryLabel = "Create a magic link",
   secondaryLabel = "Clear link",
   secondaryTone = "button",
   disabled = false

@@ -1,6 +1,6 @@
 import { atribeBackendUrl, isAtribeBackendConfigured } from "./backend";
 
-const SUPPORTED_MARKETPLACES = ["amazon.in", "amazon.com", "flipkart.com"];
+const SUPPORTED_MARKETPLACES = ["amazon.in", "amazon.com", "amzn.in", "flipkart.com"];
 
 /**
  * Check if a URL is from a supported marketplace for price history lookup.

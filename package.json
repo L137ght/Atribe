@@ -8,19 +8,26 @@
     "services/backend/*",
     "packages/*"
   ],
+  "overrides": {
+    "react-native-worklets": "0.5.1"
+  },
+  "devDependencies": {
+    "metro-runtime": "0.83.7",
+    "react-native-worklets": "0.5.1"
+  },
   "scripts": {
-    "client:start": "npm --workspace @atribe/client run start",
-    "client:ios": "npm --workspace @atribe/client run ios",
-    "client:android": "npm --workspace @atribe/client run android",
-    "client:web": "npm --workspace @atribe/client run web",
-    "backend:start": "npm --workspace @atribe/backend run start",
-    "backend:dev": "npm --workspace @atribe/backend run dev",
-    "api:start": "npm --workspace @atribe/api run start",
-    "api:dev": "npm --workspace @atribe/api run dev",
-    "redirect:start": "npm --workspace @atribe/redirect run start",
-    "redirect:dev": "npm --workspace @atribe/redirect run dev",
-    "shopify:start": "npm --workspace @atribe/shopify-app run start",
-    "shopify:dev": "npm --workspace @atribe/shopify-app run dev",
-    "test:support-feature": "node --test packages/domain/test/*.test.js services/backend/api/test/*.test.js services/backend/redirect/test/*.test.js services/backend/shopify-app/test/*.test.js"
+    "client:start": "npm --workspace @atribe/client run start --",
+    "client:ios": "npm --workspace @atribe/client run ios --",
+    "client:android": "npm --workspace @atribe/client run android --",
+    "client:web": "npm --workspace @atribe/client run web --",
+    "backend:start": "npm --workspace @atribe/backend run start --",
+    "backend:dev": "npm --workspace @atribe/backend run dev --",
+    "api:start": "npm --workspace @atribe/api run start --",
+    "api:dev": "npm --workspace @atribe/api run dev --",
+    "redirect:start": "npm --workspace @atribe/redirect run start --",
+    "redirect:dev": "npm --workspace @atribe/redirect run dev --",
+    "shopify:start": "npm --workspace @atribe/shopify-app run start --",
+    "shopify:dev": "npm --workspace @atribe/shopify-app run dev --",
+    "test:support-feature": "node --test --test-concurrency=1 packages/domain/test/*.test.js services/backend/api/test/*.test.js services/backend/redirect/test/*.test.js services/backend/shopify-app/test/*.test.js"
   }
 }

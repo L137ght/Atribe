@@ -45,7 +45,7 @@ export function ShareLinkSuccess({ shareUrl, shortCode, pointsAwarded }) {
 
   return (
     <Card style={feedbackStyles.successCard}>
-      <Text style={feedbackStyles.successTitle}>Your support link is ready.</Text>
+      <Text style={feedbackStyles.successTitle}>Your magic link is ready.</Text>
       <BodyText>
         Every valid click helps this creator and increases your Support Score.
       </BodyText>
@@ -175,7 +175,7 @@ export default function ShareSupportForm({ selectedCreatorId, onCreated }) {
       ) : null}
 
       <PrimaryButton
-        label={isSubmitting ? "Creating..." : "Create support link"}
+        label={isSubmitting ? "Creating..." : "Create a magic link"}
         onPress={handleCreate}
         disabled={isSubmitting || !url.trim()}
       />

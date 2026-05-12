@@ -1,8 +1,8 @@
 /**
- * PriceHistoryApp.com provider — fallback price history source.
+ * PriceHistoryApp.com provider.
  *
  * Attempts direct slug match first, then site search.
- * Lower priority than ProductHistory.in.
+ * Resolves direct product pages from URL-derived and marketplace page titles.
  *
  * @module priceHistoryAppProvider
  */
@@ -14,7 +14,8 @@ import {
   extractMetaContent,
   extractTagContent,
   extractPriceNearLabel,
-  extractChartData
+  extractChartData,
+  extractNextData
 } from "./htmlParsers.js";
 import { normalizeDealVerdict } from "./confidence.js";
 
@@ -28,55 +29,108 @@ const PRICE_HISTORY_APP_BASE = "https://pricehistoryapp.com";
  * @returns {Promise<PriceHistoryResult|null>}
  */
 export async function lookupPriceHistoryApp(productInfo, { signal } = {}) {
-  // Attempt 1: Direct slug from title
-  const slug = normalizeToSlug(productInfo.titleCandidate);
+  const titleCandidates = await buildTitleCandidates(productInfo, { signal });
   let pageHtml = null;
   let productPageUrl = null;
 
-  if (slug) {
-    try {
-      const directUrl = `${PRICE_HISTORY_APP_BASE}/product/${slug}`;
-      pageHtml = await fetchHtml(directUrl, { signal });
+  // Attempt 1: Direct slug from URL/page title candidates.
+  for (const title of titleCandidates) {
+    const slug = normalizeToSlug(title);
+    if (!slug) continue;
 
-      // Verify it's a real product page (not a 404 or listing page)
-      const pageTitle = extractTagContent(pageHtml, "title") ||
-        extractMetaContent(pageHtml, "og:title") || "";
-      const pageTokens = extractTokens(pageTitle);
-      const sourceTokens = extractTokens(productInfo.titleCandidate || "");
-      const overlap = sourceTokens.filter((t) => pageTokens.includes(t)).length;
+    const directResult = await fetchAndVerifyDirectProductPage(directUrlForSlug(slug), title, {
+      signal
+    });
 
-      if (overlap >= 2 || (pageTokens.length > 0 && overlap >= 1 && sourceTokens.length <= 3)) {
-        productPageUrl = directUrl;
-      } else {
-        pageHtml = null;
-      }
-    } catch (error) {
-      if (error.name === "AbortError") throw error;
-      pageHtml = null;
+    if (directResult) {
+      pageHtml = directResult.pageHtml;
+      productPageUrl = directResult.productPageUrl;
+      break;
     }
   }
 
   // Attempt 2: Search fallback
   if (!productPageUrl) {
-    try {
-      const searchHtml = await fetchPriceHistoryAppSearchHtml(
-        productInfo.titleCandidate,
-        { signal }
-      );
-      const foundPath = findProductFromSearch(searchHtml, productInfo.titleCandidate);
+    for (const title of titleCandidates) {
+      try {
+        const searchHtml = await fetchPriceHistoryAppSearchHtml(title, { signal });
+        const foundPath = findProductFromSearch(searchHtml, title);
 
-      if (foundPath) {
-        productPageUrl = `${PRICE_HISTORY_APP_BASE}${foundPath}`;
-        pageHtml = await fetchHtml(productPageUrl, { signal });
+        if (foundPath) {
+          productPageUrl = `${PRICE_HISTORY_APP_BASE}${foundPath}`;
+          pageHtml = await fetchHtml(productPageUrl, { signal });
+          break;
+        }
+      } catch (error) {
+        if (error.name === "AbortError") throw error;
       }
-    } catch (error) {
-      if (error.name === "AbortError") throw error;
     }
   }
 
   if (!productPageUrl || !pageHtml) return null;
 
   return parsePriceHistoryAppProductPage(pageHtml, productPageUrl, productInfo);
+}
+
+async function buildTitleCandidates(productInfo, { signal } = {}) {
+  const titles = [productInfo.titleCandidate, productInfo.productId].filter(Boolean);
+  const marketplaceTitle = await fetchMarketplaceProductTitle(productInfo.originalUrl, { signal });
+  if (marketplaceTitle) {
+    titles.unshift(marketplaceTitle);
+  }
+
+  return [...new Set(titles.map((title) => String(title || "").trim()).filter(Boolean))];
+}
+
+async function fetchMarketplaceProductTitle(url, { signal } = {}) {
+  try {
+    const html = await fetchHtml(url, { signal, timeoutMs: 6000 });
+    const amazonTitle = html
+      .match(/id=["']productTitle["'][^>]*>([\s\S]*?)<\/span>/i)?.[1]
+      ?.replace(/<[^>]*>/g, " ")
+      .replace(/\s+/g, " ")
+      .trim();
+
+    return (
+      amazonTitle ||
+      extractMetaContent(html, "og:title") ||
+      extractTagContent(html, "title")?.replace(/\s*:\s*Amazon\.in.*$/i, "").trim() ||
+      null
+    );
+  } catch (error) {
+    if (error.name === "AbortError") throw error;
+    return null;
+  }
+}
+
+function directUrlForSlug(slug) {
+  return `${PRICE_HISTORY_APP_BASE}/product/${slug}`;
+}
+
+async function fetchAndVerifyDirectProductPage(directUrl, sourceTitle, { signal } = {}) {
+  try {
+    const pageHtml = await fetchHtml(directUrl, { signal });
+    const pageTitle =
+      extractTagContent(pageHtml, "title") ||
+      extractMetaContent(pageHtml, "og:title") ||
+      "";
+
+    if (/404\s+Page\s+Not\s+Found/i.test(pageTitle)) {
+      return null;
+    }
+
+    const pageTokens = extractTokens(pageTitle);
+    const sourceTokens = extractTokens(sourceTitle || "");
+    const overlap = sourceTokens.filter((t) => pageTokens.includes(t)).length;
+
+    if (overlap >= 2 || (pageTokens.length > 0 && overlap >= 1 && sourceTokens.length <= 3)) {
+      return { pageHtml, productPageUrl: directUrl };
+    }
+  } catch (error) {
+    if (error.name === "AbortError") throw error;
+  }
+
+  return null;
 }
 
 /**
@@ -133,18 +187,36 @@ function findProductFromSearch(html, targetTitle) {
  * @param {import("./productInfo.js").ProductInfo} productInfo
  * @returns {PriceHistoryResult|null}
  */
-function parsePriceHistoryAppProductPage(html, productPageUrl, productInfo) {
+export function parsePriceHistoryAppProductPage(html, productPageUrl, productInfo) {
   try {
+    const nextProduct = extractPriceHistoryAppNextProduct(html);
+
     const productTitle =
+      nextProduct?.name ||
       extractMetaContent(html, "og:title") ||
       extractTagContent(html, "h1") ||
       extractTagContent(html, "title")?.replace(/[-|].*PriceHistory.*$/i, "").trim() ||
       null;
 
-    const currentPrice = extractPriceNearLabel(html, "Current(?:\\s+Price)?") || null;
-    const lowestPrice = extractPriceNearLabel(html, "Lowest") || extractPriceNearLabel(html, "Min") || null;
-    const highestPrice = extractPriceNearLabel(html, "Highest") || extractPriceNearLabel(html, "Max") || null;
-    const averagePrice = extractPriceNearLabel(html, "Average") || extractPriceNearLabel(html, "Avg") || null;
+    const currentPrice =
+      productInfoValue(nextProduct?.price) ||
+      extractPriceNearLabel(html, "Current(?:\\s+Price)?") ||
+      null;
+    const lowestPrice =
+      productInfoValue(nextProduct?.lowest_price) ||
+      extractPriceNearLabel(html, "Lowest") ||
+      extractPriceNearLabel(html, "Min") ||
+      null;
+    const highestPrice =
+      productInfoValue(nextProduct?.highest_price) ||
+      extractPriceNearLabel(html, "Highest") ||
+      extractPriceNearLabel(html, "Max") ||
+      null;
+    const averagePrice =
+      productInfoValue(nextProduct?.average_price) ||
+      extractPriceNearLabel(html, "Average") ||
+      extractPriceNearLabel(html, "Avg") ||
+      null;
 
     let dealVerdict = "Unknown";
     const verdictPatterns = [
@@ -159,7 +231,9 @@ function parsePriceHistoryAppProductPage(html, productPageUrl, productInfo) {
       }
     }
 
-    const chartData = extractChartData(html);
+    const chartData = nextProduct
+      ? extractHistoryChartData(nextProduct.history) || []
+      : extractChartData(html);
 
     return {
       provider: "pricehistoryapp",
@@ -181,4 +255,38 @@ function parsePriceHistoryAppProductPage(html, productPageUrl, productInfo) {
   } catch {
     return null;
   }
+}
+
+function extractPriceHistoryAppNextProduct(html) {
+  const nextData = extractNextData(html);
+  return nextData?.props?.pageProps?.ogProduct || null;
+}
+
+function productInfoValue(value) {
+  const parsed = Number(value);
+  return Number.isFinite(parsed) && parsed > 0 ? parsed : null;
+}
+
+function extractHistoryChartData(history) {
+  if (!history || typeof history !== "object") {
+    return null;
+  }
+
+  const points = Object.entries(history)
+    .map(([timestamp, price]) => {
+      const unixSeconds = Number(timestamp);
+      const parsedPrice = Number(price);
+      if (!Number.isFinite(unixSeconds) || !Number.isFinite(parsedPrice) || parsedPrice <= 0) {
+        return null;
+      }
+
+      return {
+        date: new Date(unixSeconds * 1000).toISOString().slice(0, 10),
+        price: parsedPrice
+      };
+    })
+    .filter(Boolean)
+    .sort((a, b) => a.date.localeCompare(b.date));
+
+  return points.length >= 2 ? points : null;
 }

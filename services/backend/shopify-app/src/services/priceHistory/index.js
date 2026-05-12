@@ -2,8 +2,8 @@
  * Main price history orchestrator.
  *
  * Resolves price history for Amazon/Flipkart product URLs by:
- *   1. ProductHistory.in (primary — search-based, no suffix guessing)
- *   2. PriceHistoryApp.com (fallback — slug + search)
+ *   1. PriceHistoryApp.com (primary — direct slug, page-title fallback, search)
+ *   2. ProductHistory.in (fallback — search-based, no suffix guessing)
  *
  * Includes caching to avoid redundant fetches.
  *
@@ -14,11 +14,13 @@ import { extractProductInfoFromUrl } from "./productInfo.js";
 import { lookupProductHistory } from "./productHistoryProvider.js";
 import { lookupPriceHistoryApp } from "./priceHistoryAppProvider.js";
 import { getCached, setCached } from "./cache.js";
-import { createTimeoutSignal } from "./providers.js";
+import { createTimeoutSignal, resolveRedirectUrl } from "./providers.js";
+import { priceHistoryPersistenceService } from "./price-history-persistence-service.js";
+import { priceHistoryReadModelService } from "./price-history-read-model-service.js";
 
 /**
  * Get the best available price history for a product URL.
- * Tries ProductHistory first, falls back to PriceHistoryApp.
+ * Tries PriceHistoryApp first, then falls back to ProductHistory.
  *
  * @param {string} productUrl - Amazon or Flipkart product URL
  * @param {Object} [options]
@@ -26,14 +28,16 @@ import { createTimeoutSignal } from "./providers.js";
  * @returns {Promise<Object>} normalized response shape
  */
 export async function getBestPriceHistoryForProductUrl(productUrl, { signal } = {}) {
+  const startedAt = Date.now();
+  const requestedUrl = String(productUrl || "").trim();
   const attemptedProviders = [];
   let fallbackUsed = false;
 
-  // Extract product info
-  const productInfo = extractProductInfoFromUrl(productUrl);
+  const normalizedUrl = await normalizeProductUrl(productUrl, { signal });
+  const productInfo = extractProductInfoFromUrl(normalizedUrl);
 
   if (!productInfo.isValid || !productInfo.marketplace) {
-    return {
+    const response = {
       status: "unsupported",
       provider: null,
       data: null,
@@ -47,12 +51,34 @@ export async function getBestPriceHistoryForProductUrl(productUrl, { signal } = 
         fallbackUsed: false
       }
     };
+    await safeRecordLookupEvent({
+      requestedUrl,
+      normalizedUrl,
+      product: null,
+      result: response,
+      startedAt
+    });
+    return response;
+  }
+
+  const product = await safeUpsertProductFromInfo({ productInfo, normalizedUrl });
+  const ownedResult = await safeGetOwnedPriceHistory(product);
+  if (ownedResult) {
+    await safeRecordLookupEvent({
+      requestedUrl,
+      normalizedUrl,
+      product,
+      result: ownedResult,
+      startedAt,
+      cacheStatus: "owned"
+    });
+    return ownedResult;
   }
 
   // Check cache
   const cached = getCached(productInfo.cacheKey);
   if (cached) {
-    return {
+    const response = {
       status: cached.status,
       provider: cached.provider,
       data: cached.data,
@@ -70,6 +96,16 @@ export async function getBestPriceHistoryForProductUrl(productUrl, { signal } = 
         fallbackUsed: false
       }
     };
+    await safePersistSuccessfulLookup({ product, result: response });
+    await safeRecordLookupEvent({
+      requestedUrl,
+      normalizedUrl,
+      product,
+      result: response,
+      startedAt,
+      cacheStatus: "hit"
+    });
+    return response;
   }
 
   // Provider total timeout
@@ -81,26 +117,33 @@ export async function getBestPriceHistoryForProductUrl(productUrl, { signal } = 
   }
 
   try {
-    // --- PRIMARY: ProductHistory ---
-    attemptedProviders.push("producthistory");
+    // --- PRIMARY: PriceHistoryApp ---
+    attemptedProviders.push("pricehistoryapp");
 
     let result = null;
     try {
-      result = await lookupProductHistory(productInfo, { signal: timeout.signal });
+      result = await lookupPriceHistoryApp(productInfo, { signal: timeout.signal });
     } catch (error) {
       if (error.name === "AbortError") {
         timeout.clear();
-        return buildTimeoutResponse(attemptedProviders);
+        const response = buildTimeoutResponse(attemptedProviders);
+        await safeRecordLookupEvent({
+          requestedUrl,
+          normalizedUrl,
+          product,
+          result: response,
+          startedAt
+        });
+        return response;
       }
       // Provider failed, continue to fallback
     }
 
     if (result) {
       timeout.clear();
-      setCached(productInfo.cacheKey, "success", "producthistory", result);
-      return {
+      const response = {
         status: "success",
-        provider: "producthistory",
+        provider: "pricehistoryapp",
         data: result,
         meta: {
           cache: "miss",
@@ -108,28 +151,45 @@ export async function getBestPriceHistoryForProductUrl(productUrl, { signal } = 
           fallbackUsed: false
         }
       };
+      setCached(productInfo.cacheKey, "success", "pricehistoryapp", result);
+      await safePersistSuccessfulLookup({ product, result: response });
+      await safeRecordLookupEvent({
+        requestedUrl,
+        normalizedUrl,
+        product,
+        result: response,
+        startedAt
+      });
+      return response;
     }
 
-    // --- FALLBACK: PriceHistoryApp ---
-    attemptedProviders.push("pricehistoryapp");
+    // --- FALLBACK: ProductHistory ---
+    attemptedProviders.push("producthistory");
     fallbackUsed = true;
 
     try {
-      result = await lookupPriceHistoryApp(productInfo, { signal: timeout.signal });
+      result = await lookupProductHistory(productInfo, { signal: timeout.signal });
     } catch (error) {
       if (error.name === "AbortError") {
         timeout.clear();
-        return buildTimeoutResponse(attemptedProviders);
+        const response = buildTimeoutResponse(attemptedProviders);
+        await safeRecordLookupEvent({
+          requestedUrl,
+          normalizedUrl,
+          product,
+          result: response,
+          startedAt
+        });
+        return response;
       }
     }
 
     timeout.clear();
 
     if (result) {
-      setCached(productInfo.cacheKey, "success", "pricehistoryapp", result);
-      return {
+      const response = {
         status: "success",
-        provider: "pricehistoryapp",
+        provider: "producthistory",
         data: result,
         meta: {
           cache: "miss",
@@ -137,11 +197,21 @@ export async function getBestPriceHistoryForProductUrl(productUrl, { signal } = 
           fallbackUsed: true
         }
       };
+      setCached(productInfo.cacheKey, "success", "producthistory", result);
+      await safePersistSuccessfulLookup({ product, result: response });
+      await safeRecordLookupEvent({
+        requestedUrl,
+        normalizedUrl,
+        product,
+        result: response,
+        startedAt
+      });
+      return response;
     }
 
     // Both providers failed
     setCached(productInfo.cacheKey, "empty", null, null);
-    return {
+    const response = {
       status: "empty",
       provider: null,
       data: null,
@@ -155,12 +225,28 @@ export async function getBestPriceHistoryForProductUrl(productUrl, { signal } = 
         fallbackUsed: true
       }
     };
+    await safeRecordLookupEvent({
+      requestedUrl,
+      normalizedUrl,
+      product,
+      result: response,
+      startedAt
+    });
+    return response;
   } catch (error) {
     timeout.clear();
     if (error.name === "AbortError") {
-      return buildTimeoutResponse(attemptedProviders);
+      const response = buildTimeoutResponse(attemptedProviders);
+      await safeRecordLookupEvent({
+        requestedUrl,
+        normalizedUrl,
+        product,
+        result: response,
+        startedAt
+      });
+      return response;
     }
-    return {
+    const response = {
       status: "error",
       provider: null,
       data: null,
@@ -174,6 +260,14 @@ export async function getBestPriceHistoryForProductUrl(productUrl, { signal } = 
         fallbackUsed
       }
     };
+    await safeRecordLookupEvent({
+      requestedUrl,
+      normalizedUrl,
+      product,
+      result: response,
+      startedAt
+    });
+    return response;
   }
 }
 
@@ -197,4 +291,58 @@ function buildTimeoutResponse(attemptedProviders) {
       fallbackUsed: attemptedProviders.length > 1
     }
   };
+}
+
+async function normalizeProductUrl(productUrl, { signal } = {}) {
+  const rawUrl = String(productUrl || "").trim();
+
+  try {
+    const parsed = new URL(rawUrl);
+    if (parsed.hostname.toLowerCase() !== "amzn.in") {
+      return rawUrl;
+    }
+
+    return await resolveRedirectUrl(rawUrl, { signal });
+  } catch {
+    return rawUrl;
+  }
+}
+
+async function safeUpsertProductFromInfo(args) {
+  try {
+    return await priceHistoryPersistenceService.upsertProductFromInfo(args);
+  } catch {
+    return null;
+  }
+}
+
+async function safeGetOwnedPriceHistory(product) {
+  try {
+    return await priceHistoryReadModelService.getOwnedPriceHistory(product);
+  } catch {
+    return null;
+  }
+}
+
+async function safePersistSuccessfulLookup(args) {
+  try {
+    await priceHistoryPersistenceService.persistSuccessfulLookup(args);
+  } catch {
+    // Price-history persistence is diagnostic and ownership-building, not user-facing availability.
+  }
+}
+
+async function safeRecordLookupEvent({ requestedUrl, normalizedUrl, product, result, startedAt, cacheStatus }) {
+  try {
+    await priceHistoryPersistenceService.recordLookupEvent({
+      requestedUrl,
+      normalizedUrl,
+      product,
+      result,
+      elapsedMs: Date.now() - startedAt,
+      cacheStatus
+    });
+  } catch {
+    // Lookup diagnostics should never break lookup compatibility.
+  }
 }

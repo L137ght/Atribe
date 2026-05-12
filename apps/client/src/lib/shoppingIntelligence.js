@@ -243,6 +243,51 @@ function parsePossiblePrice(value) {
   return Number.isFinite(parsed) ? parsed : null;
 }
 
+export function buildPriceSignalFromPriceHistory(priceHistoryData) {
+  const currentPrice = parsePossiblePrice(priceHistoryData?.currentPrice);
+  const lowestSeen = parsePossiblePrice(priceHistoryData?.lowestPrice);
+
+  if (!currentPrice || !lowestSeen) {
+    return null;
+  }
+
+  const percentAboveLow = Math.max(
+    0,
+    Math.round(((currentPrice - lowestSeen) / lowestSeen) * 100)
+  );
+
+  if (percentAboveLow <= 5) {
+    return {
+      status: "good",
+      label: "Good price",
+      detail: `Lowest seen: ${formatCurrency(lowestSeen)} · Current: ${formatCurrency(currentPrice)}`,
+      currentPrice,
+      lowestSeen,
+      percentAboveLow
+    };
+  }
+
+  if (percentAboveLow <= 20) {
+    return {
+      status: "average",
+      label: "Average price",
+      detail: `${percentAboveLow}% above known low · Current: ${formatCurrency(currentPrice)}`,
+      currentPrice,
+      lowestSeen,
+      percentAboveLow
+    };
+  }
+
+  return {
+    status: "high",
+    label: "Price looks high",
+    detail: `${percentAboveLow}% above known low · Lowest seen: ${formatCurrency(lowestSeen)}`,
+    currentPrice,
+    lowestSeen,
+    percentAboveLow
+  };
+}
+
 function buildPriceSignal(record, currentPrice) {
   const observedPrices = Array.isArray(record?.observed_prices)
     ? record.observed_prices
